@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePasswordOptions, validatePasswordStrength } from '@/lib/enhanced-auth';
 import { getSessionUser } from '@/lib/auth';

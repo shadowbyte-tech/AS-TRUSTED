@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, setAuthCookies } from '@/lib/auth';
 import { AUTH_COOKIES } from '@/lib/constants';

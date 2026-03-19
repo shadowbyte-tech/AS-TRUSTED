@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail, createFeedbackEmail } from '@/lib/email-service';
 import { logger } from '@/lib/logger';

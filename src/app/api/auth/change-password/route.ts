@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser, changePassword } from '@/lib/auth';
 import { handleError } from '@/lib/errors';

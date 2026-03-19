@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateUser, setAuthCookies } from '@/lib/auth';
 import { trackLoginAttempt, isAccountLocked, getRemainingLockoutTime } from '@/lib/enhanced-auth';

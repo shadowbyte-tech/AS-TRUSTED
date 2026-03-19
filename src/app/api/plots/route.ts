@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { readPlots, createPlot } from '@/lib/mongodb-database';
 import { PlotSchema } from '@/lib/validation';

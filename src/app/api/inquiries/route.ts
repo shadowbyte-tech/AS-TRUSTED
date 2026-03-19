@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { readInquiries, createInquiry } from '@/lib/mongodb-database';
 import { InquirySchema } from '@/lib/validation';

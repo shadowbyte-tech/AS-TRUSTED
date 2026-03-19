@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { updateProperty, getProperty } from '@/lib/property-database';
 import { PropertySchema } from '@/lib/property-validation';

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { readUsers, writeUsers } from '@/lib/mongodb-database';
 import { verifyToken } from '@/lib/auth';

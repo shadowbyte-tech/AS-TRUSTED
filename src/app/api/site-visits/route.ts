@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createRegistration, readRegistrations } from '@/lib/mongodb-database';
 import { logger } from '@/lib/logger';

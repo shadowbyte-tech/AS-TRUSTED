@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createProperty } from '@/lib/property-database';
 import { logger } from '@/lib/logger';

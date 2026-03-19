@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { readProperties } from '@/lib/property-database';
 import { readInquiries } from '@/lib/mongodb-database';

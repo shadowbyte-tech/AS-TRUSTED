@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateOwner, setAuthCookies } from '@/lib/auth';
 import { sanitizeInput } from '@/lib/security';
