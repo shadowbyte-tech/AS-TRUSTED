@@ -68,9 +68,10 @@ async function initDB() {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('MONGODB CONNECTION FAILED:', message);
 
-    // In production, NEVER silently fall back — surface the error immediately.
+    // In production, log error but ALLOW fallback to JSON instead of crashing
     if (IS_PRODUCTION) {
-      throw new Error(`Database unavailable: ${message}. Check MONGODB_URI and network access.`);
+      logger.warn(`⚠️ PROD MODE: Database down. Falling back to multi-file JSON storage! (${message})`);
+      return false;
     }
 
     // In development, fall back to JSON storage with a clear warning.
