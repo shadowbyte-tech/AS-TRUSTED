@@ -436,24 +436,49 @@ export default function HomePage() {
               </Button>
             </div>
             
-            {/* MongoDB Test Section */}
+            {/* Database Management Section */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-md mx-auto">
-              <h3 className="text-xl font-bold mb-4">Database Connection Status</h3>
-              <Button 
-                size="lg" 
-                className="w-full bg-white text-primary hover:bg-gray-100"
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/test-mongodb');
-                    const data = await response.json();
-                    alert(data.message + (data.error ? '\nError: ' + data.error : ''));
-                  } catch (error) {
-                    alert('Failed to test database connection');
-                  }
-                }}
-              >
-                Test MongoDB Connection
-              </Button>
+              <h3 className="text-xl font-bold mb-4">Database Management</h3>
+              <div className="space-y-3">
+                <Button 
+                  size="lg" 
+                  className="w-full bg-white text-primary hover:bg-gray-100"
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/test-mongodb');
+                      const data = await response.json();
+                      alert(data.message + (data.error ? '\nError: ' + data.error : '') + (data.stats ? `\n\nUsers: ${data.stats.users}\nPlots: ${data.stats.plots}` : ''));
+                    } catch (error) {
+                      alert('Failed to test database connection');
+                    }
+                  }}
+                >
+                  Test MongoDB Connection
+                </Button>
+                
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="w-full border-white/30 hover:bg-white/10 text-white"
+                  onClick={async () => {
+                    if (confirm('This will migrate all your JSON data to MongoDB. Continue?')) {
+                      try {
+                        const response = await fetch('/api/migrate-to-mongodb', { method: 'POST' });
+                        const data = await response.json();
+                        if (data.success) {
+                          alert(`✅ Migration successful!\n\nUsers: ${data.stats.users}\nPlots: ${data.stats.plots}\nTotal Collections: ${data.stats.totalCollections}`);
+                        } else {
+                          alert(`❌ Migration failed: ${data.error}`);
+                        }
+                      } catch (error) {
+                        alert('Failed to run migration');
+                      }
+                    }
+                  }}
+                >
+                  Migrate Data to MongoDB
+                </Button>
+              </div>
             </div>
           </div>
         </section>
