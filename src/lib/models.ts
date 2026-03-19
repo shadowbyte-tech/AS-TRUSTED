@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import { validateAndLogEnv } from './env-validation';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongo:EjsxsuzJugCZgAsKqatOvTvXpSNPdfUt@caboose.proxy.rlwy.net:31433';
+// Hardcoded to new Railway proxy to bypass stale Atlas URI in Vercel settings
+const MONGODB_URI = 'mongodb://mongo:EjsxsuzJugCZgAsKqatOvTvXpSNPdfUt@caboose.proxy.rlwy.net:31433';
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────
 const AuditLogSchema = new mongoose.Schema({
