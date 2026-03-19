@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/property-database';
 import { logger } from '@/lib/logger';
 
+// ✅ ADD THIS LINE - Prevents running during build
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     logger.info('🔧 Adding missing columns to properties table...');
