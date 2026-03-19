@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Note: Sensitive environment variables should be added in Netlify UI
+# This file is for build configuration only
+# Add MONGODB_URI, GEMINI_API_KEY, and JWT_SECRET in Netlify dashboard

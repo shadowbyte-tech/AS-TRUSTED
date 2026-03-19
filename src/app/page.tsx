@@ -1,198 +1,447 @@
-import { ASLogo } from '@/components/as-logo';
-import { Header } from '@/components/header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Handshake, Scale, Sparkles, MapPin, TrendingUp, DollarSign, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { SimpleHeader } from '@/components/simple-header';
+import { Footer } from '@/components/footer';
+import { MobileStickyActions } from '@/components/mobile-sticky-actions';
+import HeroSection from '@/components/hero-section';
+import TrustBadges from '@/components/trust-badges';
+import InvestmentStats from '@/components/investment-stats';
+import InvestmentZones from '@/components/investment-zones';
+import MarketIntelligence from '@/components/market-intelligence';
+import Testimonials from '@/components/testimonials';
+import InvestmentJourney from '@/components/investment-journey';
+import TelanganaMap from '@/components/telangana-map';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, TrendingUp, Shield, Crown, Star, Users, ArrowRight, CheckCircle, BarChart3, Play } from 'lucide-react';
 import Link from 'next/link';
-import { getPlots } from '@/lib/actions';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { safeGenerateMarketInsights } from '@/lib/ai-safe';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
+import type { Plot } from '@/lib/definitions';
 
-export const dynamic = 'force-dynamic';
+export default function HomePage() {
+  const [plots, setPlots] = useState<Plot[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [roiInput, setRoiInput] = useState('1000000');
+  const [roi1yr, setRoi1yr] = useState(0);
+  const [roi3yr, setRoi3yr] = useState(0);
+  const [roi5yr, setRoi5yr] = useState(0);
 
-const aboutItems = [
-    {
-        icon: Handshake,
-        title: "Trust & Transparency",
-        description: "We believe in clear, honest communication. Every plot we list is thoroughly verified, ensuring you have complete peace of mind."
-    },
-    {
-        icon: Sparkles,
-        title: "Expert Guidance",
-        description: "With years of experience in the real estate market, we provide expert advice, from Vastu analysis to future development potential."
-    },
-    {
-        icon: Scale,
-        title: "Integrity First",
-        description: "Our business is built on a foundation of integrity. We are committed to ethical practices and building long-lasting relationships with our clients."
-    }
-];
-
-export default async function Home() {
-    const plots = await getPlots();
-    let insights = null;
-    let insightsError = null;
-
-    // Use safe AI wrapper
-    if (plots.length > 0) {
-        try {
-            const plotSummaries = plots.map(p => ({ 
-                areaName: p.areaName, 
-                villageName: p.villageName, 
-                plotFacing: p.plotFacing, 
-                plotSize: p.plotSize 
-            }));
-            
-            insights = await safeGenerateMarketInsights(plotSummaries);
-        } catch(e) {
-            console.error("Failed to generate market insights:", e);
-            insightsError = "Could not load AI market insights. The model may be busy or unavailable. Please check back later.";
+  useEffect(() => {
+    const fetchPlots = async () => {
+      try {
+        const response = await fetch('/api/plots', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const plotsResponse = await response.json();
+          setPlots(plotsResponse.data || []);
+        } else {
+          console.error('Failed to fetch plots:', response.statusText);
         }
-    }
+      } catch (error) {
+        console.error('Failed to fetch plots:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlots();
+  }, []);
+
+  useEffect(() => {
+    const calculateROI = (principal: number, years: number, rate: number) => {
+      return principal * Math.pow(1 + rate, years);
+    };
+
+    const principal = parseFloat(roiInput) || 0;
+    const rate = 0.15; // 15% annual return - more realistic for land investment
+
+    setRoi1yr(calculateROI(principal, 1, rate));
+    setRoi3yr(calculateROI(principal, 3, rate));
+    setRoi5yr(calculateROI(principal, 5, rate));
+  }, [roiInput]);
+
+  const featuredPlots = Array.isArray(plots) ? plots.slice(0, 3) : [];
 
   return (
-    <div className="flex flex-col overflow-hidden">
-       <Header />
+    <div className="flex flex-col min-h-screen bg-background">
+      <SimpleHeader />
 
-       {/* Hero Section with Video Background */}
-       <section className="relative w-full py-20 md:py-32 lg:py-40 bg-background overflow-hidden">
-         {/* Video Background */}
-         <div className="absolute inset-0 w-full h-full overflow-hidden">
-           <video
-             autoPlay
-             loop
-             muted
-             playsInline
-             className="absolute w-full h-full object-cover opacity-100"
-           >
-             <source src="/videos/Real_Estate_Aerial.mp4" type="video/mp4" />
-             {/* Fallback to animated background if video doesn't load */}
-           </video>
-           {/* Overlay gradient for text readability */}
-           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/70"></div>
-         </div>
+      <main>
+        {/* Phase 1: Institutional Authority */}
+        <HeroSection />
+        <TrustBadges />
+        <InvestmentStats />
 
-         {/* Animated Gradient Overlay */}
-         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background/50 to-secondary/5 animate-gradient-shift"></div>
-         
-         {/* Floating Shapes */}
-         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-           <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float-delayed"></div>
-           <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"></div>
-         </div>
-
-         <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom dark:border-b dark:border-slate-100/5" style={{ maskImage: 'linear-gradient(to bottom, transparent, black, black, transparent)'}}></div>
-        
-        <div className="container relative px-4 md:px-6 z-10">
-          <div className="flex flex-col items-center space-y-6 text-center">
-            <div className="animate-fade-in-up">
-              <ASLogo className="h-24 w-24 animate-bounce-slow" />
+        {/* Phase 1.5: Real Success Story */}
+        <section className="py-12 md:py-16 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5">
+          <div className="container px-4 text-center">
+            <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30 mb-4 text-xs">
+              Real Success Story
+            </Badge>
+            <h2 className="text-2xl md:text-4xl font-bold font-headline mb-4">
+              <span className="text-emerald-600">₹10L invested in Kamareddy land in 2021</span> is worth <span className="text-emerald-600">₹18L today</span>
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+              80% ROI in just 3 years through strategic infrastructure development and location appreciation
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6">
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                <MapPin className="h-3 w-3 md:h-4 md:w-4 text-primary" />
+                <span className="text-xs md:text-sm font-medium text-primary">Kamareddy, Telangana</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-primary" />
+                <span className="text-xs md:text-sm font-medium text-primary">+15% Annual ROI</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                <Shield className="h-3 w-3 md:h-4 md:w-4 text-primary" />
+                <span className="text-xs md:text-sm font-medium text-primary">DTCP Approved</span>
+              </div>
             </div>
-            <div className="space-y-4 animate-fade-in-up animation-delay-200">
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary animate-gradient-x">
-                Find Your Future Property
-              </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Your trusted partner in real estate.
+          </div>
+        </section>
+
+        {/* Phase 1.6: 6 Motivational Boxes */}
+        <section className="py-16 bg-gradient-to-r from-primary/5 via-transparent to-accent/5">
+          <div className="container px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold font-headline mb-4">
+                  Capital <span className="text-primary">Today</span>, <span className="text-accent">Tomorrow's</span> Pride
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                  Click on any motivation to discover how smart investors build lasting wealth through strategic land investments
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Box 1: Capital Today Tomorrow's Wealth */}
+                <Link href="/capital-today-tomorrow" className="group">
+                  <Card className="relative overflow-hidden border-primary/20 h-full transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-primary/40 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative text-center pb-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-bold text-primary group-hover:text-primary/80 transition-colors">
+                        Capital Strategy
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative text-center">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Strategic timing for maximum appreciation in Telangana's growth corridor
+                      </p>
+                      <div className="mt-4 flex items-center justify-center text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Explore →
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                {/* Box 2: Legacy Wealth */}
+                <Link href="/legacy-wealth" className="group">
+                  <Card className="relative overflow-hidden border-emerald-500/20 h-full transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-emerald-500/40 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative text-center pb-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-emerald-500 to-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Star className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-bold text-emerald-600 group-hover:text-emerald-500/80 transition-colors">
+                        Legacy Building
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative text-center">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Land investments that last generations and create family heritage
+                      </p>
+                      <div className="mt-4 flex items-center justify-center text-xs text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Build Legacy →
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                {/* Box 3: Smart Investment */}
+                <Link href="/smart-investment" className="group">
+                  <Card className="relative overflow-hidden border-blue-500/20 h-full transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-blue-500/40 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative text-center pb-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <BarChart3 className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-bold text-blue-600 group-hover:text-blue-500/80 transition-colors">
+                        AI Intelligence
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative text-center">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Data-driven decisions with AI-powered market insights
+                      </p>
+                      <div className="mt-4 flex items-center justify-center text-xs text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Unlock AI →
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                {/* Box 4: Secure Future */}
+                <Link href="/secure-future" className="group">
+                  <Card className="relative overflow-hidden border-amber-500/20 h-full transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-amber-500/40 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative text-center pb-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Shield className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-bold text-amber-600 group-hover:text-amber-500/80 transition-colors">
+                        Bank Security
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative text-center">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        30-point legal verification with title insurance protection
+                      </p>
+                      <div className="mt-4 flex items-center justify-center text-xs text-amber-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Secure Now →
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                {/* Box 5: Exponential Growth */}
+                <Link href="/exponential-growth" className="group">
+                  <Card className="relative overflow-hidden border-purple-500/20 h-full transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-purple-500/40 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative text-center pb-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-bold text-purple-600 group-hover:text-purple-500/80 transition-colors">
+                        3X Returns
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative text-center">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Compounding wealth with 25% annual growth potential
+                      </p>
+                      <div className="mt-4 flex items-center justify-center text-xs text-purple-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Multiply Wealth →
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                {/* Box 6: Premium Club */}
+                <Link href="/premium-club" className="group">
+                  <Card className="relative overflow-hidden border-rose-500/20 h-full transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-rose-500/40 cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500/10 to-gold-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative text-center pb-4">
+                      <div className="h-12 w-12 bg-gradient-to-r from-rose-500 to-gold-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Crown className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-bold text-rose-600 group-hover:text-rose-500/80 transition-colors">
+                        Elite Club
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative text-center">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        VIP access to exclusive deals and personalized advisory
+                      </p>
+                      <div className="mt-4 flex items-center justify-center text-xs text-rose-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Join Elite →
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Phase 1.75: ROI Calculator */}
+        <section className="py-12 md:py-16 bg-background">
+          <div className="container px-4">
+            <div className="text-center mb-8 md:mb-12">
+              <Badge className="bg-primary/20 text-primary border-primary/30 mb-4 text-xs">
+                Investment Calculator
+              </Badge>
+              <h2 className="text-2xl md:text-4xl font-bold font-headline mb-4">
+                Calculate Your <span className="text-primary">Investment Returns</span>
+              </h2>
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+                See how your investment grows with our proven 15% annual returns
+              </p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-primary/20 shadow-2xl">
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Investment Amount (₹)</label>
+                  <input 
+                    type="number" 
+                    placeholder="1000000" 
+                    className="w-full h-12 px-4 rounded-lg border border-input bg-background text-lg font-medium"
+                    id="roi-calculator-input"
+                    value={roiInput}
+                    onChange={(e) => setRoiInput(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                  <div className="p-3 md:p-4 bg-white rounded-lg border border-border">
+                    <p className="text-sm text-muted-foreground">1 Year</p>
+                    <p className="text-xl md:text-2xl font-bold text-primary">₹{roi1yr.toLocaleString()}</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-white rounded-lg border border-border">
+                    <p className="text-sm text-muted-foreground">3 Years</p>
+                    <p className="text-xl md:text-2xl font-bold text-emerald-500">₹{roi3yr.toLocaleString()}</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-white rounded-lg border border-border">
+                    <p className="text-sm text-muted-foreground">5 Years</p>
+                    <p className="text-xl md:text-2xl font-bold text-purple-500">₹{roi5yr.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">At 15% annual returns with compound growth</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Investment Journey */}
+        <section className="py-12 md:py-16 bg-background">
+          <div className="container px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-4xl font-bold font-headline mb-2">
+                Your <span className="text-primary">Investment Journey</span>
+              </h2>
+              <p className="text-base text-muted-foreground max-w-xl mx-auto">
+                Track your path from browsing to owning premium land — every step unlocks more value.
+              </p>
+            </div>
+            <div className="max-w-lg mx-auto">
+              <InvestmentJourney currentStep="browsed" />
+            </div>
+          </div>
+        </section>
+
+        {/* Phase 1.85: Real Testimonials */}
+        <Testimonials />
+
+        {/* Phase 2: Market Intelligence */}
+        <InvestmentZones />
+        <TelanganaMap />
+        <MarketIntelligence />
+
+        {/* Phase 3: Aerial Insights Section */}
+        <section className="relative h-[40vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary/10 to-background">
+          <div className="container relative z-10 text-center space-y-6">
+            <h2 className="text-4xl md:text-6xl font-headline text-foreground drop-shadow-lg">
+              Aerial Insights <br />
+              <span className="text-accent italic">Infrastructure Transparency</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Get comprehensive aerial views and detailed infrastructure analysis for informed investment decisions.
+            </p>
+            <div className="mt-8">
+              <p className="text-sm text-primary font-medium">
+                🔒 Premium feature - Register and login to access detailed insights
               </p>
             </div>
           </div>
-        </div>
-      </section>
-      
-      {insights && (
-        <section className="py-12 md:py-24 bg-secondary/30">
-            <div className="container px-4 md:px-6">
-                 <div className="text-center space-y-4 mb-12">
-                    <h2 className="text-3xl font-bold tracking-tighter font-headline">AI-Powered Market Insights</h2>
-                    <p className="max-w-3xl mx-auto text-muted-foreground">
-                        We leverage AI to analyze our listings and provide you with exclusive market intelligence. Register to unlock detailed plot information.
-                    </p>
-                </div>
-                 <div className="grid gap-8 md:grid-cols-3">
-                    <Card className="p-6 text-center">
-                        <CardContent className="flex flex-col items-center gap-4">
-                            <div className="bg-primary/10 p-4 rounded-full">
-                                <MapPin className="h-8 w-8 text-primary" />
-                            </div>
-                            <h3 className="text-xl font-bold font-headline">Hotspot Area</h3>
-                            <p className="text-muted-foreground">{insights.hotspotArea}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="p-6 text-center">
-                        <CardContent className="flex flex-col items-center gap-4">
-                            <div className="bg-primary/10 p-4 rounded-full">
-                                <TrendingUp className="h-8 w-8 text-primary" />
-                            </div>
-                            <h3 className="text-xl font-bold font-headline">Trending Opportunity</h3>
-                            <p className="text-muted-foreground">{insights.trendingOpportunity}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="p-6 text-center">
-                        <CardContent className="flex flex-col items-center gap-4">
-                            <div className="bg-primary/10 p-4 rounded-full">
-                                <DollarSign className="h-8 w-8 text-primary" />
-                            </div>
-                            <h3 className="text-xl font-bold font-headline">Investment Teaser</h3>
-                            <p className="text-muted-foreground">{insights.investmentTeaser}</p>
-                        </CardContent>
-                    </Card>
-                 </div>
-
-                 <div className="text-center mt-12">
-                     <Button asChild size="lg">
-                         <Link href="/register">
-                             Register for Exclusive Access <ArrowRight className="ml-2 h-4 w-4" />
-                         </Link>
-                     </Button>
-                 </div>
-            </div>
         </section>
-      )}
 
-      {insightsError && (
-        <div className="container px-4 md:px-6 py-8">
-            <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Insights Unavailable</AlertTitle>
-                <AlertDescription>{insightsError}</AlertDescription>
-            </Alert>
-        </div>
-      )}
 
-      <section className="py-12 md:py-24 bg-background relative overflow-hidden">
-        {/* Subtle animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-background"></div>
-        
-        <div className="container px-4 md:px-6 relative z-10">
-            <div className="text-center space-y-4 mb-12 animate-fade-in-up">
-                <h2 className="text-3xl font-bold tracking-tighter font-headline">Why Choose Us?</h2>
-                <p className="max-w-3xl mx-auto text-muted-foreground">
-                    At AS Trusted Consultancy, we're more than just real estate agents; we are your partners in building a secure future. We are dedicated to helping you find the perfect piece of land that meets your needs and exceeds your expectations.
-                </p>
+        {/* Phase 5: Why Elite Trust */}
+        <section id="about" className="py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-20 items-center">
+              <div className="relative aspect-square">
+                <div className="absolute inset-0 bg-primary/5 rounded-[4rem] -rotate-3" />
+                <div className="absolute inset-0 bg-accent/5 rounded-[4rem] rotate-3" />
+                <div className="relative h-full w-full rounded-[4rem] overflow-hidden border border-border/50 group">
+                  <img
+                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000"
+                    alt="Luxury Building"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
+                  />
+                  <div className="absolute inset-0 bg-primary/20 mix-blend-multiply opacity-40" />
+                </div>
+
+                <div className="absolute -bottom-10 -right-10 p-10 glass-dark rounded-[2.5rem] border border-white/10 max-w-sm hidden md:block">
+                  <p className="text-white italic text-lg leading-relaxed mb-6">
+                    "We don't just sell plots; we architect legacy wealth through land intelligence."
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="h-px w-12 bg-accent" />
+                    <span className="text-accent text-xs font-black uppercase tracking-widest">Sri Swamy, Founder</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-10">
+                <h2 className="text-4xl md:text-6xl font-headline tracking-tight">The AS <span className="text-primary">Trusted</span> <br /> Institutional Edge.</h2>
+                <div className="space-y-8">
+                  <div className="flex gap-6">
+                    <div className="shrink-0 w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <Shield className="w-7 h-7 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-bold font-headline">Uncompromising Verification</h4>
+                      <p className="text-muted-foreground leading-relaxed">Our legal team performs a 30-year link-document verification on every listing we publish.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6">
+                    <div className="shrink-0 w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center">
+                      <TrendingUp className="w-7 h-7 text-accent" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-bold font-headline">Data-Driven Appreciation</h4>
+                      <p className="text-muted-foreground leading-relaxed">We exclusive source plots in zones with upcoming infrastructure catalysts and IT expansion corridors.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6">
+                    <div className="shrink-0 w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <MapPin className="w-7 h-7 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-bold font-headline">Strategic Site Visits</h4>
+                      <p className="text-muted-foreground leading-relaxed">Experience zero-friction site visits with personalized advisor walkthroughs and layout transparency.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="grid gap-8 md:grid-cols-3">
-                {aboutItems.map((item, index) => (
-                    <Card 
-                      key={item.title} 
-                      className="text-center p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:border-primary/50 animate-fade-in-up"
-                      style={{ animationDelay: `${index * 0.2}s` }}
-                    >
-                        <CardContent className="flex flex-col items-center gap-4">
-                           <div className="bg-primary/10 p-4 rounded-full transition-all duration-300 hover:bg-primary/20 hover:scale-110">
-                             <item.icon className="h-8 w-8 text-primary" />
-                           </div>
-                           <h3 className="text-xl font-bold font-headline">{item.title}</h3>
-                           <p className="text-muted-foreground">{item.description}</p>
-                        </CardContent>
-                    </Card>
-                ))}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-24 bg-primary text-white text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+          <div className="container relative z-10 px-4">
+            <h2 className="text-4xl md:text-7xl font-headline mb-8">Ready to <span className="text-accent">Invest</span> In <br /> Strategic Land?</h2>
+            <div className="flex flex-wrap justify-center gap-6">
+              <Button size="lg" className="h-16 px-12 rounded-full bg-accent text-primary hover:bg-white transition-all font-black uppercase tracking-widest text-lg" asChild>
+                <Link href="/properties">Start Browsing</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="h-16 px-12 rounded-full border-white/30 hover:bg-white/10 transition-all font-black uppercase tracking-widest text-lg" asChild>
+                <Link href="/about">Our Strategy</Link>
+              </Button>
             </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+      <MobileStickyActions />
     </div>
+
   );
 }

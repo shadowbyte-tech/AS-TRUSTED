@@ -1,0 +1,30 @@
+
+> nextn@0.1.0 build
+> next build
+
+   Ôû▓ Next.js 15.5.12
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     ┬À serverActions
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 35.1s
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/app/premium-properties/page.tsx:409:33
+Type error: Type 'Property' is not assignable to type 'import("C:/Users/Manikanta/Desktop/AS TRUSTED CONSULTANCY/src/lib/definitions").Property'.
+  Type 'Property' is not assignable to type 'Plot'.
+    Type 'Property' is not assignable to type 'BaseProperty'.
+      Types of property 'status' are incompatible.
+        Type 'string | undefined' is not assignable to type 'PropertyStatus | undefined'.
+          Type 'string' is not assignable to type 'PropertyStatus | undefined'.
+
+  407 |           <section className="py-8">
+  408 |             <div className="container px-4">
+> 409 |               <AIDecisionEngine property={selectedProperty} />
+      |                                 ^
+  410 |             </div>
+  411 |           </section>
+  412 |         )}
+Next.js build worker exited with code: 1 and signal: null

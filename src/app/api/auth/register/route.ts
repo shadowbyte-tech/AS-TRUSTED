@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { registerUser, generateToken } from '@/lib/auth';
+import { registerUser, setAuthCookies } from '@/lib/auth';
 import { handleError, ValidationError } from '@/lib/errors';
 import { API_MESSAGES, VALIDATION } from '@/lib/constants';
 
@@ -31,12 +31,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = generateToken(user);
+    // Set secure HTTP-only cookies
+    await setAuthCookies(user);
 
     return NextResponse.json({
       success: true,
       user,
-      token,
     });
   } catch (error) {
     const { message, statusCode } = handleError(error);

@@ -2,6 +2,7 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createContact, updateContact } from '@/lib/actions';
 import type { Contact, State } from '@/lib/definitions';
 import { Button } from './ui/button';
@@ -38,6 +39,7 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
 
 export default function ContactForm({ contact }: { contact?: Contact }) {
   const { toast } = useToast();
+  const router = useRouter();
   const initialState: State = { message: null, errors: {}, success: false };
   
   const action = contact ? updateContact.bind(null, contact.id) : createContact;
@@ -50,8 +52,17 @@ export default function ContactForm({ contact }: { contact?: Contact }) {
         description: state.message,
         variant: 'destructive',
       });
+    } else if (state?.success && state?.message) {
+      toast({
+        title: 'Success',
+        description: state.message,
+      });
+      // Redirect after successful submission
+      setTimeout(() => {
+        router.push('/dashboard/contacts');
+      }, 1500);
     }
-  }, [state, toast]);
+  }, [state, toast, router]);
   
 
   return (

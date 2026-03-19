@@ -61,14 +61,14 @@ export default function RegistrationForm() {
                         <div className="space-y-6">
                              <Alert variant="default" className="border-green-500/50 text-green-700 dark:text-green-400 [&>svg]:text-green-600 dark:[&>svg]:text-green-400">
                                 <CheckCircle className="h-4 w-4" />
-                                <AlertTitle>Registration Submitted!</AlertTitle>
+                                <AlertTitle>Registration Submitted Successfully!</AlertTitle>
                                 <AlertDescription>
-                                    <p>Thank you for your interest. The owner has been notified and will contact you shortly to provide login details.</p>
+                                    <p>Thank you for your interest in AS Trusted Consultancy. The owner has been notified and will contact you shortly with login details and investment opportunities.</p>
                                 </AlertDescription>
                             </Alert>
 
                              <div className="p-4 rounded-lg bg-muted border">
-                                <p className="text-sm font-semibold text-muted-foreground mb-4">For demo purposes, this is the WhatsApp notification the owner would receive:</p>
+                                <p className="text-sm font-semibold text-muted-foreground mb-4">📱 WhatsApp notification sent to owner:</p>
                                 <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/50 shadow-sm w-full max-w-sm mx-auto">
                                     <div className="flex items-start gap-2.5">
                                         <div className="flex-shrink-0 bg-green-500 text-white rounded-full h-8 w-8 flex items-center justify-center">
@@ -76,24 +76,30 @@ export default function RegistrationForm() {
                                         </div>
                                         <div className="flex flex-col gap-1 w-full">
                                             <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                                <span className="text-sm font-semibold text-gray-900 dark:text-white">New Lead Alert!</span>
+                                                <span className="text-sm font-semibold text-gray-900 dark:text-white">🏠 New Registration Alert!</span>
                                             </div>
                                             <div className="flex flex-col leading-1.5 p-3 border-gray-200 bg-gray-50 rounded-e-xl rounded-es-xl dark:bg-gray-700">
                                                 <p className="text-sm font-normal text-gray-900 dark:text-white">
-                                                    Name: {state.registration.name}
-                                                    <br />
-                                                    Phone: {state.registration.phone}
+                                                    Name: {state.registration.name}<br />
+                                                    Phone: {state.registration.phone}<br />
+                                                    Email: {state.registration.email}
                                                 </p>
                                             </div>
-                                             <Button asChild size="sm" className="mt-2 bg-green-600 hover:bg-green-700 w-full">
-                                                <a 
-                                                    href={`https://wa.me/${state.registration.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello ${state.registration.name}, this is the owner from AS Trusted Consultancy.`)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    Contact Lead via WhatsApp
-                                                </a>
-                                            </Button>
+                                             <div className="mt-2 space-y-2">
+                                                <Button asChild size="sm" className="bg-green-600 hover:bg-green-700 w-full">
+                                                    <a 
+                                                        href={`https://wa.me/919866404090?text=${encodeURIComponent(`Hello Sri Swamy Goud from AS Trusted Consultancy,\n\nI'm interested in your property investment opportunities. Here are my details:\n\nName: ${state.registration.name}\nPhone: ${state.registration.phone}\nEmail: ${state.registration.email}\n\nPlease contact me with more information about available properties and investment options.`)}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <MessageCircle className="mr-2 h-4 w-4" />
+                                                        Contact Owner via WhatsApp
+                                                    </a>
+                                                </Button>
+                                                <p className="text-xs text-muted-foreground text-center">
+                                                    📞 Owner: +91 98664 04090
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -1,12 +1,13 @@
 import { Badge } from './ui/badge';
-import type { PlotStatus } from '@/lib/definitions';
+import type { PropertyStatus } from '@/lib/definitions';
 
 interface PlotStatusBadgeProps {
-  status?: PlotStatus;
+  status?: PropertyStatus;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function PlotStatusBadge({ status = 'Available' }: PlotStatusBadgeProps) {
-  const getStatusColor = (status: PlotStatus) => {
+export function PlotStatusBadge({ status = 'Available', size = 'md' }: PlotStatusBadgeProps) {
+  const getStatusColor = (status: PropertyStatus) => {
     switch (status) {
       case 'Available':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-200';
@@ -21,8 +22,14 @@ export function PlotStatusBadge({ status = 'Available' }: PlotStatusBadgeProps) 
     }
   };
 
+  const sizeClasses = {
+    sm: 'px-2 py-0.5 text-[10px]',
+    md: 'px-2.5 py-0.5 text-xs',
+    lg: 'px-3 py-1 text-sm'
+  };
+
   return (
-    <Badge variant="outline" className={`${getStatusColor(status)} font-medium`}>
+    <Badge variant="outline" className={`${getStatusColor(status)} ${sizeClasses[size]} font-bold uppercase tracking-wider`}>
       {status}
     </Badge>
   );

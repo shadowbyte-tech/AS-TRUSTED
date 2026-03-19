@@ -12,7 +12,7 @@ export default function DashboardSidebar({ newRegistrationCount }: { newRegistra
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/upload', label: 'Upload Plot', icon: FileUp },
+    { href: '/upload-property/select-type', label: 'Upload Property', icon: FileUp },
     { href: '/dashboard/registrations', label: 'Registrations', icon: UserCheck, notificationCount: newRegistrationCount },
     { href: '/dashboard/inquiries', label: 'Inquiries', icon: MessageSquare },
     { href: '/dashboard/contacts', label: 'Contacts', icon: Landmark },
@@ -22,7 +22,7 @@ export default function DashboardSidebar({ newRegistrationCount }: { newRegistra
 
 
   return (
-    <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
+    <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex relative z-20">
       <div className="flex items-center space-x-2 mb-8">
         <Link href="/" className="flex items-center space-x-2">
             <ASLogo className="h-8 w-8 text-primary" />

@@ -16,9 +16,10 @@ export default async function DashboardLayout({
     <AuthGuard>
       <div className="flex min-h-screen">
         <DashboardSidebar newRegistrationCount={newRegistrationCount} />
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 w-full overflow-x-hidden">
+          <MobileSidebar />
           <Header />
-          <main className="flex-1 overflow-x-hidden bg-muted/40 p-4 md:p-8">
+          <main className="flex-1 bg-muted/40 p-2 sm:p-4 md:p-8">
             {children}
           </main>
         </div>

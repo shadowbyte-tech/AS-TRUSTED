@@ -1,0 +1,15 @@
+
+> nextn@0.1.0 typecheck
+> tsc --noEmit
+
+.next/types/validator.ts(702,31): error TS2344: Type 'typeof import("C:/Users/Manikanta/Desktop/AS TRUSTED CONSULTANCY/src/app/api/properties/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/properties/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<Property>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+src/app/api/plots/route.ts(36,51): error TS18046: 'error' is of type 'unknown'.
+src/app/api/plots/route.ts(37,49): error TS18046: 'error' is of type 'unknown'.
+src/app/normal-properties/page.tsx(95,52): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/premium-dashboard/page.tsx(49,55): error TS7006: Parameter 'p' implicitly has an 'any' type.

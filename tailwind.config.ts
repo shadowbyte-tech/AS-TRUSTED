@@ -1,5 +1,5 @@
-import type {Config} from 'tailwindcss';
-import {fontFamily} from 'tailwindcss/defaultTheme';
+import type { Config } from 'tailwindcss';
+import { fontFamily } from 'tailwindcss/defaultTheme';
 
 export default {
   darkMode: ['class'],
@@ -11,9 +11,12 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
+      padding: {
+        DEFAULT: '1rem',
+        sm: '2rem',
+        lg: '4rem',
+        xl: '5rem',
+        '2xl': '6rem',
       },
     },
     extend: {
@@ -85,10 +88,17 @@ export default {
             height: '0',
           },
         },
+        'shimmer': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'shimmer': 'shimmer 2s infinite linear',
+        'reveal': 'reveal 1s cubic-bezier(0.77, 0, 0.175, 1) forwards',
+        'smooth-scale': 'smooth-scale 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards',
       },
     },
   },

@@ -1,0 +1,12 @@
+src/components/plot-form.tsx(5,40): error TS2307: Cannot find module '@/lib/actions' or its corresponding type declarations.
+src/components/plot-form.tsx(6,46): error TS2307: Cannot find module '@/lib/definitions' or its corresponding type declarations.
+src/components/plot-form.tsx(14,26): error TS2307: Cannot find module '@/hooks/use-toast' or its corresponding type declarations.
+src/components/plot-form.tsx(252,59): error TS2345: Argument of type 'HTMLFormElement' is not assignable to parameter of type 'FormData'.
+  Type 'HTMLFormElement' is missing the following properties from type 'FormData': delete, get, getAll, has, and 2 more.
+src/components/ui/alert.tsx(4,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/ui/button.tsx(6,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/ui/card.tsx(3,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/ui/input.tsx(3,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/ui/label.tsx(7,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/ui/select.tsx(7,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+src/components/ui/textarea.tsx(3,18): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.

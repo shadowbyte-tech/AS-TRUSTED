@@ -12,17 +12,17 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!isLoading && (!user || user.role !== 'Owner')) {
+    if (!isLoading && (!user || (user.role !== 'Owner' && user.role !== 'Premium'))) {
       toast({
         title: 'Access Denied',
-        description: 'You must be an owner to view this page.',
+        description: 'You must be an owner or premium user to view this page.',
         variant: 'destructive',
       });
-      router.replace('/login');
+      router.replace('/user-login');
     }
   }, [user, isLoading, router, toast]);
 
-  if (isLoading || !user || user.role !== 'Owner') {
+  if (isLoading || !user || (user.role !== 'Owner' && user.role !== 'Premium')) {
     return (
         <div className="w-full h-screen flex items-center justify-center">
             <div className="space-y-4 p-8 w-full max-w-md">

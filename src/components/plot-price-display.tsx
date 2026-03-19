@@ -3,13 +3,15 @@ interface PlotPriceDisplayProps {
   pricePerSqft?: number;
   priceNegotiable?: boolean;
   size?: 'small' | 'medium' | 'large';
+  className?: string;
 }
 
-export function PlotPriceDisplay({ 
-  price, 
-  pricePerSqft, 
+export function PlotPriceDisplay({
+  price,
+  pricePerSqft,
   priceNegotiable,
-  size = 'medium' 
+  size = 'medium',
+  className
 }: PlotPriceDisplayProps) {
   const formatPrice = (amount: number) => {
     if (amount >= 10000000) {
@@ -42,7 +44,7 @@ export function PlotPriceDisplay({
   }
 
   return (
-    <div className="space-y-1">
+    <div className={`space-y-1 ${className || ''}`}>
       <div className="flex items-baseline gap-2">
         <p className={`font-bold ${textSizes[size]}`}>
           {formatPrice(price)}

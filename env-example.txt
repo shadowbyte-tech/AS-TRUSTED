@@ -1,0 +1,11 @@
+# Email Service Configuration
+RESEND_API_KEY=your_resend_api_key_here
+
+# Database Configuration
+DATABASE_URL=file:./database.db
+
+# Next.js Configuration
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+# WhatsApp Configuration
+NEXT_PUBLIC_WHATSAPP_NUMBER=919866404090

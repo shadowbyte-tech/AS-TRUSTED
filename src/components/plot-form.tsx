@@ -18,6 +18,15 @@ import { Textarea } from './ui/textarea';
 import { useRouter } from 'next/navigation';
 
 const plotFacings: PlotFacing[] = ['North', 'South', 'East', 'West', 'North-East', 'North-West', 'South-East', 'South-West'];
+const propertyTypes = [
+  { value: 'plot', label: 'Plot/Land' },
+  { value: 'house', label: 'Independent House' },
+  { value: 'villa', label: 'Villa' },
+  { value: 'apartment', label: 'Apartment/Flat' },
+  { value: 'farmhouse', label: 'Farm House' },
+  { value: 'commercial', label: 'Commercial Property' },
+  { value: 'studio', label: 'Studio Room' },
+];
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
     const { pending } = useFormStatus();
@@ -32,18 +41,21 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
             ) : (
                 <>
                     {isEditing ? <Save className="mr-2 h-4 w-4" /> : <FileUp className="mr-2 h-4 w-4" />}
-                    {isEditing ? 'Save Changes' : 'Upload Plot'}
+                    {isEditing ? 'Save Changes' : 'Upload Property'}
                 </>
             )}
         </Button>
     )
 }
 
-export default function PlotForm({ plot }: { plot?: Plot }) {
+export default function PlotForm({ plot, plotType }: { plot?: Plot; plotType?: 'premium' | 'normal' }) {
   const { toast } = useToast();
   const router = useRouter();
   const [description, setDescription] = useState(plot?.description || '');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>(plot?.images || []);
+  const [selectedPropertyType, setSelectedPropertyType] = useState(plot?.propertyType || 'plot');
   const isApiKeyConfigured = process.env.NEXT_PUBLIC_GEMINI_API_KEY_CONFIGURED === 'true';
 
   const initialState: State = { message: null, errors: {}, success: false, plotId: null };
@@ -67,14 +79,83 @@ export default function PlotForm({ plot }: { plot?: Plot }) {
     }
   }, [state, toast, router, plot]);
 
-  const handleGenerateDescription = async (form: HTMLFormElement) => {
-    toast({
-        variant: 'destructive',
+  const handleImageChange = (files: FileList | null) => {
+    if (!files) return;
+    
+    const newFiles = Array.from(files).slice(0, 5); // Max 5 images
+    const newPreviews: string[] = [];
+    
+    newFiles.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            newPreviews.push(e.target.result as string);
+            if (newPreviews.length === newFiles.length) {
+              setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 5));
+              setImageFiles(prev => [...prev, ...newFiles].slice(0, 5));
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+  const handleGenerateDescription = async (formData: FormData) => {
+    if (!isApiKeyConfigured) {
+      toast({
         title: 'Feature Temporarily Disabled',
         description: 'AI description generation is temporarily disabled. Please write your own description.',
-    });
-  }
+      });
+      return;
+    }
+    
+    setIsGenerating(true);
+    try {
+      const plotNumber = formData.get('plotNumber') as string;
+      const villageName = formData.get('villageName') as string;
+      const areaName = formData.get('areaName') as string;
+      const plotSize = formData.get('plotSize') as string;
+      const plotFacing = formData.get('plotFacing') as string;
 
+      const prompt = `Write a premium, attractive real estate description for a ${selectedPropertyType} with the following details:
+      Number: ${plotNumber}
+      Location: ${areaName}, ${villageName}
+      Size: ${plotSize}
+      Facing: ${plotFacing}
+      
+      The description should highlight the investment potential and luxury aspect. Keep it under 150 words.`;
+
+      const response = await fetch('/api/ai/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDescription(data.text);
+        toast({ title: 'Success', description: 'AI description generated!' });
+      } else {
+        throw new Error('Failed to generate description');
+      }
+    } catch (error) {
+      toast({
+        title: 'AI Unavailable',
+        description: 'Failed to generate description. Please try again later.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // All hooks are called above, now we can safely have conditional logic
   return (
     <form action={dispatch}>
       <Card>
@@ -89,6 +170,19 @@ export default function PlotForm({ plot }: { plot?: Plot }) {
               <Label htmlFor="plotSize">Plot Size</Label>
               <Input id="plotSize" name="plotSize" placeholder="e.g., 2400 sqft" defaultValue={plot?.plotSize} required />
               {state.errors?.plotSize && <p className="text-sm text-destructive">{state.errors.plotSize[0]}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="propertyType">Property Type</Label>
+              <Select name="propertyType" value={selectedPropertyType} onValueChange={(value: string) => setSelectedPropertyType(value)} required>
+                <SelectTrigger id="propertyType">
+                  <SelectValue placeholder="Select property type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Plot">Plot/Land</SelectItem>
+                  <SelectItem value="House">Independent House</SelectItem>
+                  <SelectItem value="Land">Agricultural Land</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="villageName">Village Name</Label>
@@ -147,7 +241,23 @@ export default function PlotForm({ plot }: { plot?: Plot }) {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="category">Plot Category</Label>
+              <Select name="category" defaultValue={plot?.category || plotType === 'premium' ? 'Premium' : 'Normal'}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Normal">Normal</SelectItem>
+                  <SelectItem value="Premium">Premium</SelectItem>
+                  <SelectItem value="Luxury">Luxury</SelectItem>
+                </SelectContent>
+              </Select>
+              {state.errors?.category && <p className="text-sm text-destructive">{state.errors.category[0]}</p>}
+            </div>
+
+            <div className="flex items-center space-x-2 pt-8">
             <input 
               type="checkbox" 
               id="priceNegotiable" 
@@ -157,6 +267,7 @@ export default function PlotForm({ plot }: { plot?: Plot }) {
               className="rounded border-gray-300"
             />
             <Label htmlFor="priceNegotiable" className="text-sm">Price is negotiable</Label>
+          </div>
           </div>
 
           <div className="space-y-2">
@@ -174,25 +285,66 @@ export default function PlotForm({ plot }: { plot?: Plot }) {
                 variant="outline" 
                 size="sm" 
                 className="mt-2" 
-                disabled={true}
-                onClick={(e) => handleGenerateDescription(e.currentTarget.form!)}
+                disabled={isGenerating || !isApiKeyConfigured}
+                onClick={(e) => handleGenerateDescription(new FormData(e.currentTarget.form!))}
               >
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Generate with AI (Disabled)
+                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                  {isApiKeyConfigured ? 'Generate with AI' : 'AI generation disabled'}
               </Button>
-               <p className="text-xs text-muted-foreground mt-1">AI generation is temporarily disabled for build stability.</p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">
+          <div className="space-y-4">
+            <Label>
                 <div className='flex items-center gap-2'>
                     <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                    Plot Image
+                    Property Images
                 </div>
             </Label>
-            <Input id="imageUrl" name="imageUrl" type="file" accept="image/png, image/jpeg" required={!plot} />
-             {plot && <p className="text-sm text-muted-foreground">Leave blank to keep the existing image.</p>}
-            {state.errors?.imageUrl && <p className="text-sm text-destructive">{state.errors.imageUrl[0]}</p>}
+            
+            {/* Image Upload Input */}
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              <Input 
+                id="images" 
+                name="images" 
+                type="file" 
+                accept="image/png, image/jpeg, image/jpg, image/webp"
+                multiple 
+                className="border-0 bg-transparent"
+                onChange={(e) => handleImageChange(e.target.files)}
+              />
+              <p className="text-sm text-muted-foreground mt-2">
+                Upload multiple images (PNG, JPG, WebP). Max 5 images.
+              </p>
+            </div>
+
+            {/* Image Previews */}
+            {imagePreviews.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={preview} 
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                      {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            
           </div>
           
           {state.message && !state.success && (

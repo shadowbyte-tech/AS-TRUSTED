@@ -1,6 +1,5 @@
 'use client';
 
-import { deletePlot } from '@/lib/actions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,20 +20,37 @@ export default function DeletePlotButton({ plotId, trigger }: { plotId: string; 
   const { toast } = useToast();
 
   const handleDelete = async () => {
-    const result = await deletePlot(plotId);
-    
-    if (result.success) {
-      toast({
-        title: 'Success!',
-        description: result.message,
+    try {
+      const response = await fetch('/api/property/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: plotId }),
       });
-      // Optional: redirect or refresh the page
-      window.location.reload();
-    } else {
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: 'Success!',
+          description: result.message,
+        });
+        // Optional: redirect or refresh the page
+        window.location.reload();
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error!',
+          description: result.error || result.message,
+        });
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
       toast({
         variant: 'destructive',
         title: 'Error!',
-        description: result.message,
+        description: 'Failed to delete property',
       });
     }
   };

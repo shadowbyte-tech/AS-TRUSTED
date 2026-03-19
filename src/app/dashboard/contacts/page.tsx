@@ -14,17 +14,25 @@ import DeleteContactButton from '@/components/delete-contact-button';
 import { Contact } from '@/lib/definitions';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { UserPlus, MoreVertical, Pencil, Mail, Phone, User, ShoppingCart, Landmark } from 'lucide-react';
+import { UserPlus, MoreVertical, Pencil, Mail, Phone, User, ShoppingCart, Landmark, TrendingUp, UserCheck, MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export default async function ManageContactsPage() {
   const contacts = await getContacts();
 
-  const RoleIcon = ({ role }: { role: 'Seller' | 'Buyer' }) => {
-    if (role === 'Seller') {
+  const RoleIcon = ({ role }: { role: 'Seller' | 'Buyer' | 'Investor' | 'Agent' | 'Other' }) => {
+    switch (role) {
+      case 'Seller':
         return <Landmark className="mr-3 h-5 w-5 text-primary" />;
+      case 'Investor':
+        return <TrendingUp className="mr-3 h-5 w-5 text-primary" />;
+      case 'Agent':
+        return <UserCheck className="mr-3 h-5 w-5 text-primary" />;
+      case 'Other':
+        return <MoreHorizontal className="mr-3 h-5 w-5 text-primary" />;
+      default:
+        return <ShoppingCart className="mr-3 h-5 w-5 text-primary" />;
     }
-    return <ShoppingCart className="mr-3 h-5 w-5 text-primary" />;
   }
 
   return (

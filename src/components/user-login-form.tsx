@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { KeyRound, Mail } from 'lucide-react';
+import { KeyRound, Mail, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -17,31 +17,51 @@ export default function UserLoginForm() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Use the login function from auth context which handles email/password properly
-    const success = await login(email, password);
+    
+    
+    // Call the actual auth context login method
+    const result = await login(email, password);
 
-    if (success) {
-       router.push('/plots');
-       toast({
+    
+
+    if (result.success && (result as any).user) {
+      toast({
         title: 'Login Successful',
-        description: 'Welcome!',
+        description: 'Welcome! Taking you to available properties...',
       });
+      
+      // Brief delay to let user state settle
+      setTimeout(() => {
+        
+        
+        // Redirect based on user role
+        const user = (result as any).user;
+        if (user.role === 'Owner') {
+          window.location.href = '/dashboard';
+        } else if (user.role === 'Premium') {
+          router.push('/premium-dashboard');
+        } else {
+          router.push('/properties');
+        }
+      }, 1000);
     } else {
-       toast({
+      toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: 'Invalid email or password. Please try again.',
+        description: result.error || 'Invalid email or password. Please try again.',
       });
     }
+    setIsLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} autoComplete="on">
       <Card>
         <CardHeader>
           <CardTitle>Welcome</CardTitle>
@@ -49,39 +69,47 @@ export default function UserLoginForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="user-email">Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                id="email" 
+                id="user-email" 
                 type="email" 
-                placeholder="user@consult.com" 
+                placeholder="user@email.com" 
                 required 
                 className="pl-10" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="user-password">Password</Label>
             <div className="relative">
               <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                id="password"
+                id="user-password"
                 type="password"
                 placeholder="••••••••"
                 required
                 className="pl-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
               />
             </div>
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
-            Sign In
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing In...</> : 'Sign In'}
           </Button>
         </CardFooter>
       </Card>

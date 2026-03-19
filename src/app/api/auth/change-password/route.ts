@@ -5,7 +5,7 @@ import { API_MESSAGES, VALIDATION } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getSessionUser(request);
+    const user = getSessionUser();
     
     if (!user) {
       return NextResponse.json(
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await changePassword(user.id, currentPassword, newPassword);
+    await changePassword((user as any)?.id || '', currentPassword, newPassword);
 
     return NextResponse.json({
       success: true,

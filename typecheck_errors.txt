@@ -1,0 +1,16 @@
+
+> nextn@0.1.0 typecheck
+> tsc --noEmit
+
+src/components/user-management-backup.tsx(483,9): error TS1128: Declaration or statement expected.
+src/components/user-management-backup.tsx(484,7): error TS1109: Expression expected.
+src/components/user-management-backup.tsx(485,5): error TS1109: Expression expected.
+src/components/user-management-backup.tsx(523,21): error TS1109: Expression expected.
+src/components/user-management-backup.tsx(523,23): error TS17015: Expected corresponding closing tag for JSX fragment.
+src/components/user-management-backup.tsx(523,26): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/user-management-backup.tsx(616,12): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/user-management-backup.tsx(618,7): error TS1128: Declaration or statement expected.
+src/components/user-management-backup.tsx(622,9): error TS2657: JSX expressions must have one parent element.
+src/components/user-management-backup.tsx(646,7): error TS1128: Declaration or statement expected.
+src/components/user-management-backup.tsx(647,5): error TS1109: Expression expected.
+src/components/user-management-backup.tsx(648,3): error TS1109: Expression expected.

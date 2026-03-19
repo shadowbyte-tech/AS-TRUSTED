@@ -7,7 +7,7 @@
  * The data is exported from this file and imported into the server actions.
  * This ensures that all server actions are operating on the same data array in memory.
  */
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import path from 'path';
 import type { Plot, User, Inquiry, Contact, Registration } from './definitions';
 import { AppError } from './errors';
@@ -87,8 +87,9 @@ export async function writeContacts(contacts: Contact[]): Promise<void> {
 // User operations
 export async function readUsers(): Promise<User[]> {
   return readJsonFile<User[]>(userDataPath, [
-    { id: 'u1', email: 'swamy@consult.com', role: 'Owner' },
-    { id: 'u2', email: 'user@consult.com', role: 'User' },
+    { id: 'owner-1', email: 'swamy@consult.com', role: 'Owner' },
+    { id: 'premium-1', email: 'premium@astrustedconsultancy.com', role: 'Premium' },
+    { id: 'ecl5bhl', email: 'mani@consult.com', role: 'User' },
   ]);
 }
 
@@ -98,8 +99,9 @@ export async function writeUsers(users: User[]): Promise<void> {
 
 // Legacy exports for backward compatibility
 export const users: User[] = [
-  { id: 'u1', email: 'swamy@consult.com', role: 'Owner' },
-  { id: 'u2', email: 'user@consult.com', role: 'User' },
+  { id: 'owner-1', email: 'swamy@consult.com', role: 'Owner' },
+  { id: 'premium-1', email: 'premium@astrustedconsultancy.com', role: 'Premium' },
+  { id: 'ecl5bhl', email: 'mani@consult.com', role: 'User' },
 ];
 
 export const contacts: Contact[] = [
@@ -111,3 +113,32 @@ export const registrations: Registration[] = [
   { id: 'reg-1', name: 'Arjun Mehra', phone: '+91 99887 76655', email: 'arjun.m@example.com', createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), notes: 'Interested in investment properties.', isNew: true },
   { id: 'reg-2', name: 'Sneha Patel', phone: '+91 88776 65544', email: 'sneha.p@example.com', createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), notes: 'First-time home buyer, needs guidance on the process.', isNew: true },
 ];
+
+export async function updateOwnerProfile(email: string, profileData: { name?: string; phone?: string; location?: string }) {
+  try {
+    // Read current users
+    const users = await readUsers();
+    
+    // Find and update the owner
+    const updatedUsers = users.map(user => {
+      if (user.email === email && user.role === 'Owner') {
+        return {
+          ...user,
+          ...profileData,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return user;
+    });
+    
+    // Write back to database
+    await writeUsers(updatedUsers);
+    
+    // Return the updated user
+    const updatedUser = updatedUsers.find(u => u.email === email && u.role === 'Owner');
+    return updatedUser || null;
+  } catch (error) {
+    console.error('Error updating owner profile:', error);
+    return null;
+  }
+}

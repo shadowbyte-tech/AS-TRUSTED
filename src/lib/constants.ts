@@ -6,7 +6,22 @@
 export const USER_ROLES = {
   OWNER: 'Owner',
   USER: 'User',
+  PREMIUM: 'Premium',
+  ELITE: 'Elite',
 } as const;
+
+// Monetization tiers (ordered by ascending access level)
+export const MONETIZATION_TIERS = {
+  FREE: 'User',
+  PREMIUM: 'Premium',
+  ELITE: 'Elite',
+  OWNER: 'Owner',
+} as const;
+
+// Roles that have access to premium features
+export const PREMIUM_ROLES = ['Premium', 'Elite', 'Owner'] as const;
+// Roles that have access to elite-only features
+export const ELITE_ROLES = ['Elite', 'Owner'] as const;
 
 // Contact types
 export const CONTACT_TYPES = {
@@ -87,6 +102,15 @@ export const API_MESSAGES = {
 
 // JWT configuration
 export const JWT_CONFIG = {
-  EXPIRES_IN: '7d',
+  ACCESS_TOKEN_EXPIRES_IN: '15m',
+  REFRESH_TOKEN_EXPIRES_IN: '7d',
   ALGORITHM: 'HS256',
+} as const;
+
+// Cookie configuration
+export const AUTH_COOKIES = {
+  ACCESS_TOKEN: 'auth_access_token',
+  REFRESH_TOKEN: 'auth_refresh_token',
+  MAX_AGE_ACCESS: 15 * 60, // 15 minutes in seconds
+  MAX_AGE_REFRESH: 7 * 24 * 60 * 60, // 7 days in seconds
 } as const;

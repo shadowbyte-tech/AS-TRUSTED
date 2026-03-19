@@ -43,3 +43,5 @@ next-env.d.ts
 # Application logs
 app-debug.log
 api-debug.log
+# Local Netlify folder
+.netlify

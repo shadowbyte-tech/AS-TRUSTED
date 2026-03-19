@@ -50,7 +50,8 @@ export async function migratePlotsToEnhanced(): Promise<{
     // 3️⃣ Convert EnhancedPlot → Plot (for writePlots)
     const migratedPlots: Plot[] = enhancedPlots.map((enhanced) => ({
       ...enhanced,
-
+      propertyType: 'Plot' as const,
+      propertyNumber: enhanced.plotNumber,
       // ✅ Plot requires imageUrl — derive from EnhancedPlot
       imageUrl: enhanced.thumbnailUrl || '',
 

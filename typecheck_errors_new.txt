@@ -1,0 +1,8 @@
+
+> nextn@0.1.0 typecheck
+> tsc --noEmit
+
+src/app/premium-properties/page.tsx(551,1): error TS1005: ',' expected.
+src/app/premium-properties/page.tsx(555,4): error TS17008: JSX element 'div' has no corresponding closing tag.
+src/app/premium-properties/page.tsx(558,6): error TS17008: JSX element 'main' has no corresponding closing tag.
+src/app/premium-properties/page.tsx(592,1): error TS1005: '</' expected.

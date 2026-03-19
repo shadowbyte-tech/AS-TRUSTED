@@ -1,6 +1,6 @@
 
 import AuthGuard from '@/components/auth-guard';
-import ContactForm from '@/components/contact-form-server';
+import ContactForm from '@/components/contact-form-simple';
 
 export default function AddContactPage() {
   return (
