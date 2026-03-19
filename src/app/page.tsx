@@ -478,6 +478,17 @@ export default function HomePage() {
                 >
                   Migrate Data to MongoDB
                 </Button>
+                
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="w-full border-white/30 hover:bg-white/10 text-white"
+                  asChild
+                >
+                  <Link href="/create-owner">
+                    Create Owner Account
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
