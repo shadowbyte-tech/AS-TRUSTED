@@ -11,6 +11,15 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { Plot, User, Inquiry, Contact, Registration } from './definitions';
 import { AppError } from './errors';
+import { createClient } from '@libsql/client';
+
+export async function databaseOpen() {
+  const client = createClient({
+    url: process.env.TURSO_CONNECTION_URL || process.env.TURSO_DATABASE_URL || '',
+    authToken: process.env.TURSO_AUTH_TOKEN,
+  });
+  return client;
+}
 
 const plotDataPath = path.join(process.cwd(), 'src', 'lib', 'plot-data.json');
 const inquiryDataPath = path.join(process.cwd(), 'src', 'lib', 'inquiry-data.json');
