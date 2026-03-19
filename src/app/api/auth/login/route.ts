@@ -15,6 +15,16 @@ export async function POST(request: NextRequest) {
                       request.headers.get('x-real-ip') || 
                       'unknown';
     
+    // DEBUG: Log request details
+    console.log('🔍 Login API Debug:', {
+      clientIP,
+      userAgent: request.headers.get('user-agent'),
+      contentType: request.headers.get('content-type'),
+      hasBody: !!request.body,
+      env: process.env.NODE_ENV,
+      jwtSecret: !!process.env.JWT_SECRET
+    });
+    
     // Rate limiting: 5 attempts per 15 minutes per IP (disabled in production for debugging)
     if (process.env.NODE_ENV === 'development' && !globalRateLimiter.isAllowed(`login:${clientIP}`, 5, 15 * 60 * 1000)) {
       const remainingTime = globalRateLimiter.getRemainingTime(`login:${clientIP}`);

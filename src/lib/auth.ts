@@ -131,14 +131,20 @@ export async function authenticateOwner(credentials: LoginCredentials): Promise<
 export async function authenticateUser(credentials: LoginCredentials): Promise<AuthUser | null> {
   const { email, password } = credentials;
 
+  console.log('🔍 Auth Debug - Input:', { email, passwordLength: password.length });
+
   if (!email || !password) {
     throw new ValidationError('Email and password are required');
   }
 
   const users = await readUsers();
+  console.log('🔍 Auth Debug - Users found:', users.length);
+  
   const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
+  console.log('🔍 Auth Debug - User found:', !!user, user?.email, user?.role);
+  
   if (!user) {
+    console.log('🔍 Auth Debug - User not found in database');
     return null;
   }
 
@@ -251,16 +257,16 @@ export async function setAuthCookies(user: AuthUser) {
 
   cookieStore.set(AUTH_COOKIES.ACCESS_TOKEN, accessToken, {
     httpOnly: true,
-    secure: isProduction, // ✅ Enforce HTTPS in production
-    sameSite: 'strict',
+    secure: false, // ⚠️ TEMPORARY: Disable secure flag for Vercel deployment
+    sameSite: 'lax', // ⚠️ TEMPORARY: Use lax for cross-site requests
     maxAge: AUTH_COOKIES.MAX_AGE_ACCESS,
     path: '/',
   });
 
   cookieStore.set(AUTH_COOKIES.REFRESH_TOKEN, refreshToken, {
     httpOnly: true,
-    secure: isProduction, // ✅ Enforce HTTPS in production
-    sameSite: 'strict',
+    secure: false, // ⚠️ TEMPORARY: Disable secure flag for Vercel deployment
+    sameSite: 'lax', // ⚠️ TEMPORARY: Use lax for cross-site requests
     maxAge: AUTH_COOKIES.MAX_AGE_REFRESH,
     path: '/',
   });
