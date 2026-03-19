@@ -1,0 +1,12 @@
+{
+  "buildCommand": "next build",
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "functions": {
+    "src/app/api/**": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}

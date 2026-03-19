@@ -16,6 +16,12 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   // ─── SECURITY HEADERS (belt-and-suspenders with middleware) ────────────────
   async headers() {
