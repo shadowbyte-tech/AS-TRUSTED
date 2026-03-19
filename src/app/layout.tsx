@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Inter, Space_Grotesk, Cinzel } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import dynamic from 'next/dynamic';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 // Import the ClientWidgets wrapper (standard import is fine because the component itself handles dynamic loading)
 import ClientWidgets from '@/components/client-widgets';
@@ -170,6 +171,7 @@ export default function RootLayout({
             </div>
             <Toaster />
             <ClientWidgets />
+            <SpeedInsights />
           </AuthProvider>
         </ThemeProvider>
         
