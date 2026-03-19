@@ -1,0 +1,22 @@
+{
+  "name": "AS Trusted Consultancy",
+  "short_name": "AS Trusted",
+  "description": "Premium real estate consultancy and property investment services in Hyderabad",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07070e",
+  "theme_color": "#c9a84c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "real estate", "productivity"],
+  "lang": "en",
+  "scope": "/",
+  "id": "as-trusted-consultancy"
+}

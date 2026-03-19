@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import { validateAndLogEnv } from './env-validation';
 
-// Updated to the newest specific Vercel Atlas Cluster
-const MONGODB_URI = process.env.TURSO_CONNECTION_MONGODB_URI || process.env.MONGODB_URI || 'mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority';
+// Hardcoded directly to the NEW Vercel-Admin Atlas cluster so Vercel's stale environment variables don't block it
+const MONGODB_URI = 'mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority';
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────
 const AuditLogSchema = new mongoose.Schema({

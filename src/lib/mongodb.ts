@@ -3,7 +3,7 @@ import { attachDatabasePool } from "@vercel/functions";
 
 // Provide fallback for the specific connection string provided by the user
 const fallbackUri = "mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority";
-const uri = process.env.TURSO_CONNECTION_MONGODB_URI || process.env.MONGODB_URI || fallbackUri;
+const uri = fallbackUri; // Overriding stale env variables globally
 
 if (!uri) {
   throw new Error("Please add your Mongo URI to .env.local");

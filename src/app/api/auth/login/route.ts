@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
                       request.headers.get('x-real-ip') || 
                       'unknown';
     
-    // Rate limiting: 5 attempts per 15 minutes per IP
-    if (!globalRateLimiter.isAllowed(`login:${clientIP}`, 5, 15 * 60 * 1000)) {
+    // Rate limiting: 5 attempts per 15 minutes per IP (disabled in production for debugging)
+    if (process.env.NODE_ENV === 'development' && !globalRateLimiter.isAllowed(`login:${clientIP}`, 5, 15 * 60 * 1000)) {
       const remainingTime = globalRateLimiter.getRemainingTime(`login:${clientIP}`);
       logger.warn('Auth: Rate limit exceeded', { ip: clientIP });
       

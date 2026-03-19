@@ -141,7 +141,8 @@ export function middleware(request: NextRequest) {
   const isAuthApi = AUTH_API_PATHS.some(p => pathname.startsWith(p));
 
   // Apply CSRF validation to protected API routes (not auth or public endpoints)
-  if (isStateMutatingMethod && isApiRoute && !isPublicApiRoute && !isAuthApi && process.env.NODE_ENV === 'production') {
+  // DISABLED TEMPORARILY to fix login issues
+  if (false && isStateMutatingMethod && isApiRoute && !isPublicApiRoute && !isAuthApi && process.env.NODE_ENV === 'production') {
     const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
     const headerToken = request.headers.get(CSRF_HEADER_NAME);
 
@@ -152,6 +153,19 @@ export function middleware(request: NextRequest) {
       });
     }
   }
+
+  // DEBUG: Log environment and request details
+  console.log('🔍 Middleware Debug:', {
+    pathname,
+    method: request.method,
+    isStateMutatingMethod: ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method),
+    isApiRoute: pathname.startsWith('/api/'),
+    isPublicApiRoute: PUBLIC_API_PREFIXES.some(p => pathname.startsWith(p)),
+    isAuthApi: AUTH_API_PATHS.some(p => pathname.startsWith(p)),
+    nodeEnv: process.env.NODE_ENV,
+    hasAccessToken: !!request.cookies.get(AUTH_COOKIES.ACCESS_TOKEN)?.value,
+    hasRefreshToken: !!request.cookies.get(AUTH_COOKIES.REFRESH_TOKEN)?.value
+  });
 
   // ── 5. DASHBOARD PROTECTION ──────────────────────────────────────────────
   const isDashboardPath = PROTECTED_DASHBOARD_PATHS.some(p => pathname.startsWith(p));

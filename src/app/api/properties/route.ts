@@ -17,6 +17,10 @@ export async function GET(request: NextRequest) {
     const propertyType = searchParams.get('propertyType');
     const skip = (page - 1) * limit;
 
+    // Add caching headers for better performance
+    const response = NextResponse.next();
+    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=60');
+
     const allProperties = await readProperties();
     
     // Filter by property type if specified
@@ -36,6 +40,10 @@ export async function GET(request: NextRequest) {
         limit,
         totalPages: Math.ceil(filteredProperties.length / limit),
         propertyTypes: ['Plot', 'House', 'Land']
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=60'
       }
     });
   } catch (error) {
