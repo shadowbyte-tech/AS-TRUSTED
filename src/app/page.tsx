@@ -427,12 +427,32 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
           <div className="container relative z-10 px-4">
             <h2 className="text-4xl md:text-7xl font-headline mb-8">Ready to <span className="text-accent">Invest</span> In <br /> Strategic Land?</h2>
-            <div className="flex flex-wrap justify-center gap-6">
+            <div className="flex flex-wrap justify-center gap-6 mb-8">
               <Button size="lg" className="h-16 px-12 rounded-full bg-accent text-primary hover:bg-white transition-all font-black uppercase tracking-widest text-lg" asChild>
                 <Link href="/properties">Start Browsing</Link>
               </Button>
               <Button size="lg" variant="outline" className="h-16 px-12 rounded-full border-white/30 hover:bg-white/10 transition-all font-black uppercase tracking-widest text-lg" asChild>
                 <Link href="/about">Our Strategy</Link>
+              </Button>
+            </div>
+            
+            {/* MongoDB Test Section */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-md mx-auto">
+              <h3 className="text-xl font-bold mb-4">Database Connection Status</h3>
+              <Button 
+                size="lg" 
+                className="w-full bg-white text-primary hover:bg-gray-100"
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/test-mongodb');
+                    const data = await response.json();
+                    alert(data.message + (data.error ? '\nError: ' + data.error : ''));
+                  } catch (error) {
+                    alert('Failed to test database connection');
+                  }
+                }}
+              >
+                Test MongoDB Connection
               </Button>
             </div>
           </div>

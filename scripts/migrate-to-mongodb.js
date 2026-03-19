@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 // Load environment variables
 require('dotenv').config();
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority';
 
 if (!MONGODB_URI) {
   console.error('Error: MONGODB_URI not found in .env file');
@@ -98,10 +98,10 @@ async function migrate() {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB successfully!');
 
-    const dataDir = path.join(__dirname, '..', 'src', 'lib');
+    const dataDir = path.join(__dirname, '..', 'data');
 
     // Migrate plots
-    const plots = readJsonFile(path.join(dataDir, 'plot-data.json'));
+    const plots = readJsonFile(path.join(dataDir, 'plots.json'));
     if (plots && plots.length > 0) {
       console.log(`Migrating ${plots.length} plots...`);
       for (const plot of plots) {
@@ -112,7 +112,7 @@ async function migrate() {
     }
 
     // Migrate users
-    const users = readJsonFile(path.join(dataDir, 'user-data.json'));
+    const users = readJsonFile(path.join(dataDir, 'users.json'));
     if (users && users.length > 0) {
       console.log(`Migrating ${users.length} users...`);
       for (const user of users) {
@@ -123,7 +123,7 @@ async function migrate() {
     }
 
     // Migrate passwords
-    const passwords = readJsonFile(path.join(dataDir, 'password-data.json'));
+    const passwords = readJsonFile(path.join(dataDir, 'passwords.json'));
     if (passwords) {
       console.log('Migrating passwords...');
       for (const [email, hashedPassword] of Object.entries(passwords)) {
@@ -133,7 +133,7 @@ async function migrate() {
     }
 
     // Migrate registrations
-    const registrations = readJsonFile(path.join(dataDir, 'registration-data.json'));
+    const registrations = readJsonFile(path.join(dataDir, 'registrations.json'));
     if (registrations && registrations.length > 0) {
       console.log(`Migrating ${registrations.length} registrations...`);
       for (const reg of registrations) {
@@ -145,7 +145,7 @@ async function migrate() {
     }
 
     // Migrate inquiries
-    const inquiries = readJsonFile(path.join(dataDir, 'inquiry-data.json'));
+    const inquiries = readJsonFile(path.join(dataDir, 'inquiries.json'));
     if (inquiries && inquiries.length > 0) {
       console.log(`Migrating ${inquiries.length} inquiries...`);
       for (const inq of inquiries) {
@@ -157,7 +157,7 @@ async function migrate() {
     }
 
     // Migrate contacts
-    const contacts = readJsonFile(path.join(dataDir, 'contact-data.json'));
+    const contacts = readJsonFile(path.join(dataDir, 'contacts.json'));
     if (contacts && contacts.length > 0) {
       console.log(`Migrating ${contacts.length} contacts...`);
       for (const contact of contacts) {
