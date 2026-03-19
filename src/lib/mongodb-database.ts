@@ -59,25 +59,10 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Initialize database connection
 async function initDB() {
-  if (isMongoInitialized) return true;
-  try {
-    await connectDB();
-    isMongoInitialized = true;
-    return true;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    logger.error('MONGODB CONNECTION FAILED:', message);
-
-    // In production, log error but ALLOW fallback to JSON instead of crashing
-    if (IS_PRODUCTION) {
-      logger.warn(`⚠️ PROD MODE: Database down. Falling back to multi-file JSON storage! (${message})`);
-      return false;
-    }
-
-    // In development, fall back to JSON storage with a clear warning.
-    logger.warn('⚠️  DEV MODE: Falling back to multi-file JSON storage. Data will NOT be in MongoDB.');
-    return false;
-  }
+  // 🚨 FORCE JSON STORAGE ONLY 🚨
+  // MongoDB connection is timing out on Vercel. Bypassing entirely.
+  logger.warn('⚠️ DATABASE DISABLED: Forcing temporary bypass to JSON storage.');
+  return false;
 }
 
 /**
