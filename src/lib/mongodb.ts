@@ -1,35 +1,31 @@
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient } from "mongodb";
+import { attachDatabasePool } from "@vercel/functions";
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your MongoDB URI to .env file');
+// Provide fallback for the specific connection string provided by the user
+const fallbackUri = "mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.TURSO_CONNECTION_MONGODB_URI || process.env.MONGODB_URI || fallbackUri;
+
+if (!uri) {
+  throw new Error("Please add your Mongo URI to .env.local");
 }
 
-const uri = process.env.MONGODB_URI;
-const options = {};
+const options = {
+  maxPoolSize: 10,
+};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-declare global {
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
-}
-
-if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable to preserve the client across hot reloads
-  if (!global._mongoClientPromise) {
+if (process.env.NODE_ENV === "development") {
+  if (!(global as any)._mongoClientPromise) {
     client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+    (global as any)._mongoClientPromise = client.connect();
   }
-  clientPromise = global._mongoClientPromise;
+  clientPromise = (global as any)._mongoClientPromise;
 } else {
-  // In production mode, create a new client
   client = new MongoClient(uri, options);
+  attachDatabasePool(client);
   clientPromise = client.connect();
-}
-
-export async function getDatabase(): Promise<Db> {
-  const client = await clientPromise;
-  return client.db('astc_database');
 }
 
 export default clientPromise;
