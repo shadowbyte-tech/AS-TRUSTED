@@ -489,6 +489,17 @@ export default function HomePage() {
                     Create Owner Account
                   </Link>
                 </Button>
+                
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="w-full border-white/30 hover:bg-white/10 text-white"
+                  asChild
+                >
+                  <Link href="/test-mongodb-login">
+                    Test MongoDB Login
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
