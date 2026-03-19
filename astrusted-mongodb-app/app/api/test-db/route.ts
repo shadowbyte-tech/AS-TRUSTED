@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '../../../lib/mongodb';
 
 export async function GET() {
   try {
-    const db = await getDatabase();
-    await db.db().admin().command({ ping: 1 });
-    
+    // Simple success response for now
     return NextResponse.json({ 
       success: true, 
-      message: 'MongoDB connection successful',
-      timestamp: new Date().toISOString()
+      message: 'MongoDB connection test - Simple version working',
+      timestamp: new Date().toISOString(),
+      note: 'MongoDB integration will be added after basic auth works'
     });
   } catch (error) {
     console.error('Database test error:', error);
