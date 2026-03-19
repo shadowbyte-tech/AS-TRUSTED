@@ -67,9 +67,18 @@ async function verifyAndMigratePassword(
   storedValue: string,
   userEmail: string
 ): Promise<{ valid: boolean; migrated: boolean }> {
+  console.log('🔍 Password Debug:', {
+    inputLength: inputPassword.length,
+    storedValue,
+    isBcryptHash: isBcryptHash(storedValue),
+    userEmail
+  });
+
   // Case 1: Already a bcrypt hash — use bcrypt.compare
   if (isBcryptHash(storedValue)) {
+    console.log('🔍 Using bcrypt comparison');
     const valid = await bcrypt.compare(inputPassword, storedValue);
+    console.log('🔍 Bcrypt compare result:', valid);
     return { valid, migrated: false };
   }
 
