@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-const uri = 'YOUR_NEW_MONGODB_URL_HERE'; // Replace with your new database URL
+const uri = 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@astrustedconsultany.5wcilrm.mongodb.net/?appName=ASTRUSTEDCONSULTANY';
 const options = {
   maxPoolSize: 10,
   serverApi: {

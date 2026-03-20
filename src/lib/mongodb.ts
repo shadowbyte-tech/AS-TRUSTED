@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import { attachDatabasePool } from "@vercel/functions";
 
 // Provide fallback for the specific connection string provided by the user
-const fallbackUri = "YOUR_NEW_MONGODB_URL_HERE"; // Replace with your new database URL
+const fallbackUri = "mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@astrustedconsultany.5wcilrm.mongodb.net/?appName=ASTRUSTEDCONSULTANY";
 const uri = fallbackUri; // Force override stale environment variables globally to ensure connectivity
 
 if (!uri) {
