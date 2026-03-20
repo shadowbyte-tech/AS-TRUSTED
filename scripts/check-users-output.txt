@@ -1,0 +1,22 @@
+Connecting to MongoDB...
+Ô£à Connected!
+Using Database: as-trusted-consultancy
+Collections: [ 'plots', 'users', 'registrations', 'passwords' ]
+Users found: 8
+- owner@astrustedconsultancy.com (Owner)
+- premium@astrustedconsultancy.com (Premium)
+- swamy@consult.com (Owner)
+- mani@consult.com (User)
+- premium2@astrustedconsultancy.com (Premium)
+- asss25122023@gmail.com (User)
+- sukka@consult.com (Premium)
+- swamygoud@consult.com (Owner)
+Passwords found: 6
+- swamy@consult.com (Start: $2a$1...)
+- premium@astrustedconsultancy.com (Start: $2a$1...)
+- mani@consult.com (Start: mani@...)
+- premium2@astrustedconsultancy.com (Start: premi...)
+- sukka@consult.com (Start: manik...)
+- swamygoud@consult.com (Start: swamy...)
+Plots found: 1
+- 101 in Birchwood (Sold)
