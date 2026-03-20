@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,10 @@ type View = 'manual' | 'forgot-password' | 'reset-password';
 export default function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  
   const [view, setView] = useState<View>('manual');
   const [securityAnswer, setSecurityAnswer] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -66,11 +69,11 @@ export default function LoginForm() {
         
         // Redirect based on user role
         if (data.user?.role === 'Owner') {
-          window.location.href = '/dashboard';
+          router.push(callbackUrl);
         } else if (data.user?.role === 'Premium') {
-          window.location.href = '/premium-dashboard';
+          router.push('/premium-dashboard');
         } else {
-          window.location.href = '/properties';
+          router.push('/properties');
         }
       } else {
         toast({
