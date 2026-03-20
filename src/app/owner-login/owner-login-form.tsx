@@ -56,7 +56,7 @@ export default function OwnerLoginForm() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/owner-login-simple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ export default function OwnerLoginForm() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="owner@astrustedconsultancy.com"
+                    placeholder="owner@astrustedconsultancy.com or swamy@consult.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
