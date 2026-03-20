@@ -33,8 +33,30 @@ export async function POST(request: NextRequest) {
     const plots = JSON.parse(plotsData);
     await db.collection('plots').deleteMany({});
     if (plots.length > 0) {
-      await db.collection('plots').insertMany(plots);
-      console.log(`✅ Migrated ${plots.length} plots`);
+      // Handle duplicate plot numbers by adding suffix
+      const plotNumbers = new Set();
+      const processedPlots = plots.map((plot, index) => {
+        let plotNumber = plot.plotNumber;
+        let suffix = '';
+        let counter = 1;
+        
+        while (plotNumbers.has(plotNumber + suffix)) {
+          suffix = `-${counter}`;
+          counter++;
+        }
+        
+        const finalPlotNumber = plotNumber + suffix;
+        plotNumbers.add(finalPlotNumber);
+        
+        return {
+          ...plot,
+          plotNumber: finalPlotNumber,
+          _id: plot.id || `plot-${index}`
+        };
+      });
+      
+      await db.collection('plots').insertMany(processedPlots);
+      console.log(`✅ Migrated ${processedPlots.length} plots (duplicates handled)`);
     }
     
     // Migrate other collections
