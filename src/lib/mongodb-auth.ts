@@ -22,7 +22,7 @@ export interface LoginCredentials {
 export async function authenticateUser(credentials: LoginCredentials): Promise<AuthUser | null> {
   try {
     const { MongoClient } = require('mongodb');
-    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || 'mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority';
+    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@smkg.wc88qhm.mongodb.net/?appName=SMKG';
     
     const client = new MongoClient(uri);
     await client.connect();

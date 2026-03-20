@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import { attachDatabasePool } from "@vercel/functions";
 
 // Provide fallback for the specific connection string provided by the user
-const fallbackUri = "mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority";
+const fallbackUri = "mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@smkg.wc88qhm.mongodb.net/?appName=SMKG";
 const uri = process.env.MONGODB_URI || fallbackUri; // Overriding stale env variables globally
 
 if (!uri) {
