@@ -4,7 +4,7 @@ export async function GET() {
   try {
     // Test MongoDB connection using your database
     const { MongoClient } = require('mongodb');
-    const uri = 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@smkg.wc88qhm.mongodb.net/?appName=SMKG';
+    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || process.env.MONGODB_URI || 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@smkg.wc88qhm.mongodb.net/?appName=SMKG';
     
     console.log('🔍 Testing MongoDB connection with URI:', uri);
     
