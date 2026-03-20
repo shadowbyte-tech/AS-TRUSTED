@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateOwner, setAuthCookies } from '@/lib/auth';
+import { authenticateUser, setAuthCookies } from '@/lib/mongodb-auth';
 import { sanitizeInput } from '@/lib/security';
 import { logger } from '@/lib/logger';
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // For owner login, we bypass the regular lockout system
     // Owner accounts have special privileges and shouldn't be locked out
-    const user = await authenticateOwner({ 
+    const user = await authenticateUser({ 
       email: sanitizedEmail, 
       password: sanitizedPassword 
     });
@@ -49,10 +49,7 @@ export async function POST(request: NextRequest) {
     logger.info('✅ Authentication successful for:', user.email);
 
     // Set secure HTTP-only cookies
-    await setAuthCookies(user);
-    logger.info('🍪 Auth cookies set');
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Owner login successful',
       user: {
@@ -61,6 +58,10 @@ export async function POST(request: NextRequest) {
         role: user.role
       }
     });
+    await setAuthCookies(response, user);
+    logger.info('🍪 Auth cookies set');
+
+    return response;
 
   } catch (error) {
     logger.error('💥 Owner login error:', error);
