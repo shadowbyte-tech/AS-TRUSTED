@@ -36,8 +36,8 @@ export default function LoginForm() {
     setIsLoading(true);
     setLockoutInfo(null);
 
-    // Use simple login endpoint for immediate testing
-    const loginEndpoint = '/api/auth/simple-login';
+    // Use the main login endpoint
+    const loginEndpoint = '/api/auth/login';
     
     try {
       // Ensure proper JSON formatting

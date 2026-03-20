@@ -1,112 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { authenticateUser, authenticateOwner, setAuthCookies } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
     
-    console.log('🔍 Login attempt:', email);
+    if (!email || !password) {
+      return NextResponse.json({
+        success: false,
+        error: 'Email and password are required'
+      }, { status: 400 });
+    }
+
+    logger.info('🔍 Login attempt for:', email);
     
-    const { MongoClient } = require('mongodb');
-    const uri = 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/?appName=ASTRUSTEDCONSULTANY';
+    // 1. Try to authenticate as regular/premium user
+    let user = await authenticateUser({ email, password });
     
-    const client = new MongoClient(uri);
-    await client.connect();
-    const db = client.db('as-trusted-consultancy');
-    
-    // Find user
-    const user = await db.collection('users').findOne({ 
-      email: email.toLowerCase() 
-    });
-    
+    // 2. If not found, try as owner
     if (!user) {
-      await client.close();
+      user = await authenticateOwner({ email, password });
+    }
+
+    if (!user) {
+      logger.warn('❌ Authentication failed for:', email);
       return NextResponse.json({
         success: false,
-        error: 'User not found'
-      });
+        error: 'Invalid credentials. Please check your email and password.'
+      }, { status: 401 });
     }
-    
-    // Find password
-    const passwordDoc = await db.collection('passwords').findOne({ 
-      email: email.toLowerCase() 
-    });
-    
-    if (!passwordDoc) {
-      await client.close();
-      return NextResponse.json({
-        success: false,
-        error: 'Password not found'
-      });
-    }
-    
-    const storedPassword = passwordDoc.hashedPassword || passwordDoc.password;
-    
-    // Check if password is bcrypt hash or plain text
-    let passwordValid = false;
-    if (storedPassword.startsWith('$2') || storedPassword.startsWith('$1')) {
-      // Bcrypt hash - skip for now
-      passwordValid = false;
-      console.log('⚠️ Bcrypt password detected, skipping comparison');
-    } else {
-      // Plain text comparison
-      passwordValid = password === storedPassword;
-    }
-    
-    await client.close();
-    
-    if (!passwordValid) {
-      return NextResponse.json({
-        success: false,
-        error: 'Invalid credentials',
-        debug: {
-          email: email.toLowerCase(),
-          passwordType: storedPassword.startsWith('$2') ? 'bcrypt' : 'plain',
-          note: 'Password comparison failed'
-        }
-      });
-    }
-    
-    // Create JWT token
-    const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
-        role: user.role 
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    
-    // Set HTTP-only cookie
-    const response = NextResponse.json({
+
+    logger.info(`✅ Authentication successful for: ${email} (${user.role})`);
+
+    // 3. Set authentication cookies (JWT)
+    await setAuthCookies(user);
+
+    // 4. Return success response
+    return NextResponse.json({
       success: true,
       user: {
         id: user.id,
         email: user.email,
         role: user.role,
-        name: user.name
+        name: user.name || email.split('@')[0]
       }
     });
-    
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/'
-    });
-    
-    console.log('✅ Login successful for:', email);
-    return response;
-    
+
   } catch (error) {
-    console.error('❌ Login error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    logger.error('❌ Login error:', errorMessage);
+    
     return NextResponse.json({
       success: false,
-      error: 'Internal server error'
+      error: 'An error occurred during login. Please try again later.'
     }, { status: 500 });
   }
 }

@@ -1,43 +1,32 @@
-export const dynamic = 'force-dynamic';
-
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { getSessionUser } from '@/lib/auth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get('auth-token')?.value;
+    // Correctly extracts and verifies the session from JWT cookies
+    const user = await getSessionUser();
     
-    if (!token) {
-      return NextResponse.json({ user: null });
+    if (!user) {
+      return NextResponse.json({ 
+        user: null 
+      });
     }
-    
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as any;
-      
-      // Hardcoded users for immediate testing
-      const validUsers = [
-        { id: 'admin-001', email: 'admin@astrustedconsultancy.com', role: 'Owner', name: 'Admin User' },
-        { id: 'swamy-001', email: 'swamygoud@consult.com', role: 'Owner', name: 'Swamy Goud' },
-        { id: 'premium-001', email: 'premium@astrustedconsultancy.com', role: 'Premium', name: 'Premium User' }
-      ];
-      
-      const user = validUsers.find(u => u.id === decoded.id);
-      
-      if (user) {
-        return NextResponse.json({ user });
-      } else {
-        return NextResponse.json({ user: null });
+
+    return NextResponse.json({ 
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name || user.email.split('@')[0]
       }
-      
-    } catch (jwtError) {
-      console.error('JWT verification failed:', jwtError);
-      return NextResponse.json({ user: null });
-    }
-    
+    });
+
   } catch (error) {
-    console.error('Auth me error:', error);
-    return NextResponse.json({ user: null });
+    console.error('Error in /api/auth/me:', error);
+    return NextResponse.json({ 
+      user: null 
+    });
   }
 }

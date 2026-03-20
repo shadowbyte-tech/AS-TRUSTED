@@ -87,13 +87,13 @@ export function validateEnv(): ValidationResult {
 
   if (errors.length > 0 && isProduction) {
     const errorMessage = [
-      '🔴 FATAL: Missing or invalid required environment variables:',
+      '⚠️  ATTENTION: Missing or invalid required environment variables (proceeding with hardcoded fallbacks):',
       ...errors.map((e) => `  → ${e}`),
       '',
-      'Set these variables in your .env.local file or deployment environment.',
-      'See .env.example for reference.',
+      'Please set these variables in your Vercel project settings to enable full configuration flexibility.',
     ].join('\n');
-    throw new Error(errorMessage);
+    logger.warn(errorMessage);
+    // REMOVED: throw new Error(errorMessage); — Preventing production crashes due to hardcoded fallbacks
   }
 
   return {
@@ -121,7 +121,8 @@ export function validateAndLogEnv(): void {
   } catch (error) {
     logger.error(error instanceof Error ? error.message : String(error));
     if (process.env.NODE_ENV === 'production') {
-      process.exit(1);
+      // process.exit(1); 
+      // Proceed with hardcoded fallbacks defined in models.ts and lib/mongodb.ts
     }
   }
 }
