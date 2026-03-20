@@ -427,90 +427,13 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
           <div className="container relative z-10 px-4">
             <h2 className="text-4xl md:text-7xl font-headline mb-8">Ready to <span className="text-accent">Invest</span> In <br /> Strategic Land?</h2>
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
+            <div className="flex flex-wrap justify-center gap-6">
               <Button size="lg" className="h-16 px-12 rounded-full bg-accent text-primary hover:bg-white transition-all font-black uppercase tracking-widest text-lg" asChild>
                 <Link href="/properties">Start Browsing</Link>
               </Button>
               <Button size="lg" variant="outline" className="h-16 px-12 rounded-full border-white/30 hover:bg-white/10 transition-all font-black uppercase tracking-widest text-lg" asChild>
                 <Link href="/about">Our Strategy</Link>
               </Button>
-            </div>
-            
-            {/* Database Management Section */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-md mx-auto">
-              <h3 className="text-xl font-bold mb-4">Database Management</h3>
-              <div className="space-y-3">
-                <Button 
-                  size="lg" 
-                  className="w-full bg-white text-primary hover:bg-gray-100"
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('/api/test-mongodb');
-                      const data = await response.json();
-                      alert(data.message + (data.error ? '\nError: ' + data.error : '') + (data.stats ? `\n\nUsers: ${data.stats.users}\nPlots: ${data.stats.plots}` : ''));
-                    } catch (error) {
-                      alert('Failed to test database connection');
-                    }
-                  }}
-                >
-                  Test MongoDB Connection
-                </Button>
-                
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="w-full border-white/30 hover:bg-white/10 text-white"
-                  onClick={async () => {
-                    if (confirm('This will migrate all your JSON data to MongoDB. Continue?')) {
-                      try {
-                        const response = await fetch('/api/migrate-to-mongodb', { method: 'POST' });
-                        const data = await response.json();
-                        if (data.success) {
-                          alert(`✅ Migration successful!\n\nUsers: ${data.stats.users}\nPlots: ${data.stats.plots}\nTotal Collections: ${data.stats.totalCollections}`);
-                        } else {
-                          alert(`❌ Migration failed: ${data.error}`);
-                        }
-                      } catch (error) {
-                        alert('Failed to run migration');
-                      }
-                    }
-                  }}
-                >
-                  Migrate Data to MongoDB
-                </Button>
-                
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="w-full border-white/30 hover:bg-white/10 text-white"
-                  asChild
-                >
-                  <Link href="/create-owner">
-                    Create Owner Account
-                  </Link>
-                </Button>
-                
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="w-full border-white/30 hover:bg-white/10 text-white"
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('/api/deployment-status');
-                      const data = await response.json();
-                      if (data.success) {
-                        alert(`✅ Deployment Status:\n\nConnected: ${data.status.connected ? 'Yes' : 'No'}\nTotal Users: ${data.status.totalUsers}\nSwamy Exists: ${data.status.swamyExists ? 'Yes' : 'No'}\nDatabase: ${data.status.database}\nEnvironment: ${data.status.environment}\n\nMongoDB is working!`);
-                      } else {
-                        alert(`❌ Status check failed: ${data.error}`);
-                      }
-                    } catch (error) {
-                      alert('Failed to check deployment status');
-                    }
-                  }}
-                >
-                  Check Deployment Status
-                </Button>
-              </div>
             </div>
           </div>
         </section>

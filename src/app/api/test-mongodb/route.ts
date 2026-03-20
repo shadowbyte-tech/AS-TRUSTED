@@ -26,7 +26,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       status: 'Connected to MongoDB Atlas',
       database: 'as-trusted-consultancy',
-      collections: collections.map(c => c.name),
+      collections: collections.map((c: any) => c.name),
       stats: {
         users: userCount,
         plots: plotCount
