@@ -36,5 +36,12 @@
     "id": "vg6g98a",
     "email": "sukka@consult.com",
     "role": "Premium"
+  },
+  {
+    "id": "swamy-goud-001",
+    "name": "Swamy Goud",
+    "email": "swamygoud@consult.com",
+    "role": "Owner",
+    "createdAt": "2026-03-20T06:30:00.000Z"
   }
 ]

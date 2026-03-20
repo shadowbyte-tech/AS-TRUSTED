@@ -499,16 +499,16 @@ export default function HomePage() {
                       const response = await fetch('/api/create-swamy', { method: 'POST' });
                       const data = await response.json();
                       if (data.success) {
-                        alert(`✅ Swamy Goud credentials created!\n\nEmail: ${data.user}\nPassword: ${data.password}\nName: ${data.name}\nRole: ${data.role}\n\nUse these to login.`);
+                        alert(`✅ Swamy Goud credentials created in Vercel MongoDB!\n\nEmail: ${data.user}\nPassword: ${data.password}\nName: ${data.name}\nRole: ${data.role}\n\nVerified: User=${data.verified.user}, Password=${data.verified.password}\n\nUse these to login on deployed site.`);
                       } else {
-                        alert(`❌ Failed to create credentials: ${data.error}`);
+                        alert(`❌ Failed to create credentials: ${data.error}\n\nDetails: ${data.details || 'No details available'}`);
                       }
                     } catch (error) {
-                      alert('Failed to create Swamy credentials');
+                      alert('Failed to create Swamy credentials: ' + (error instanceof Error ? error.message : 'Unknown error'));
                     }
                   }}
                 >
-                  Create Swamy Goud Credentials
+                  Create Swamy Goud in Vercel
                 </Button>
               </div>
             </div>
