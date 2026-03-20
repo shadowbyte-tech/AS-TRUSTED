@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateUser, setAuthCookies } from '@/lib/auth';
+import { authenticateUser, setAuthCookies } from '@/lib/mongodb-auth';
 import { trackLoginAttempt, isAccountLocked, getRemainingLockoutTime } from '@/lib/enhanced-auth';
 import { handleError } from '@/lib/errors';
 import { API_MESSAGES } from '@/lib/constants';
@@ -141,7 +141,11 @@ export async function POST(request: NextRequest) {
     logger.info('Auth: Rate limiter reset', { ip: clientIP });
 
     // Set secure HTTP-only cookies
-    await setAuthCookies(user);
+    const response = NextResponse.json({
+      success: true,
+      user,
+    });
+    await setAuthCookies(response, user);
 
     // 🕒 AUDIT: Log successful login
     await createAuditTrail({
@@ -154,10 +158,7 @@ export async function POST(request: NextRequest) {
 
     logger.info('Auth: Login successful', { email: user.email });
 
-    return NextResponse.json({
-      success: true,
-      user,
-    });
+    return response;
   } catch (error) {
     logger.error('❌ Login API error:', error);
     const { message, statusCode } = handleError(error);
