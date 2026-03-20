@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Starting complete data migration to MongoDB...');
     
     const { MongoClient } = require('mongodb');
-    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@astrustedconsultany.5wcilrm.mongodb.net/?appName=ASTRUSTEDCONSULTANY';
+    const uri = 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/?appName=ASTRUSTEDCONSULTANY';
     
     const client = new MongoClient(uri);
     await client.connect();
