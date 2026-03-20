@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { validateAndLogEnv } from './env-validation';
 
 // Hardcoded directly to the NEW Atlas cluster so Vercel's stale environment variables don't block it
-const MONGODB_URI = 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@smkg.wc88qhm.mongodb.net/as-trusted-consultancy?appName=SMKG';
+const MONGODB_URI = 'YOUR_NEW_MONGODB_URL_HERE'; // Replace with your new database URL
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────
 const AuditLogSchema = new mongoose.Schema({

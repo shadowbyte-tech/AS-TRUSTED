@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     
     // Simple MongoDB connection test
     const { MongoClient } = require('mongodb');
-    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || 'mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority';
+    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || 'YOUR_NEW_MONGODB_URL_HERE'; // Replace with your new database URL
     
     const client = new MongoClient(uri);
     await client.connect();
