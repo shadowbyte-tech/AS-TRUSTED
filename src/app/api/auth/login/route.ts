@@ -32,13 +32,15 @@ export async function POST(request: NextRequest) {
       // We will check exactly why it failed to give feedback
       let diagnosticMessage = 'Invalid credentials. Please check your email and password.';
       try {
-        const { readUsers } = await import('@/lib/mongodb-database');
+        const { readUsers, getDBStatus } = await import('@/lib/mongodb-database');
         const { getPassword } = await import('@/lib/mongodb-database');
+        
+        const dbStatus = await getDBStatus();
         const users = await readUsers();
         const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
         
         if (!foundUser) {
-           diagnosticMessage = `Error: User '${email}' not found in the database. DB connected: ${users.length > 0}`;
+           diagnosticMessage = `Error: User '${email}' not found. DB connected: ${dbStatus.connected}. DB Error: ${dbStatus.error || 'None'}`;
         } else {
            const storedPwd = await getPassword(foundUser.email);
            if (!storedPwd) {
