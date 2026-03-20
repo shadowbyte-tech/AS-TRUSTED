@@ -36,7 +36,7 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<A
     });
     
     if (!user) {
-      console.log('❌ User not found:', credentials.email);
+      console.log('❌ Auth failure for:', credentials.email, '- USER RECORD NOT FOUND in collection "users"');
       await client.close();
       return null;
     }
@@ -47,7 +47,7 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<A
     });
     
     if (!passwordDoc) {
-      console.log('❌ Password not found for:', credentials.email);
+      console.log('❌ Auth failure for:', credentials.email, '- PASSWORD RECORD NOT FOUND in collection "passwords"');
       await client.close();
       return null;
     }
@@ -84,7 +84,14 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<A
     };
     
   } catch (error) {
-    console.error('❌ Authentication error:', error);
+    const errorDetails = error instanceof Error ? error.message : String(error);
+    console.error('❌ Authentication CRITICAL error (Connection or Query failed):', errorDetails);
+    
+    // Check for common connection errors
+    if (errorDetails.includes('ETIMEOUT') || errorDetails.includes('ECONNREFUSED')) {
+      console.error('⚠️  HINT: This looks like a network or whitelist issue. Check Atlas IP Access List.');
+    }
+    
     return null;
   }
 }

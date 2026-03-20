@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Migrate other collections
-    const collections = ['inquiries', 'registrations', 'contacts'];
+    const collections = ['inquiries', 'registrations', 'contacts', 'passwords', 'auditlogs'];
     for (const collectionName of collections) {
       try {
         const filePath = path.join(dataDir, `${collectionName}.json`);
