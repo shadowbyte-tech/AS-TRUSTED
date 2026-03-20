@@ -494,11 +494,21 @@ export default function HomePage() {
                   size="lg" 
                   variant="outline"
                   className="w-full border-white/30 hover:bg-white/10 text-white"
-                  asChild
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/simple-migrate', { method: 'POST' });
+                      const data = await response.json();
+                      if (data.success) {
+                        alert(`✅ Simple migration successful!\n\nTest user created:\nEmail: ${data.user}\nPassword: ${data.password}\n\nUse these to test login.`);
+                      } else {
+                        alert(`❌ Simple migration failed: ${data.error}`);
+                      }
+                    } catch (error) {
+                      alert('Failed to run simple migration');
+                    }
+                  }}
                 >
-                  <Link href="/test-mongodb-login">
-                    Test MongoDB Login
-                  </Link>
+                  Simple Migration (Create Test User)
                 </Button>
               </div>
             </div>
