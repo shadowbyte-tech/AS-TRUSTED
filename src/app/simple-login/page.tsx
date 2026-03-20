@@ -17,8 +17,9 @@ export default function SimpleLogin() {
 
     // Hardcoded authentication on client side
     const validUsers = [
-      { email: 'admin@astrustedconsultancy.com', password: 'admin123', role: 'Owner', name: 'Admin User', id: 'admin-001' },
-      { email: 'swamygoud@consult.com', password: 'swamy@2775', role: 'Owner', name: 'Swamy Goud', id: 'swamy-001' }
+      { email: 'owner@astrustedconsultancy.com', password: 'manikanta@2775', role: 'Owner', name: 'Owner User', id: 'owner-001' },
+      { email: 'swamy@consult.com', password: 'manikanta@2775', role: 'Owner', name: 'Swamy Goud', id: 'swamy-001' },
+      { email: 'admin@astrustedconsultancy.com', password: 'admin123', role: 'Owner', name: 'Admin User', id: 'admin-001' }
     ];
 
     const user = validUsers.find(u => u.email === email && u.password === password);
@@ -30,9 +31,9 @@ export default function SimpleLogin() {
       
       setMessage('✅ Login successful! Redirecting...');
       
-      // Redirect to dashboard after 2 seconds
+      // Redirect to owner-login after 2 seconds
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/owner-login');
       }, 2000);
     } else {
       setMessage('❌ Invalid credentials');
@@ -106,13 +107,16 @@ export default function SimpleLogin() {
 
           <div className="text-center">
             <p className="text-xs text-gray-500">
-              Test Credentials:
+              Owner Credentials:
+            </p>
+            <p className="text-xs text-gray-500">
+              owner@astrustedconsultancy.com / manikanta@2775
+            </p>
+            <p className="text-xs text-gray-500">
+              swamy@consult.com / manikanta@2775
             </p>
             <p className="text-xs text-gray-500">
               admin@astrustedconsultancy.com / admin123
-            </p>
-            <p className="text-xs text-gray-500">
-              swamygoud@consult.com / swamy@2775
             </p>
           </div>
         </form>
