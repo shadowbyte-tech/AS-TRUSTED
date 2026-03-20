@@ -37,8 +37,7 @@ export default function LoginForm() {
     setLockoutInfo(null);
 
     // Use owner login endpoint for executive portal
-    // Use owner login endpoint for executive portal
-    const loginEndpoint = '/api/auth/owner-login';
+    const loginEndpoint = '/api/auth/owner-login-simple';
     
     try {
       // Ensure proper JSON formatting
