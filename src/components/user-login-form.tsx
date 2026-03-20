@@ -45,9 +45,9 @@ export default function UserLoginForm() {
         if (user.role === 'Owner') {
           window.location.href = '/dashboard';
         } else if (user.role === 'Premium') {
-          router.push('/premium-dashboard');
+          window.location.href = '/premium-properties';
         } else {
-          router.push('/properties');
+          window.location.href = '/normal-properties';
         }
       }, 1000);
     } else {

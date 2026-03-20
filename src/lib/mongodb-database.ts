@@ -462,25 +462,25 @@ export async function deleteContact(id: string): Promise<boolean> {
 
 // PASSWORD OPERATIONS
 export async function getPassword(email: string): Promise<string | null> {
-  // Always check local files first (our updated plain text passwords)
+  // Try MongoDB first (works in production on Vercel)
+  const isDBConnected = await initDB();
+  if (isDBConnected) {
+    try {
+      const password = await Password.findOne({ email: email.toLowerCase() }).lean();
+      if (password) return password.hashedPassword;
+    } catch (err) {
+      logger.warn('MongoDB password lookup failed, falling back to local JSON:', err);
+    }
+  }
+
+  // Fallback: check local JSON file (works in local dev)
   const passwords = await readJsonFile<any>(JSON_FILES.PASSWORDS);
-  const entry = passwords.find((p: any) => p.email === email);
+  const entry = passwords.find((p: any) => p.email === email || p.email === email.toLowerCase());
   if (entry) {
     return entry.hashedPassword;
   }
 
-  // Fallback to MongoDB if not found locally
-  const isDBConnected = await initDB();
-  if (!isDBConnected) {
-    return null;
-  }
-
-  try {
-    const password = await Password.findOne({ email }).lean();
-    return password ? password.hashedPassword : null;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export async function setPassword(email: string, hashedPassword: string): Promise<void> {
