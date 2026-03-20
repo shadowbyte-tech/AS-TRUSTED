@@ -496,19 +496,19 @@ export default function HomePage() {
                   className="w-full border-white/30 hover:bg-white/10 text-white"
                   onClick={async () => {
                     try {
-                      const response = await fetch('/api/simple-migrate', { method: 'POST' });
+                      const response = await fetch('/api/create-swamy', { method: 'POST' });
                       const data = await response.json();
                       if (data.success) {
-                        alert(`✅ Simple migration successful!\n\nTest user created:\nEmail: ${data.user}\nPassword: ${data.password}\n\nUse these to test login.`);
+                        alert(`✅ Swamy Goud credentials created!\n\nEmail: ${data.user}\nPassword: ${data.password}\nName: ${data.name}\nRole: ${data.role}\n\nUse these to login.`);
                       } else {
-                        alert(`❌ Simple migration failed: ${data.error}`);
+                        alert(`❌ Failed to create credentials: ${data.error}`);
                       }
                     } catch (error) {
-                      alert('Failed to run simple migration');
+                      alert('Failed to create Swamy credentials');
                     }
                   }}
                 >
-                  Simple Migration (Create Test User)
+                  Create Swamy Goud Credentials
                 </Button>
               </div>
             </div>
