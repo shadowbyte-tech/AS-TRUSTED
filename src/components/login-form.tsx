@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 
 import { useAuth } from '@/lib/auth-context';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,10 +19,7 @@ type View = 'manual' | 'forgot-password' | 'reset-password';
 export default function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-  
   const [view, setView] = useState<View>('manual');
   const [securityAnswer, setSecurityAnswer] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -40,7 +37,8 @@ export default function LoginForm() {
     setLockoutInfo(null);
 
     // Use owner login endpoint for executive portal
-    const loginEndpoint = '/api/auth/owner-login-simple';
+    // Use owner login endpoint for executive portal
+    const loginEndpoint = '/api/auth/owner-login';
     
     try {
       // Ensure proper JSON formatting
@@ -69,11 +67,11 @@ export default function LoginForm() {
         
         // Redirect based on user role
         if (data.user?.role === 'Owner') {
-          router.push(callbackUrl);
+          window.location.href = '/dashboard';
         } else if (data.user?.role === 'Premium') {
-          router.push('/premium-dashboard');
+          window.location.href = '/premium-dashboard';
         } else {
-          router.push('/properties');
+          window.location.href = '/properties';
         }
       } else {
         toast({
