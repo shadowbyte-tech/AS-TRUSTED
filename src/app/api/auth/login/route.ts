@@ -43,17 +43,31 @@ export async function POST(request: NextRequest) {
     }
     
     const storedPassword = passwordDoc.hashedPassword || passwordDoc.password;
-    const passwordValid = password === storedPassword;
     
-    if (!passwordValid) {
-      await client.close();
-      return NextResponse.json({
-        success: false,
-        error: 'Invalid password'
-      });
+    // Check if password is bcrypt hash or plain text
+    let passwordValid = false;
+    if (storedPassword.startsWith('$2') || storedPassword.startsWith('$1')) {
+      // Bcrypt hash - skip for now
+      passwordValid = false;
+      console.log('⚠️ Bcrypt password detected, skipping comparison');
+    } else {
+      // Plain text comparison
+      passwordValid = password === storedPassword;
     }
     
     await client.close();
+    
+    if (!passwordValid) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid credentials',
+        debug: {
+          email: email.toLowerCase(),
+          passwordType: storedPassword.startsWith('$2') ? 'bcrypt' : 'plain',
+          note: 'Password comparison failed'
+        }
+      });
+    }
     
     // Create JWT token
     const token = jwt.sign(

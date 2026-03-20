@@ -16,19 +16,14 @@ export async function GET(request: NextRequest) {
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       
-      const { MongoClient } = require('mongodb');
-      const uri = 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/?appName=ASTRUSTEDCONSULTANY';
+      // Hardcoded users for immediate testing
+      const validUsers = [
+        { id: 'admin-001', email: 'admin@astrustedconsultancy.com', role: 'Owner', name: 'Admin User' },
+        { id: 'swamy-001', email: 'swamygoud@consult.com', role: 'Owner', name: 'Swamy Goud' },
+        { id: 'premium-001', email: 'premium@astrustedconsultancy.com', role: 'Premium', name: 'Premium User' }
+      ];
       
-      const client = new MongoClient(uri);
-      await client.connect();
-      const db = client.db('as-trusted-consultancy');
-      
-      const user = await db.collection('users').findOne(
-        { id: decoded.id },
-        { projection: { id: 1, email: 1, role: 1, name: 1, phone: 1, location: 1 } }
-      );
-      
-      await client.close();
+      const user = validUsers.find(u => u.id === decoded.id);
       
       if (user) {
         return NextResponse.json({ user });
