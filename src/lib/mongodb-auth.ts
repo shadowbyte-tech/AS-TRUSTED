@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
@@ -52,19 +51,12 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<A
       return null;
     }
     
-    // Check password (supports both plain text and bcrypt)
-    let passwordValid = false;
-    const storedPassword = passwordDoc.hashedPassword;
+    // Check password (plain text only)
+    const storedPassword = passwordDoc.hashedPassword || passwordDoc.password;
+    const passwordValid = credentials.password === storedPassword;
     
-    if (storedPassword.startsWith('$2') || storedPassword.startsWith('$1')) {
-      // Bcrypt hash
-      passwordValid = await bcrypt.compare(credentials.password, storedPassword);
-      console.log('🔍 Using bcrypt password verification');
-    } else {
-      // Plain text (for migrated data)
-      passwordValid = credentials.password === storedPassword;
-      console.log('🔍 Using plain text password verification');
-    }
+    console.log('🔍 Using plain text password verification');
+    console.log('🔍 Password comparison:', credentials.password, '===', storedPassword, '=', passwordValid);
     
     if (!passwordValid) {
       console.log('❌ Password mismatch for:', credentials.email);
