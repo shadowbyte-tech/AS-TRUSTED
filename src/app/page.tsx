@@ -467,24 +467,22 @@ export default function HomePage() {
                   variant="outline"
                   className="w-full border-white/30 hover:bg-white/10 text-white"
                   onClick={async () => {
-                    try {
-                      const response = await fetch('/api/verify-sync', { method: 'POST' });
-                      const data = await response.json();
-                      if (data.success) {
-                        const syncInfo = Object.entries(data.syncStatus).map(([key, status]: [string, any]) => 
-                          `${key}: Local=${status.local}, MongoDB=${status.mongodb} ${status.synced ? '✅' : '❌'}`
-                        ).join('\n');
-                        
-                        alert(`📊 Data Sync Status:\n\n${syncInfo}\n\nTotal Local: ${data.summary.totalLocalRecords}\nTotal MongoDB: ${data.summary.totalMongoRecords}\nFully Synced: ${data.isFullySynced ? '✅' : '❌'}\nReady for GitHub: ${data.summary.readyForGitHub ? '✅' : '❌'}`);
-                      } else {
-                        alert(`❌ Sync check failed: ${data.error}`);
+                    if (confirm('⚠️ This will DELETE ALL data from MongoDB Atlas database (including sample data). Continue?')) {
+                      try {
+                        const response = await fetch('/api/clear-database', { method: 'POST' });
+                        const data = await response.json();
+                        if (data.success) {
+                          alert(`✅ Database cleared!\n\nCollections: ${data.summary.successCount}/${data.summary.totalCollections}\nDocuments Deleted: ${data.summary.totalDocumentsDeleted}\n\nReady for fresh migration!`);
+                        } else {
+                          alert(`❌ Failed to clear database: ${data.error}`);
+                        }
+                      } catch (error) {
+                        alert('Failed to clear database');
                       }
-                    } catch (error) {
-                      alert('Failed to check sync status');
                     }
                   }}
                 >
-                  Verify MongoDB Sync
+                  Clear MongoDB Atlas
                 </Button>
               </div>
             </div>
