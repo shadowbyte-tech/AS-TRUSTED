@@ -496,19 +496,19 @@ export default function HomePage() {
                   className="w-full border-white/30 hover:bg-white/10 text-white"
                   onClick={async () => {
                     try {
-                      const response = await fetch('/api/create-swamy', { method: 'POST' });
+                      const response = await fetch('/api/deployment-status');
                       const data = await response.json();
                       if (data.success) {
-                        alert(`✅ Swamy Goud credentials created in Vercel MongoDB!\n\nEmail: ${data.user}\nPassword: ${data.password}\nName: ${data.name}\nRole: ${data.role}\n\nVerified: User=${data.verified.user}, Password=${data.verified.password}\n\nUse these to login on deployed site.`);
+                        alert(`✅ Deployment Status:\n\nConnected: ${data.status.connected ? 'Yes' : 'No'}\nTotal Users: ${data.status.totalUsers}\nSwamy Exists: ${data.status.swamyExists ? 'Yes' : 'No'}\nDatabase: ${data.status.database}\nEnvironment: ${data.status.environment}\n\nMongoDB is working!`);
                       } else {
-                        alert(`❌ Failed to create credentials: ${data.error}\n\nDetails: ${data.details || 'No details available'}`);
+                        alert(`❌ Status check failed: ${data.error}`);
                       }
                     } catch (error) {
-                      alert('Failed to create Swamy credentials: ' + (error instanceof Error ? error.message : 'Unknown error'));
+                      alert('Failed to check deployment status');
                     }
                   }}
                 >
-                  Create Swamy Goud in Vercel
+                  Check Deployment Status
                 </Button>
               </div>
             </div>
