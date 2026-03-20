@@ -8,8 +8,9 @@ export async function POST(request: NextRequest) {
     
     // Hardcoded fallback credentials
     const hardcodedUsers = [
-      { email: 'admin@astrustedconsultancy.com', password: 'admin123', role: 'Owner', name: 'Admin User', id: 'admin-001' },
-      { email: 'swamygoud@consult.com', password: 'swamy@2775', role: 'Owner', name: 'Swamy Goud', id: 'swamy-001' }
+      { email: 'owner@astrustedconsultancy.com', password: 'manikanta@2775', role: 'Owner', name: 'Owner User', id: 'owner-001' },
+      { email: 'swamy@consult.com', password: 'manikanta@2775', role: 'Owner', name: 'Swamy Goud', id: 'swamy-001' },
+      { email: 'admin@astrustedconsultancy.com', password: 'admin123', role: 'Owner', name: 'Admin User', id: 'admin-001' }
     ];
     
     // Check hardcoded credentials first
