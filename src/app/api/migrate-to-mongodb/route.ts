@@ -3,12 +3,13 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export async function POST(request: NextRequest) {
+  let client;
   try {
-    // Test MongoDB connection first
+    // Connect to MongoDB
     const { MongoClient } = require('mongodb');
-    const uri = 'mongodb+srv://sukkamanikantagoud_db_user:ZZBbpijo3jun3Oc0@smkg.wc88qhm.mongodb.net/?appName=SMKG';
+    const uri = process.env.TURSO_CONNECTION_MONGODB_URI || 'mongodb+srv://Vercel-Admin-as-trusted-consultancy:DEyNeV57jM73uap3@as-trusted-consultancy.ehwtipr.mongodb.net/?retryWrites=true&w=majority';
     
-    const client = new MongoClient(uri);
+    client = new MongoClient(uri);
     await client.connect();
     const db = client.db('as-trusted-consultancy');
     
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (plots.length > 0) {
       // Handle duplicate plot numbers by adding suffix
       const plotNumbers = new Set();
-      const processedPlots = plots.map((plot, index) => {
+      const processedPlots = plots.map((plot: any, index: number) => {
         let plotNumber = plot.plotNumber;
         let suffix = '';
         let counter = 1;
@@ -81,11 +82,11 @@ export async function POST(request: NextRequest) {
     await db.collection('users').createIndex({ email: 1 }, { unique: true });
     await db.collection('plots').createIndex({ plotNumber: 1 }, { unique: true });
     
-    await client.close();
-    
     // Verify data
     const userCount = await db.collection('users').countDocuments();
     const plotCount = await db.collection('plots').countDocuments();
+    
+    await client.close();
     
     return NextResponse.json({
       success: true,
