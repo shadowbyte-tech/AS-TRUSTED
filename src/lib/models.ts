@@ -2,7 +2,13 @@ import mongoose from 'mongoose';
 import { validateAndLogEnv } from './env-validation';
 
 // Hardcoded directly to the Atlas cluster with the correct database name
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/as-trusted-consultancy?appName=ASTRUSTEDCONSULTANY';
+const WORKING_MONGODB_URI = 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/as-trusted-consultancy?appName=ASTRUSTEDCONSULTANY';
+let MONGODB_URI = process.env.MONGODB_URI || '';
+
+// Force bypass of any broken/stale environment variables (especially on Vercel)
+if (!MONGODB_URI || MONGODB_URI.includes('smkg.wc88qhm.mongodb.net')) {
+  MONGODB_URI = WORKING_MONGODB_URI;
+}
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────
 const AuditLogSchema = new mongoose.Schema({
