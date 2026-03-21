@@ -41,11 +41,13 @@ export async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000, // Fail fast in 5 seconds
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 2000, // Very aggressive for serverless
+      connectTimeoutMS: 5000,
     };
 
+    logger.info('🔌 Connecting to MongoDB Atlas...');
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
+      logger.info('🔌 MongoDB Connected Successfully');
       return m;
     });
   }
