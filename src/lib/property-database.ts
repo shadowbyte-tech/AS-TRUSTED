@@ -205,6 +205,16 @@ export async function createProperty(propertyData: Omit<Property, 'id' | 'create
     const propertyId = Math.random().toString(36).substr(2, 9);
     const now = new Date().toISOString();
 
+    // Normalize property type for database compatibility
+    let normalizedType = propertyData.propertyType;
+    if (['Villa', 'Apartment', 'Farmhouse', 'Studio', 'House'].includes(normalizedType)) {
+      normalizedType = 'House';
+    } else if (['Land', 'Commercial'].includes(normalizedType)) {
+      normalizedType = 'Land';
+    } else {
+      normalizedType = 'Plot';
+    }
+
     // Insert base property
     await db.execute(`
       INSERT INTO properties (
@@ -215,7 +225,7 @@ export async function createProperty(propertyData: Omit<Property, 'id' | 'create
     `, [
       propertyId,
       propertyData.propertyNumber,
-      propertyData.propertyType,
+      normalizedType,
       propertyData.villageName,
       propertyData.areaName,
       propertyData.imageUrl || null,

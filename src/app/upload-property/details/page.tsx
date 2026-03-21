@@ -24,6 +24,15 @@ import {
   Sparkles
 } from 'lucide-react';
 
+const getBasePropertyType = (type: string): 'Plot' | 'House' | 'Land' => {
+  const houseTypes = ['House', 'Villa', 'Apartment', 'Farmhouse', 'Studio'];
+  const landTypes = ['Land', 'Commercial'];
+  
+  if (houseTypes.includes(type)) return 'House';
+  if (landTypes.includes(type)) return 'Land';
+  return 'Plot';
+};
+
 function PropertyDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -78,7 +87,23 @@ function PropertyDetailsContent() {
   }, [propertyType, router]);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'propertyType') {
+      // Automatically set reasonable defaults for subtypes
+      const updates: any = { propertyType: value };
+      
+      if (['Villa', 'Apartment', 'Farmhouse', 'Studio'].includes(value)) {
+        updates.houseType = value;
+      } else if (value === 'House') {
+        updates.houseType = 'Independent';
+      } else if (value === 'Commercial') {
+        updates.landType = 'Commercial';
+      }
+      
+      setFormData(prev => ({ ...prev, ...updates }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+    
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -204,21 +229,23 @@ function PropertyDetailsContent() {
     }
 
     // Type-specific validation
-    if (formData.propertyType === 'Plot') {
+    const baseType = getBasePropertyType(formData.propertyType);
+    
+    if (baseType === 'Plot') {
       if (!formData.plotSize.trim()) {
         newErrors.plotSize = 'Plot size is required';
       }
       if (!formData.pricePerSqft || parseFloat(formData.pricePerSqft) <= 0) {
         newErrors.pricePerSqft = 'Valid price per sqft is required';
       }
-    } else if (formData.propertyType === 'House') {
+    } else if (baseType === 'House') {
       if (!formData.houseSize.trim()) {
         newErrors.houseSize = 'House size is required';
       }
       if (!formData.bedrooms || parseInt(formData.bedrooms) <= 0) {
         newErrors.bedrooms = 'Valid number of bedrooms is required';
       }
-    } else if (formData.propertyType === 'Land') {
+    } else if (baseType === 'Land') {
       if (!formData.landSize.trim()) {
         newErrors.landSize = 'Land size is required';
       }
@@ -239,8 +266,11 @@ function PropertyDetailsContent() {
 
     try {
       // Prepare property data
+      const baseType = getBasePropertyType(formData.propertyType);
+      
       const propertyData = {
         ...formData,
+        propertyType: baseType as any,
         price: parseFloat(formData.price),
         pricePerSqft: formData.pricePerSqft ? parseFloat(formData.pricePerSqft) : undefined,
         bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : undefined,
@@ -545,7 +575,7 @@ function PropertyDetailsContent() {
           </Card>
 
           {/* Type-specific fields */}
-          {formData.propertyType === 'Plot' && (
+          {getBasePropertyType(formData.propertyType) === 'Plot' && (
             <Card className="bg-gradient-to-br from-amber-800/50 to-orange-900/50 backdrop-blur-md border-amber-700 shadow-2xl">
               <CardHeader className="pb-6">
                 <CardTitle className="flex items-center gap-3 text-2xl text-white">
@@ -625,7 +655,7 @@ function PropertyDetailsContent() {
           )}
 
           {/* House specific fields */}
-          {formData.propertyType === 'House' && (
+          {getBasePropertyType(formData.propertyType) === 'House' && (
             <Card className="bg-gradient-to-br from-blue-800/50 to-indigo-900/50 backdrop-blur-md border-blue-700 shadow-2xl">
               <CardHeader className="pb-6">
                 <CardTitle className="flex items-center gap-3 text-2xl text-white">
@@ -734,7 +764,7 @@ function PropertyDetailsContent() {
           )}
 
           {/* Land specific fields */}
-          {formData.propertyType === 'Land' && (
+          {getBasePropertyType(formData.propertyType) === 'Land' && (
             <Card className="bg-gradient-to-br from-green-800/50 to-emerald-900/50 backdrop-blur-md border-green-700 shadow-2xl">
               <CardHeader className="pb-6">
                 <CardTitle className="flex items-center gap-3 text-2xl text-white">
