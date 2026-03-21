@@ -50,16 +50,22 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    logger.error('❌ Login error:', errorMessage);
-    if (error instanceof Error) {
-        logger.error('Stack trace:', error.stack);
-    }
+    } catch (error: any) {
+    const errorString = JSON.stringify(error, Object.getOwnPropertyNames(error));
+    logger.error('❌ Login error (detailed):', errorString);
     
+    const supabaseUrlSet = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKeySet = !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+    const jwtSecretSet = !!process.env.JWT_SECRET;
+
     return NextResponse.json({
       success: false,
-      error: `An error occurred during login: ${errorMessage}. Please check your environment variables.`
+      error: `Login failed. Diagnostics:
+- Supabase URL Set: ${supabaseUrlSet}
+- Supabase Key Set: ${supabaseKeySet}
+- JWT Secret Set: ${jwtSecretSet}
+- Error Detail: ${error?.message || 'Unknown error'}
+- Full Info: ${errorString.substring(0, 200)}`
     }, { status: 500 });
   }
 }
