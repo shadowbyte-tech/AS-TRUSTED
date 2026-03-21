@@ -2,7 +2,7 @@
  * Password storage using MongoDB
  * Replaces file-based storage for production deployment
  */
-import { getPassword as getPasswordDB, setPassword as setPasswordDB } from './mongodb-database';
+import { getStoredPassword as getPasswordDB, setStoredPassword as setPasswordDB } from './supabase-database';
 import fs from 'fs/promises';
 import path from 'path';
 import { logger } from './logger';
@@ -15,45 +15,30 @@ async function getLocalPassword(email: string): Promise<string | null> {
     const passwords = JSON.parse(content);
     return passwords[email] || null;
   } catch (error) {
-    logger.error('Failed to read local password data:', error);
+    // Silence error if file doesn't exist - it's a legacy fallback
     return null;
   }
 }
 
 export async function getPassword(email: string): Promise<string | null> {
   try {
-    logger.info('🔐 GET PASSWORD CALLED FOR:', email);
     const dbPassword = await getPasswordDB(email);
-    logger.info('🔐 DB PASSWORD RESULT:', dbPassword ? 'FOUND' : 'NOT FOUND');
-    if (dbPassword) {
-      logger.debug('🔐 DB PASSWORD HASH RETRIEVED');
-      return dbPassword;
-    }
-    // Fallback to local if not in DB
-    logger.info('🔐 FALLING BACK TO LOCAL STORAGE');
-    const localPassword = await getLocalPassword(email);
-    logger.info('🔐 LOCAL PASSWORD RESULT:', localPassword ? 'FOUND' : 'NOT FOUND');
-    if (localPassword) {
-      logger.debug('🔐 LOCAL PASSWORD HASH RETRIEVED');
-    }
-    return localPassword;
+    if (dbPassword) return dbPassword;
+    
+    // Fallback to local if not in Supabase (during migration period)
+    return await getLocalPassword(email);
   } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.warn('MongoDB password fetch failed, falling back to local storage:', errorMessage);
-    logger.info('🔐 FALLBACK TO LOCAL STORAGE DUE TO ERROR');
-    const localPassword = await getLocalPassword(email);
-      logger.debug('🔐 LOCAL PASSWORD HASH (ERROR FALLBACK)');
-    return localPassword;
+    logger.warn(`Supabase password fetch failed for ${email}:`, error);
+    return await getLocalPassword(email);
   }
 }
 
 export async function setPassword(email: string, hashedPassword: string): Promise<void> {
   try {
     await setPasswordDB(email, hashedPassword);
+    logger.info(`✅ Password updated in Supabase for: ${email}`);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.warn('MongoDB password save failed:', errorMessage);
-    // In dev, we don't necessarily need to write back to JSON automatically 
-    // but the getPassword fallback will allow existing JSON passwords to work.
+    logger.error(`Supabase password save failed for ${email}:`, error);
+    throw error;
   }
 }

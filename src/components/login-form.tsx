@@ -142,9 +142,13 @@ export default function LoginForm() {
             }),
         });
 
-        const data = await response.json();
+        const contentType = response.headers.get('content-type');
+        let data;
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        }
 
-        if (response.ok) {
+        if (response.ok && data?.success) {
             toast({
                 title: 'Password Reset!',
                 description: 'Your password has been successfully changed. Please log in with your new password.',
@@ -156,9 +160,10 @@ export default function LoginForm() {
             setSecurityAnswer('');
             setView('manual');
         } else {
+            const errorMessage = data?.error || `Reset Failed (${response.status}). Please try again.`;
             toast({
                 title: 'Reset Failed',
-                description: data.error || 'Failed to reset password. Please try again.',
+                description: errorMessage,
                 variant: 'destructive',
             });
         }

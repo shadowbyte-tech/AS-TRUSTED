@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { readUsers, createUser as createUserDB } from './mongodb-database';
+import { readUsers, getUserByEmail, saveUser } from './supabase-database';
 import type { User } from './definitions';
 import { AuthenticationError, ValidationError } from './errors';
 import { getPassword, setPassword } from './password-storage';
@@ -105,20 +105,15 @@ export async function authenticateOwner(credentials: LoginCredentials): Promise<
     throw new ValidationError('Email and password are required');
   }
 
-  const users = await readUsers();
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const user = await getUserByEmail(email);
 
-  if (!user) {
-    return null;
-  }
-
-  if (user.role !== 'Owner') {
+  if (!user || user.role !== 'Owner') {
     return null;
   }
 
   const storedPassword = await getPassword(user.email);
   if (!storedPassword) {
-    console.error(`No password record found for: ${user.email}`);
+    logger.error(`No password record found in Supabase for: ${user.email}`);
     return null;
   }
 
@@ -140,31 +135,19 @@ export async function authenticateOwner(credentials: LoginCredentials): Promise<
 export async function authenticateUser(credentials: LoginCredentials): Promise<AuthUser | null> {
   const { email, password } = credentials;
 
-  console.log('🔍 Auth Debug - Input:', { email, passwordLength: password.length });
-
   if (!email || !password) {
     throw new ValidationError('Email and password are required');
   }
 
-  const users = await readUsers();
-  console.log('🔍 Auth Debug - Users found:', users.length);
+  const user = await getUserByEmail(email);
   
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  console.log('🔍 Auth Debug - User found:', !!user, user?.email, user?.role);
-  
-  if (!user) {
-    console.log('🔍 Auth Debug - User not found in database');
-    return null;
-  }
-
-  // Owner accounts must use the owner-specific login route
-  if (user.role === 'Owner') {
+  if (!user || user.role === 'Owner') {
     return null;
   }
 
   const storedPassword = await getPassword(user.email);
   if (!storedPassword) {
-    console.error(`No password record found for: ${user.email}`);
+    logger.error(`No password record found in Supabase for: ${user.email}`);
     return null;
   }
 
@@ -202,7 +185,7 @@ export async function registerUser(data: RegisterData): Promise<AuthUser | null>
   const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
   await setPassword(email, hashedPassword);
 
-  const savedUser = await createUserDB({
+  const savedUser = await saveUser({
     email,
     role: role as 'User' | 'Owner' | 'Premium',
   });
@@ -309,12 +292,24 @@ export async function getSessionUser(): Promise<AuthUser | null> {
   }
 
   try {
-    const users = await readUsers();
-    const user = users.find(u => u.id === decoded.id);
+    const user = await getUserByEmail(decoded.email || ''); // Assuming email is in token or we fetch by ID
 
-    if (!user) {
-      return null;
+    if (!user && decoded.id) {
+       // Fallback: finding by ID if email not directly available/trusted in token
+       const users = await readUsers();
+       const foundUser = users.find(u => u.id === decoded.id);
+       if (!foundUser) return null;
+       return {
+         id: foundUser.id,
+         email: foundUser.email,
+         role: foundUser.role,
+         name: foundUser.name,
+         phone: foundUser.phone,
+         location: foundUser.location,
+       };
     }
+
+    if (!user) return null;
 
     return {
       id: user.id,

@@ -15,18 +15,19 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    logger.info('🔍 Login attempt for:', email);
+    logger.info(`🔍 Login attempt for: ${email}`);
     
     // 1. Try to authenticate as regular/premium user
     let user = await authenticateUser({ email, password });
     
     // 2. If not found, try as owner
     if (!user) {
+      logger.debug(`🔍 User "${email}" not found as regular user, trying as Owner`);
       user = await authenticateOwner({ email, password });
     }
 
     if (!user) {
-      logger.warn('❌ Authentication failed for:', email);
+      logger.warn(`❌ Authentication failed for: ${email}. Check credentials/role.`);
       return NextResponse.json({
         success: false,
         error: 'Invalid credentials. Please check your email and password.'
