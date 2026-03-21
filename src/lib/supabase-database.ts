@@ -279,14 +279,12 @@ export async function getStoredPassword(email: string): Promise<string | null> {
 export async function setStoredPassword(email: string, hashedPassword: string): Promise<void> {
   try {
     const supabase = await getSupabase();
-    // Use email as a deterministic ID or generate one
-    const id = `pw_${Buffer.from(email).toString('base64').substring(0, 16)}`;
+    // Use upsert with onConflict: 'email' so it updates the existing record regardless of ID
     const { error } = await supabase.from('passwords').upsert({
-      id,
       email: email.toLowerCase(),
       hashed_password: hashedPassword,
       updated_at: new Date().toISOString()
-    });
+    }, { onConflict: 'email' });
     if (error) throw error;
   } catch (error) {
     logger.error(`Supabase: setStoredPassword failed for ${email}:`, error);
