@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { validateAndLogEnv } from './env-validation';
+import { logger } from './logger';
 
 // Prioritize Vercel's Environment Variable, fallback to hardcoded if strictly necessary
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/as-trusted-consultancy?appName=ASTRUSTEDCONSULTANY';
