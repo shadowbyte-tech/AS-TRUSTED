@@ -162,7 +162,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.index({ role: 1 });
 
 // Registration Schema
-const RegistrationSchema = new mongoose.Schema({
+const LeadSchema = new mongoose.Schema({
   _id: { type: String, required: true },
   name: { type: String, required: true },
   phone: { type: String, required: true },
@@ -172,8 +172,8 @@ const RegistrationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-RegistrationSchema.index({ email: 1 });
-RegistrationSchema.index({ createdAt: -1 });
+LeadSchema.index({ email: 1 });
+LeadSchema.index({ createdAt: -1 });
 
 // Inquiry Schema
 const InquirySchema = new mongoose.Schema({
@@ -229,7 +229,7 @@ const ComparisonSchema = new mongoose.Schema({
 export const Property = mongoose.models.Property || mongoose.model('Property', PropertySchema);
 export const Plot = mongoose.models.Plot || mongoose.model('Plot', PropertySchema); // Changed PlotSchema to PropertySchema
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
-export const Registration = mongoose.models.Registration || mongoose.model('Registration', RegistrationSchema);
+export const Registration = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
 export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', InquirySchema);
 export const Contact = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
 export const Password = mongoose.models.Password || mongoose.model('Password', PasswordSchema);

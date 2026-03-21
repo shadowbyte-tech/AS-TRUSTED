@@ -505,33 +505,28 @@ export async function writeRegistrations(registrations: RegistrationType[]): Pro
 }
 
 export async function createRegistration(regData: Omit<RegistrationType, 'id'>): Promise<RegistrationType> {
-  const isDBConnected = await initDB();
   const id = Math.random().toString(36).substring(2, 9);
   const newReg = { id, ...regData };
 
   try {
-    const regs = await readJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS);
-    await writeJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS, [newReg, ...regs]);
-  } catch (err) {
-    logger.warn('JSON registration save failed:', err);
-  }
-
-  if (isDBConnected) {
-    try {
+    const isDBConnected = await initDB();
+    if (isDBConnected) {
       const { isNew, ...rest } = regData;
       const registration = await Registration.create({
         _id: id,
         ...rest,
-        isUnread: isNew ?? true
+        isUnread: true
       });
+      
       return {
         id: registration._id.toString(),
         ...regData,
       };
-    } catch (err) { 
-      logger.error('MongoDB registration save failed:', err);
     }
+  } catch (err) {
+    logger.error('Registration: MongoDB creation failed, falling back to mock.', err);
   }
+
   return newReg;
 }
 

@@ -747,27 +747,6 @@ export async function createRegistration(prevState: any, formData: FormData): Pr
       };
     }
 
-    // 2. Create User Entry (Silent fallback)
-    try {
-      await createUserDB({
-        name,
-        email,
-        role: 'User' as const,
-        phone,
-        createdAt: registrationData.createdAt
-      });
-    } catch (err) {
-      logger.warn('⚠️ User entry skipped:', err);
-    }
-
-    // 3. Revalidate Paths (Safe)
-    try {
-      revalidatePath('/dashboard/registrations');
-      revalidatePath('/dashboard', 'layout');
-    } catch (err) {
-      logger.warn('⚠️ Revalidation skipped');
-    }
-
     logger.info('✅ Registration Finished Successfully');
     return {
       success: true,
