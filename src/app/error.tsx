@@ -52,16 +52,9 @@ export default function Error({
           Optimization in Progress
         </h1>
         
-        <p className="text-slate-400 text-lg mb-4 leading-relaxed font-medium">
+        <p className="text-slate-400 text-lg mb-10 leading-relaxed font-medium">
           A truly premium website like <span className="text-cyan-400 font-bold">AS Trusted</span> never closes. Our AI-driven maintenance engine is currently resolving a minor technical anomaly to ensure your experience remains elite and uninterrupted.
         </p>
-        
-        <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-10 text-left overflow-auto max-h-40">
-          <p className="text-red-400 font-mono text-xs">
-            {error.message || "Unknown Error"} <br/>
-            {error.digest && `Digest: ${error.digest}`}
-          </p>
-        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button 
