@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import { validateAndLogEnv } from './env-validation';
 
-// Hardcoded directly to the Atlas cluster with the correct database name
-// We are explicitly ignoring process.env.MONGODB_URI to prevent Vercel from injecting broken/stale values.
-const MONGODB_URI = 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/as-trusted-consultancy?appName=ASTRUSTEDCONSULTANY';
+// Prioritize Vercel's Environment Variable, fallback to hardcoded if strictly necessary
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@astrustedconsultany.5wcilrm.mongodb.net/as-trusted-consultancy?appName=ASTRUSTEDCONSULTANY';
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────
 const AuditLogSchema = new mongoose.Schema({
