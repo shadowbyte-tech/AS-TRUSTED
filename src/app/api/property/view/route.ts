@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/property-database';
+import { incrementPropertyViews, getProperty } from '@/lib/mongodb-database';
 import { getClientIP } from '@/lib/security';
 import { logger } from '@/lib/logger';
 
@@ -19,28 +19,16 @@ export async function POST(request: NextRequest) {
     const timestamp = new Date().toISOString();
 
     // Check if property exists
-    const propertyCheck = await db.execute(`
-      SELECT id FROM properties WHERE id = ?
-    `, [propertyId]);
+    const property = await getProperty(propertyId);
 
-    if (propertyCheck.rows.length === 0) {
+    if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
 
-    // Insert or update view record
-    await db.execute(`
-      INSERT OR REPLACE INTO property_views (property_id, ip_address, user_agent, viewed_at)
-      VALUES (?, ?, ?, ?)
-    `, [propertyId, clientIP, userAgent]);
-
-    // Update total view count for the property
-    await db.execute(`
-      UPDATE properties 
-      SET views = COALESCE(views, 0) + 1,
-      last_viewed_at = ?
-      WHERE id = ?
-    `, [timestamp, propertyId]);
-
+    // Increment views in MongoDB
+    await incrementPropertyViews(propertyId);
+    
+    // Log analytical data for reference
     logger.info(`👁️ Property View Tracked: ${propertyId} from ${clientIP}`);
 
     return NextResponse.json({ 

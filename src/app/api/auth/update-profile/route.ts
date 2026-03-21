@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { updateOwnerProfile } from '@/lib/database';
+import { updateUserProfile } from '@/lib/mongodb-database';
 import { verifyToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     const { name, phone, location } = await request.json();
 
-    // Update owner profile in database
-    const updatedUser = await updateOwnerProfile(decoded.email, {
+    // Update user profile in MongoDB
+    const updatedUser = await updateUserProfile(decoded.email, {
       name,
       phone,
       location

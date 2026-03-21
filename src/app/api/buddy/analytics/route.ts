@@ -1,9 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
-import { readProperties } from '@/lib/property-database';
-import { readInquiries } from '@/lib/mongodb-database';
-import { readUsers } from '@/lib/database';
+import { readProperties, readInquiries, readUsers } from '@/lib/mongodb-database';
 
 export async function GET() {
   try {

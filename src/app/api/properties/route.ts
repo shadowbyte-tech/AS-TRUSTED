@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { readProperties, createProperty } from '@/lib/property-database';
+import { readProperties, createProperty } from '@/lib/mongodb-database';
 import { PropertySchema } from '@/lib/property-validation';
 import { globalRateLimiter } from '@/lib/security';
 import { logger } from '@/lib/logger';

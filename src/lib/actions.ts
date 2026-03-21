@@ -26,15 +26,13 @@ import {
   updateContact as updateContactDB,
   deleteContact as deleteContactDB,
   createRegistration as createRegistrationDB,
-  markRegistrationsAsRead as markRegistrationsAsReadDB
-} from './mongodb-database';
-import { 
+  markRegistrationsAsRead as markRegistrationsAsReadDB,
   readProperties,
   createProperty,
   updateProperty,
   deleteProperty,
   getProperty
-} from './property-database';
+} from './mongodb-database';
 import { VALIDATION, API_MESSAGES } from './constants';
 import { setPassword, getPassword } from './password-storage';
 import bcrypt from 'bcryptjs';
@@ -172,7 +170,7 @@ const ImageSchema = z.instanceof(File, { message: API_MESSAGES.ERROR.IMAGE_REQUI
 
 async function checkDuplicatePlot(plotNumber: string, villageName: string, currentId?: string) {
   const plots = await readPlots();
-  const existingPlot = plots.find(p => p.plotNumber.toLowerCase() === plotNumber.toLowerCase() && p.villageName.toLowerCase() === villageName.toLowerCase());
+  const existingPlot = plots.find(p => p.propertyNumber.toLowerCase() === plotNumber.toLowerCase() && p.villageName.toLowerCase() === villageName.toLowerCase());
   if (existingPlot && existingPlot.id !== currentId) {
     return true;
   }

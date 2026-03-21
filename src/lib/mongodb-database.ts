@@ -6,8 +6,8 @@
  * it automatically falls back to multi-file JSON storage in the /data directory.
  */
 
-import { connectDB, Plot, User, Registration, Inquiry, Contact, Password } from './models';
-import type { Plot as PlotType, User as UserType, Registration as RegistrationType, Inquiry as InquiryType, Contact as ContactType } from './definitions';
+import { connectDB, Property, Plot, User, Registration, Inquiry, Contact, Password } from './models';
+import type { Property as PropertyType, Plot as PlotType, User as UserType, Registration as RegistrationType, Inquiry as InquiryType, Contact as ContactType } from './definitions';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { logger } from './logger';
@@ -49,8 +49,13 @@ async function readJsonFile<T>(filePath: string): Promise<T[]> {
 }
 
 async function writeJsonFile<T>(filePath: string, data: T[]): Promise<void> {
-  await ensureDataDir();
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+  try {
+    await ensureDataDir();
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    // Silently log and fail in production (Vercel)
+    logger.warn(`Failed to write JSON file ${path.basename(filePath)}, likely read-only FS:`, err);
+  }
 }
 
 // MongoDB initialization flag
@@ -103,113 +108,307 @@ export async function getDBStatus() {
   }
 }
 
-// PLOT OPERATIONS
-export async function readPlots(): Promise<PlotType[]> {
+// PROPERTY OPERATIONS
+export async function readProperties(): Promise<PropertyType[]> {
   const isDBConnected = await initDB();
+  
   if (!isDBConnected) {
-    logger.warn('DB Down: Reading plots from multi-file JSON storage.');
-    return await readAllPlots();
+    logger.warn('DB Down: Reading properties from multi-file JSON storage.');
+    return await readAllPlots() as any;
   }
 
   try {
-    const plots = await Plot.find({}).sort({ _id: -1 }).lean();
-    return plots.map(plot => ({
-      id: plot._id.toString(),
-      plotNumber: plot.plotNumber,
-      propertyNumber: plot.plotNumber, // Mapping for unified system
-      propertyType: 'Plot' as const,
-      villageName: plot.villageName,
-      areaName: plot.areaName,
-      plotSize: plot.plotSize,
-      plotFacing: plot.plotFacing,
-      imageUrl: plot.imageUrl,
-      imageHint: plot.imageHint,
-      description: plot.description,
-      price: plot.price,
-      pricePerSqft: plot.pricePerSqft,
-      priceNegotiable: plot.priceNegotiable,
-      status: plot.status,
-      category: plot.category,
-      createdAt: plot.createdAt?.toISOString(),
-      updatedAt: plot.updatedAt?.toISOString(),
-    }));
+    const data = await Property.find({}).sort({ createdAt: -1 }).lean();
+    return data.map(doc => {
+      const base: any = {
+        id: doc._id.toString(),
+        propertyNumber: doc.propertyNumber,
+        propertyType: doc.propertyType,
+        villageName: doc.villageName,
+        areaName: doc.areaName,
+        imageUrl: doc.imageUrl || '',
+        imageHint: doc.imageHint || '',
+        description: doc.description || '',
+        price: doc.price || 0,
+        priceNegotiable: doc.priceNegotiable || false,
+        status: doc.status || 'Available',
+        category: doc.category || 'Normal',
+        images: doc.images || [],
+        createdAt: doc.createdAt?.toISOString(),
+        updatedAt: doc.updatedAt?.toISOString(),
+      };
+
+      if (doc.propertyType === 'Plot') {
+        return {
+          ...base,
+          plotNumber: doc.propertyNumber,
+          plotSize: doc.plotSize || '',
+          plotFacing: doc.plotFacing || 'North',
+          pricePerSqft: doc.pricePerSqft,
+        };
+      } else if (doc.propertyType === 'House') {
+        return {
+          ...base,
+          houseSize: doc.houseSize || '',
+          bedrooms: doc.bedrooms || 0,
+          bathrooms: doc.bathrooms || 0,
+          floors: doc.floors || 1,
+          houseType: doc.houseType || 'Independent',
+          furnished: doc.furnished || false,
+          parking: doc.parking || false,
+          amenities: doc.amenities || [],
+          yearBuilt: doc.yearBuilt,
+        };
+      } else {
+        return {
+          ...base,
+          landSize: doc.landSize || '',
+          landType: doc.landType || 'Residential',
+          zoning: doc.zoning || '',
+          roadAccess: doc.roadAccess || false,
+          waterConnection: doc.waterConnection || false,
+          electricityConnection: doc.electricityConnection || false,
+          soilType: doc.soilType,
+          topography: doc.topography,
+        };
+      }
+    });
   } catch (error) {
     logger.error('MongoDB read failed, falling back to multi-file JSON:', error);
-    return await readAllPlots();
+    return await readAllPlots() as any;
   }
 }
 
-export async function createPlot(plotData: Omit<PlotType, 'id' | 'createdAt'>): Promise<PlotType> {
-  const isDBConnected = await initDB();
+// Alias for compatibility
+export const readPlots = readProperties;
 
-  // Always update multi-file JSON storage first
-  const newPlot = await createPlotMultiFile(plotData);
+export async function createProperty(propertyData: Omit<PropertyType, 'id' | 'createdAt'>): Promise<PropertyType> {
+  const isDBConnected = await initDB();
+  const id = Math.random().toString(36).substring(2, 9);
+  const now = new Date().toISOString();
+  
+  const newProperty: PropertyType = {
+    id,
+    ...propertyData,
+    createdAt: now,
+    updatedAt: now,
+  } as any;
+
+  // Attempt multi-file write but don't crash if it fails (Vercel)
+  try {
+    if (propertyData.propertyType === 'Plot') {
+      await createPlotMultiFile(propertyData as any);
+    }
+  } catch (err) {
+    logger.warn('Multi-file plot save failed (Vercel?):', err);
+  }
 
   if (isDBConnected) {
     try {
-      const mongoPlot = new Plot({
-        _id: newPlot.id,
-        ...plotData
+      const doc = new Property({
+        _id: id,
+        ...propertyData,
       });
-      await mongoPlot.save();
-      logger.info('✅ Plot saved to both MongoDB and multi-file JSON');
+      await doc.save();
+      logger.info('✅ Property saved to MongoDB');
     } catch (err) {
-      logger.error('MongoDB save failed, but multi-file JSON succeeded:', err);
+      logger.error('MongoDB property save failed:', err);
     }
   }
 
-  return newPlot;
+  return newProperty;
 }
 
-export async function updatePlot(id: string, updateData: Partial<PlotType>): Promise<boolean> {
+// Alias for compatibility
+export const createPlot = createProperty;
+
+export async function updateProperty(id: string, updateData: Partial<PropertyType>): Promise<PropertyType | null> {
   const isDBConnected = await initDB();
 
-  // Always update multi-file JSON storage first
-  const jsonSuccess = await updatePlotMultiFile(id, updateData);
+  // Multi-file update attempt
+  try {
+    if (updateData.propertyType === 'Plot' || !updateData.propertyType) {
+      await updatePlotMultiFile(id, updateData as any);
+    }
+  } catch (err) {
+    logger.warn('Multi-file update failed:', err);
+  }
 
   if (isDBConnected) {
     try {
-      const result = await Plot.findByIdAndUpdate(id, {
+      await Property.findByIdAndUpdate(id, {
         ...updateData,
         updatedAt: new Date(),
       });
-      logger.info('✅ Plot updated in both MongoDB and multi-file JSON');
-      return !!result;
+      logger.info('✅ Property updated in MongoDB');
+      return await getProperty(id);
     } catch (err) {
-      logger.error('MongoDB update failed, but multi-file JSON succeeded:', err);
+      logger.error('MongoDB property update failed:', err);
     }
   }
 
-  return jsonSuccess;
+  // Fallback if DB down (though imperfect for non-plots)
+  return await getProperty(id);
 }
 
-export async function deletePlot(id: string): Promise<boolean> {
+// Alias for compatibility
+export const updatePlot = updateProperty;
+
+export async function getProperty(id: string): Promise<PropertyType | null> {
+  const isDBConnected = await initDB();
+  if (!isDBConnected) {
+    const plots = await readAllPlots();
+    return plots.find(p => p.id === id) as any || null;
+  }
+
+  try {
+    const doc = await Property.findById(id).lean();
+    if (!doc) return null;
+    
+    // Use the same mapping as readProperties
+    const base: any = {
+      id: doc._id.toString(),
+      propertyNumber: doc.propertyNumber,
+      propertyType: doc.propertyType,
+      villageName: doc.villageName,
+      areaName: doc.areaName,
+      imageUrl: doc.imageUrl || '',
+      imageHint: doc.imageHint || '',
+      description: doc.description || '',
+      price: doc.price || 0,
+      priceNegotiable: doc.priceNegotiable || false,
+      status: doc.status || 'Available',
+      category: doc.category || 'Normal',
+      images: doc.images || [],
+      views: doc.views || 0,
+      lastViewedAt: doc.lastViewedAt?.toISOString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
+    };
+
+    if (doc.propertyType === 'Plot') {
+      return {
+        ...base,
+        plotNumber: doc.propertyNumber,
+        plotSize: doc.plotSize || '',
+        plotFacing: doc.plotFacing || 'North',
+        pricePerSqft: doc.pricePerSqft,
+      };
+    } else if (doc.propertyType === 'House') {
+      return {
+        ...base,
+        houseSize: doc.houseSize || '',
+        bedrooms: doc.bedrooms || 0,
+        bathrooms: doc.bathrooms || 0,
+        floors: doc.floors || 1,
+        houseType: doc.houseType || 'Independent',
+        furnished: doc.furnished || false,
+        parking: doc.parking || false,
+        amenities: doc.amenities || [],
+        yearBuilt: doc.yearBuilt,
+      };
+    } else {
+      return {
+        ...base,
+        landSize: doc.landSize || '',
+        landType: doc.landType || 'Residential',
+        zoning: doc.zoning || '',
+        roadAccess: doc.roadAccess || false,
+        waterConnection: doc.waterConnection || false,
+        electricityConnection: doc.electricityConnection || false,
+        soilType: doc.soilType,
+        topography: doc.topography,
+      };
+    }
+  } catch (error) {
+    logger.error('MongoDB getProperty failed:', error);
+    const plots = await readAllPlots();
+    return plots.find(p => p.id === id) as any || null;
+  }
+}
+
+export async function incrementPropertyViews(id: string): Promise<boolean> {
+  const isDBConnected = await initDB();
+  if (isDBConnected) {
+    try {
+      await Property.findByIdAndUpdate(id, {
+        $inc: { views: 1 },
+        $set: { lastViewedAt: new Date() }
+      });
+      return true;
+    } catch (err) {
+      logger.error('MongoDB increment views failed:', err);
+    }
+  }
+  return false;
+}
+
+export async function deleteProperty(id: string): Promise<boolean> {
   const isDBConnected = await initDB();
 
-  // Always update multi-file JSON storage first
-  const jsonSuccess = await deletePlotMultiFile(id);
+  try {
+    await deletePlotMultiFile(id);
+  } catch (err) {
+    logger.warn('Multi-file delete failed:', err);
+  }
 
   if (isDBConnected) {
     try {
-      const result = await Plot.findByIdAndDelete(id);
-      logger.info('✅ Plot deleted from both MongoDB and multi-file JSON');
+      const result = await Property.findByIdAndDelete(id);
+      logger.info('✅ Property deleted from MongoDB');
       return !!result;
     } catch (err) {
-      logger.error('MongoDB delete failed, but multi-file JSON succeeded:', err);
+      logger.error('MongoDB property delete failed:', err);
     }
   }
 
-  return jsonSuccess;
+  return true;
 }
 
+// Alias for compatibility
+export const deletePlot = deleteProperty;
+
 export async function writePlots(plots: PlotType[]): Promise<void> {
-  // Always update JSON for dual-mode durability
+  // Always attempt JSON write but don't crash
   await writeJsonFile<PlotType>(JSON_FILES.PLOTS, plots);
 }
 
 // USER MANAGEMENT FUNCTIONS
 
 // USER OPERATIONS
+export async function updateUserProfile(email: string, profileData: { name?: string; phone?: string; location?: string }): Promise<UserType | null> {
+  const isDBConnected = await initDB();
+  
+  if (isDBConnected) {
+    try {
+      const user = await User.findOneAndUpdate(
+        { email: email.toLowerCase() },
+        { 
+          $set: { 
+            ...profileData,
+            updatedAt: new Date()
+          } 
+        },
+        { new: true }
+      );
+      
+      if (user) {
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          role: user.role as any,
+          name: user.name,
+          phone: user.phone,
+          location: user.location,
+        };
+      }
+    } catch (err) {
+      logger.error('MongoDB user profile update failed:', err);
+    }
+  }
+  return null;
+}
+
 export async function readUsers(): Promise<UserType[]> {
   const isDBConnected = await initDB();
   if (!isDBConnected) return await readJsonFile<UserType>(JSON_FILES.USERS);
@@ -235,18 +434,27 @@ export async function createUser(userData: Omit<UserType, 'id'>): Promise<UserTy
   const id = Math.random().toString(36).substring(2, 9);
   const newUser = { id, ...userData };
 
-  const users = await readJsonFile<UserType>(JSON_FILES.USERS);
-  await writeJsonFile<UserType>(JSON_FILES.USERS, [...users, newUser]);
+  try {
+    const users = await readJsonFile<UserType>(JSON_FILES.USERS);
+    await writeJsonFile<UserType>(JSON_FILES.USERS, [...users, newUser]);
+  } catch (err) {
+    logger.warn('JSON user creation failed:', err);
+  }
 
   if (isDBConnected) {
     try {
-      const user = await User.create(userData);
+      const user = await User.create({
+        _id: id,
+        ...userData
+      });
       return {
         id: user._id.toString(),
         email: user.email,
-        role: user.role as 'Owner' | 'User',
+        role: user.role as any,
       };
-    } catch { }
+    } catch (err) { 
+      logger.error('MongoDB user creation failed:', err);
+    }
   }
 
   return newUser;
@@ -297,13 +505,18 @@ export async function createRegistration(regData: Omit<RegistrationType, 'id'>):
   const id = Math.random().toString(36).substring(2, 9);
   const newReg = { id, ...regData };
 
-  const regs = await readJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS);
-  await writeJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS, [newReg, ...regs]);
+  try {
+    const regs = await readJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS);
+    await writeJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS, [newReg, ...regs]);
+  } catch (err) {
+    logger.warn('JSON registration save failed:', err);
+  }
 
   if (isDBConnected) {
     try {
       const { isNew, ...rest } = regData;
       const registration = await Registration.create({
+        _id: id,
         ...rest,
         isUnread: isNew ?? true
       });
@@ -311,7 +524,9 @@ export async function createRegistration(regData: Omit<RegistrationType, 'id'>):
         id: registration._id.toString(),
         ...regData,
       };
-    } catch { }
+    } catch (err) { 
+      logger.error('MongoDB registration save failed:', err);
+    }
   }
   return newReg;
 }
@@ -359,17 +574,26 @@ export async function createInquiry(inqData: Omit<InquiryType, 'id'>): Promise<I
   const id = Math.random().toString(36).substring(2, 9);
   const newInq = { id, ...inqData };
 
-  const inquiries = await readJsonFile<InquiryType>(JSON_FILES.INQUIRIES);
-  await writeJsonFile<InquiryType>(JSON_FILES.INQUIRIES, [newInq, ...inquiries]);
+  try {
+    const inquiries = await readJsonFile<InquiryType>(JSON_FILES.INQUIRIES);
+    await writeJsonFile<InquiryType>(JSON_FILES.INQUIRIES, [newInq, ...inquiries]);
+  } catch (err) {
+    logger.warn('JSON inquiry save failed:', err);
+  }
 
   if (isDBConnected) {
     try {
-      const inquiry = await Inquiry.create(inqData);
+      const inquiry = await Inquiry.create({
+        _id: id,
+        ...inqData
+      });
       return {
         id: inquiry._id.toString(),
         ...inqData,
       };
-    } catch { }
+    } catch (err) { 
+      logger.error('MongoDB inquiry save failed:', err);
+    }
   }
   return newInq;
 }
@@ -403,17 +627,26 @@ export async function createContact(contactData: Omit<ContactType, 'id'>): Promi
   const id = Math.random().toString(36).substring(2, 9);
   const newContact = { id, ...contactData };
 
-  const contacts = await readJsonFile<ContactType>(JSON_FILES.CONTACTS);
-  await writeJsonFile<ContactType>(JSON_FILES.CONTACTS, [...contacts, newContact]);
+  try {
+    const contacts = await readJsonFile<ContactType>(JSON_FILES.CONTACTS);
+    await writeJsonFile<ContactType>(JSON_FILES.CONTACTS, [...contacts, newContact]);
+  } catch (err) {
+    logger.warn('JSON contact save failed:', err);
+  }
 
   if (isDBConnected) {
     try {
-      const contact = await Contact.create(contactData);
+      const contact = await Contact.create({
+        _id: id,
+        ...contactData
+      });
       return {
         id: contact._id.toString(),
         ...contactData,
       };
-    } catch { }
+    } catch (err) { 
+      logger.error('MongoDB contact save failed:', err);
+    }
   }
   return newContact;
 }

@@ -15,8 +15,7 @@ import {
   Activity
 } from 'lucide-react';
 import PropertyAnalyticsDashboard from '@/components/property-analytics-dashboard';
-import { readUsers } from '@/lib/database';
-import { readPlots } from '@/lib/mongodb-database';
+import { readUsers, readPlots } from '@/lib/mongodb-database';
 
 interface Stats {
   totalPlots: number;

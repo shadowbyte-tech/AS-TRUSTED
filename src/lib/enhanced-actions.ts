@@ -7,9 +7,12 @@ import {
   readFavorites, 
   writeFavorites, 
   readComparisons, 
-  writeComparisons 
+  writeComparisons,
+  addFavoriteDB,
+  removeFavoriteDB,
+  updateComparisonDB
 } from './enhanced-database';
-import { readPlots, writePlots } from './database';
+import { readProperties, updateProperty, incrementPropertyViews } from './mongodb-database';
 
 // Enhanced Plot Schema
 const EnhancedPlotSchema = z.object({
@@ -56,6 +59,7 @@ export async function addToFavorites(userId: string, plotId: string, notes?: str
     
     favorites.push(newFavorite);
     await writeFavorites(favorites);
+    await addFavoriteDB(newFavorite);
     revalidatePath('/favorites');
     
     return { success: true, favorite: newFavorite };
@@ -76,6 +80,7 @@ export async function removeFromFavorites(userId: string, plotId: string) {
     const updated = favorites.filter(f => !(f.userId === userId && f.plotId === plotId));
     
     await writeFavorites(updated);
+    await removeFavoriteDB(userId, plotId);
     revalidatePath('/favorites');
     
     return { success: true };
@@ -92,7 +97,7 @@ export async function removeFromFavorites(userId: string, plotId: string) {
 export async function getUserFavorites(userId: string) {
   try {
     const favorites = await readFavorites();
-    const plots = await readPlots();
+    const plots = await readProperties();
     
     const userFavorites = favorites.filter(f => f.userId === userId);
     const favoritePlots = userFavorites.map(fav => {
@@ -144,6 +149,7 @@ export async function addToComparison(userId: string, plotId: string) {
     if (!userComparison.plotIds.includes(plotId)) {
       userComparison.plotIds.push(plotId);
       await writeComparisons(comparisons);
+      await updateComparisonDB(userComparison);
       revalidatePath('/compare');
       
       return { success: true, comparison: userComparison };
@@ -169,6 +175,7 @@ export async function removeFromComparison(userId: string, plotId: string) {
     if (userComparison) {
       userComparison.plotIds = userComparison.plotIds.filter(id => id !== plotId);
       await writeComparisons(comparisons);
+      await updateComparisonDB(userComparison);
       revalidatePath('/compare');
     }
     
@@ -186,7 +193,7 @@ export async function removeFromComparison(userId: string, plotId: string) {
 export async function getUserComparison(userId: string) {
   try {
     const comparisons = await readComparisons();
-    const plots = await readPlots();
+    const plots = await readProperties();
     
     const userComparison = comparisons.find(c => 
       c.userId === userId &&
@@ -221,27 +228,13 @@ export async function getUserComparison(userId: string) {
  */
 export async function updatePlotStatus(plotId: string, status: 'Available' | 'Reserved' | 'Sold' | 'Under Negotiation') {
   try {
-    const plots = await readPlots();
-    const plotIndex = plots.findIndex(p => p.id === plotId);
+    // Use unified MongoDB updateProperty
+    const updated = await updateProperty(plotId, { status } as any);
     
-    if (plotIndex === -1) {
-      return { success: false, message: 'Plot not found' };
-    }
-    
-    // Type-safe property update - EnhancedPlot extends Plot
-    const plot = plots[plotIndex];
-    const updatedPlot = {
-      ...plot,
-      status,
-      updatedAt: new Date().toISOString(),
-    };
-    
-    plots[plotIndex] = updatedPlot;
-    await writePlots(plots);
     revalidatePath('/dashboard/plots');
     revalidatePath('/plots');
     
-    return { success: true, plot: updatedPlot };
+    return { success: !!updated, plot: updated };
   } catch (error) {
     return { success: false, message: 'Failed to update plot status', error };
   }
@@ -254,23 +247,8 @@ export async function updatePlotStatus(plotId: string, status: 'Available' | 'Re
  */
 export async function incrementPlotViewCount(plotId: string) {
   try {
-    const plots = await readPlots();
-    const plotIndex = plots.findIndex(p => p.id === plotId);
-    
-    if (plotIndex === -1) {
-      return { success: false, message: 'Plot not found' };
-    }
-    
-    // Type-safe property update
-    const plot = plots[plotIndex];
-    const updatedPlot = {
-      ...plot,
-      viewCount: (plot as any).viewCount ? (plot as any).viewCount + 1 : 1,
-      updatedAt: new Date().toISOString(),
-    };
-    
-    plots[plotIndex] = updatedPlot;
-    await writePlots(plots);
+    // Use unified MongoDB incrementPropertyViews
+    await incrementPropertyViews(plotId);
     
     return { success: true };
   } catch (error) {

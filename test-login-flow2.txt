@@ -1,0 +1,40 @@
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: CLOUDINARY_CLOUD_NAME ÔÇö Cloudinary cloud name for image uploads.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: CLOUDINARY_API_KEY ÔÇö Cloudinary API key.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: CLOUDINARY_API_SECRET ÔÇö Cloudinary API secret.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: NEXTAUTH_URL ÔÇö The canonical URL of your site (required for production). e.g. https://astrustedconsultancy.com
+[36m[INFO][0m Ô£à Environment variables validated successfully.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: CLOUDINARY_CLOUD_NAME ÔÇö Cloudinary cloud name for image uploads.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: CLOUDINARY_API_KEY ÔÇö Cloudinary API key.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: CLOUDINARY_API_SECRET ÔÇö Cloudinary API secret.
+[33m[WARN][0m ÔÜá´©Å  Optional Missing env var: NEXTAUTH_URL ÔÇö The canonical URL of your site (required for production). e.g. https://astrustedconsultancy.com
+[36m[INFO][0m Ô£à Environment variables validated successfully.
+DB Status: {
+  connected: true,
+  type: 'MongoDB',
+  host: 'astrustedconsultany.5wcilrm.mongodb.net'
+}
+
+Testing authenticateOwner for swamygoud@consult.com...
+[36m[INFO][0m ­ƒöÉ GET PASSWORD CALLED FOR:
+"swamygoud@consult.com"
+[36m[INFO][0m ­ƒöÉ DB PASSWORD RESULT:
+"FOUND"
+[90m[DEBUG][0m ­ƒöÉ DB PASSWORD HASH RETRIEVED
+­ƒöì Password Debug: {
+  inputLength: 10,
+  storedValue: 'swamy@2775',
+  isBcryptHash: false,
+  userEmail: 'swamygoud@consult.com'
+}
+[36m[INFO][0m Ô£à Password migrated to bcrypt for: swamygoud@consult.com
+Owner Result: {
+  id: '69bd3dffc7ec2d9e30079028',
+  email: 'swamygoud@consult.com',
+  role: 'Owner'
+}
+
+Testing authenticateUser for swamygoud@consult.com...
+­ƒöì Auth Debug - Input: { email: 'swamygoud@consult.com', passwordLength: 10 }
+­ƒöì Auth Debug - Users found: 8
+­ƒöì Auth Debug - User found: true swamygoud@consult.com Owner
+User Result: null

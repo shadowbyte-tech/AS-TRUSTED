@@ -59,22 +59,21 @@ export async function connectDB() {
   return cached.conn;
 }
 
-// Plot Schema
-const PlotSchema = new mongoose.Schema({
-  plotNumber: { type: String, required: true },
+// Property Schema (Unified for Plot, House, and Land)
+const PropertySchema = new mongoose.Schema({
+  propertyNumber: { type: String, required: true },
+  propertyType: { 
+    type: String, 
+    enum: ['Plot', 'House', 'Land'], 
+    required: true,
+    index: true 
+  },
   villageName: { type: String, required: true },
   areaName: { type: String, required: true },
-  plotSize: { type: String, required: true },
-  plotFacing: {
-    type: String,
-    enum: ['North', 'South', 'East', 'West', 'North-East', 'North-West', 'South-East', 'South-West'],
-    required: true
-  },
-  imageUrl: { type: String, required: true },
+  imageUrl: { type: String },
   imageHint: { type: String, default: 'custom upload' },
   description: { type: String },
   price: { type: Number },
-  pricePerSqft: { type: Number },
   priceNegotiable: { type: Boolean, default: false },
   status: {
     type: String,
@@ -86,20 +85,61 @@ const PlotSchema = new mongoose.Schema({
     enum: ['Normal', 'Premium'],
     default: 'Normal'
   },
+  images: [{ type: String }],
+  
+  // Plot Specific
+  plotNumber: { type: String },
+  plotSize: { type: String },
+  plotFacing: {
+    type: String,
+    enum: ['North', 'South', 'East', 'West', 'North-East', 'North-West', 'South-East', 'South-West']
+  },
+  pricePerSqft: { type: Number },
   isDtcpApproved: { type: Boolean, default: false },
   isReadyToConstruct: { type: Boolean, default: false },
   hasHighwayAccess: { type: Boolean, default: false },
-  images: [{ type: String }],
+  
+  // House Specific
+  houseSize: { type: String },
+  bedrooms: { type: Number },
+  bathrooms: { type: Number },
+  floors: { type: Number },
+  houseType: { 
+    type: String, 
+    enum: ['Independent', 'Villa', 'Apartment', 'Duplex', 'Penthouse'] 
+  },
+  furnished: { type: Boolean, default: false },
+  parking: { type: Boolean, default: false },
+  amenities: [{ type: String }],
+  yearBuilt: { type: Number },
+  
+  // Land Specific
+  landSize: { type: String },
+  landType: { 
+    type: String, 
+    enum: ['Agricultural', 'Commercial', 'Residential', 'Industrial'] 
+  },
+  zoning: { type: String },
+  roadAccess: { type: Boolean, default: false },
+  waterConnection: { type: Boolean, default: false },
+  electricityConnection: { type: Boolean, default: false },
+  soilType: { type: String },
+  topography: { type: String },
+
+  // Analytics
+  views: { type: Number, default: 0 },
+  lastViewedAt: { type: Date },
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
 // Add indexes for performance
-PlotSchema.index({ villageName: 1, areaName: 1 });
-PlotSchema.index({ price: 1 });
-PlotSchema.index({ category: 1 });
-PlotSchema.index({ status: 1 });
-PlotSchema.index({ plotNumber: 1, villageName: 1 }, { unique: true });
+PropertySchema.index({ villageName: 1, areaName: 1 });
+PropertySchema.index({ price: 1 });
+PropertySchema.index({ category: 1 });
+PropertySchema.index({ status: 1 });
+PropertySchema.index({ propertyNumber: 1, villageName: 1 }, { unique: true });
 
 // User Schema
 const UserSchema = new mongoose.Schema({
@@ -157,16 +197,36 @@ const PasswordSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   hashedPassword: { type: String, required: true }, // Always bcrypt hash — NEVER plain text
   isMigrated: { type: Boolean, default: true },    // true = already bcrypt, false = legacy (plain text)
-  updatedAt: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now }
+});
+
+const FavoriteSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
+  userId: { type: String, required: true },
+  plotId: { type: String, required: true }, // Keeping plotId for compatibility
+  addedAt: { type: Date, default: Date.now },
+  notes: { type: String }
+});
+
+const ComparisonSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
+  userId: { type: String, required: true },
+  plotIds: { type: [String], default: [] },
+  createdAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date }
 });
 
 // Export models
-export const Plot = mongoose.models.Plot || mongoose.model('Plot', PlotSchema);
+export const Property = mongoose.models.Property || mongoose.model('Property', PropertySchema);
+export const Plot = mongoose.models.Plot || mongoose.model('Plot', PropertySchema); // Changed PlotSchema to PropertySchema
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
 export const Registration = mongoose.models.Registration || mongoose.model('Registration', RegistrationSchema);
 export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', InquirySchema);
 export const Contact = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
 export const Password = mongoose.models.Password || mongoose.model('Password', PasswordSchema);
+export const AuditTrail = mongoose.models.AuditTrail || mongoose.model('AuditTrail', AuditLogSchema); // Changed AuditTrailSchema to AuditLogSchema
+export const Favorite = mongoose.models.Favorite || mongoose.model('Favorite', FavoriteSchema);
+export const Comparison = mongoose.models.Comparison || mongoose.model('Comparison', ComparisonSchema);
 
 // Add to global type
 declare global {

@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/property-database';
+import { readProperties } from '@/lib/mongodb-database';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,99 +10,83 @@ export async function GET(request: NextRequest) {
     const propertyId = searchParams.get('propertyId');
     const days = parseInt(searchParams.get('days') || '30');
 
-    // Get basic property analytics
-    let query = `
-      SELECT 
-        p.id,
-        p.property_number,
-        p.property_type,
-        p.village_name,
-        p.area_name,
-        p.views as total_views,
-        p.last_viewed_at,
-        p.price,
-        p.status,
-        p.category
-      FROM properties p
-    `;
+    const allProperties = await readProperties();
+    
+    // Filter by property ID if specified
+    const targetProperties = propertyId 
+      ? allProperties.filter(p => p.id === propertyId) 
+      : allProperties;
 
-    let params: any[] = [];
-
-    if (propertyId) {
-      query += ' WHERE p.id = ?';
-      params.push(propertyId);
-    }
-
-    query += ' ORDER BY p.views DESC';
-
-    const result = await db.execute(query, params);
-
-    // Transform database rows to frontend format
-    const transformedProperties = result.rows.map((row: any) => ({
-      id: row.id,
-      propertyNumber: row.property_number,
-      propertyType: row.property_type,
-      villageName: row.village_name,
-      areaName: row.area_name,
-      views: row.total_views || 0,
-      lastViewedAt: row.last_viewed_at,
-      price: row.price,
-      status: row.status,
-      category: row.category
-    }));
+    // Transform and sort by views
+    const transformedProperties = targetProperties.map((p: any) => ({
+      id: p.id,
+      propertyNumber: p.propertyNumber,
+      propertyType: p.propertyType,
+      villageName: p.villageName,
+      areaName: p.areaName,
+      views: p.views || 0,
+      lastViewedAt: p.lastViewedAt,
+      price: p.price,
+      status: p.status,
+      category: p.category
+    })).sort((a, b) => (b.views || 0) - (a.views || 0));
 
     // Calculate summary statistics
-    const totalViews = transformedProperties.reduce((sum: number, property: any) => sum + (property.views || 0), 0);
-    const uniqueVisitors = new Set(transformedProperties.map((property: any) => property.id)).size; // Simplified unique count
+    const totalViews = transformedProperties.reduce((sum: number, p: any) => sum + (p.views || 0), 0);
+    const uniqueRecords = transformedProperties.length;
 
-    // Get category statistics
-    const categoryStatsQuery = `
-      SELECT 
-        category,
-        COUNT(*) as count,
-        SUM(views) as total_views,
-        AVG(views) as avg_views
-      FROM properties
-      GROUP BY category
-      ORDER BY total_views DESC
-    `;
+    // Category statistics
+    const categoryStats: Record<string, { count: number, total_views: number, avg_views: number }> = {};
+    allProperties.forEach(p => {
+      const cat = p.category || 'Normal';
+      if (!categoryStats[cat]) categoryStats[cat] = { count: 0, total_views: 0, avg_views: 0 };
+      categoryStats[cat].count++;
+      categoryStats[cat].total_views += (p as any).views || 0;
+    });
+    
+    const formattedCategoryStats = Object.entries(categoryStats).map(([category, stats]) => ({
+      category,
+      count: stats.count,
+      total_views: stats.total_views,
+      avg_views: stats.total_views / stats.count
+    }));
 
-    const categoryStatsResult = await db.execute(categoryStatsQuery);
+    // Location (Village) statistics
+    const locationStats: Record<string, { count: number, total_views: number, avg_price: number, totalPrice: number }> = {};
+    allProperties.forEach(p => {
+      const loc = p.villageName;
+      if (!locationStats[loc]) locationStats[loc] = { count: 0, total_views: 0, avg_price: 0, totalPrice: 0 };
+      locationStats[loc].count++;
+      locationStats[loc].total_views += (p as any).views || 0;
+      locationStats[loc].totalPrice += p.price || 0;
+    });
 
-    // Get location statistics
-    const locationStatsQuery = `
-      SELECT 
-        village_name,
-        COUNT(*) as count,
-        SUM(views) as total_views,
-        AVG(price) as avg_price
-      FROM properties
-      GROUP BY village_name
-      ORDER BY total_views DESC
-      LIMIT 10
-    `;
-
-    const locationStatsResult = await db.execute(locationStatsQuery);
+    const formattedLocationStats = Object.entries(locationStats).map(([village_name, stats]) => ({
+      village_name,
+      count: stats.count,
+      total_views: stats.total_views,
+      avg_price: stats.totalPrice / stats.count
+    })).sort((a, b) => b.total_views - a.total_views).slice(0, 10);
 
     return NextResponse.json({
       success: true,
       data: {
         properties: transformedProperties,
-        dailyViews: [], // Empty for now
+        dailyViews: [], // Empty for now as we don't store time-series yet
         topProperties: transformedProperties.slice(0, 10),
-        categoryStats: categoryStatsResult.rows,
-        locationStats: locationStatsResult.rows,
+        categoryStats: formattedCategoryStats,
+        locationStats: formattedLocationStats,
         summary: {
-          totalProperties: transformedProperties.length,
+          totalProperties: allProperties.length,
           totalViews: totalViews,
-          uniqueVisitors: uniqueVisitors,
+          uniqueVisitors: uniqueRecords,
           period: `${days} days`
         }
       }
     });
 
   } catch (error) {
-    console.error('Analytics API error:', error);
+    logger.error('Analytics API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch analytics data', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
