@@ -53,10 +53,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     logger.error('❌ Login error:', errorMessage);
+    if (error instanceof Error) {
+        logger.error('Stack trace:', error.stack);
+    }
     
     return NextResponse.json({
       success: false,
-      error: 'An error occurred during login. Please try again later.'
+      error: `An error occurred during login: ${errorMessage}. Please check your environment variables.`
     }, { status: 500 });
   }
 }

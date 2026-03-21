@@ -39,6 +39,16 @@ const REQUIRED_ENV_VARS: EnvVar[] = [
     required: false,
     description: 'The canonical URL of your site (required for production). e.g. https://astrustedconsultancy.com',
   },
+  {
+    key: 'NEXT_PUBLIC_SUPABASE_URL',
+    required: true,
+    description: 'Supabase Project URL.',
+  },
+  {
+    key: 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY',
+    required: true,
+    description: 'Supabase Publishable Key.',
+  },
 ];
 
 export interface ValidationResult {
