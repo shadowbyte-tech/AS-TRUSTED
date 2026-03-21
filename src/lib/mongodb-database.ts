@@ -121,11 +121,11 @@ export async function readProperties(): Promise<PropertyType[]> {
     const data = await Property.find({}).sort({ createdAt: -1 }).lean();
     return data.map(doc => {
       const base: any = {
-        id: doc._id.toString(),
-        propertyNumber: doc.propertyNumber,
-        propertyType: doc.propertyType,
-        villageName: doc.villageName,
-        areaName: doc.areaName,
+        id: doc._id?.toString() || '',
+        propertyNumber: doc.propertyNumber || 'Unknown',
+        propertyType: doc.propertyType || 'Plot',
+        villageName: doc.villageName || 'Unknown',
+        areaName: doc.areaName || 'Unknown',
         imageUrl: doc.imageUrl || '',
         imageHint: doc.imageHint || '',
         description: doc.description || '',
@@ -134,8 +134,8 @@ export async function readProperties(): Promise<PropertyType[]> {
         status: doc.status || 'Available',
         category: doc.category || 'Normal',
         images: doc.images || [],
-        createdAt: doc.createdAt?.toISOString(),
-        updatedAt: doc.updatedAt?.toISOString(),
+        createdAt: doc.createdAt instanceof Date ? doc.createdAt.toISOString() : (doc.createdAt || new Date().toISOString()),
+        updatedAt: doc.updatedAt instanceof Date ? doc.updatedAt.toISOString() : (doc.updatedAt || new Date().toISOString()),
       };
 
       if (doc.propertyType === 'Plot') {
@@ -416,9 +416,13 @@ export async function readUsers(): Promise<UserType[]> {
   try {
     const users = await User.find({}).lean();
     return users.map(user => ({
-      id: user._id.toString(),
-      email: user.email,
-      role: user.role as 'Owner' | 'User' | 'Premium',
+      id: user._id?.toString() || '',
+      email: user.email || '',
+      role: (user.role as any) || 'User',
+      name: user.name || '',
+      phone: user.phone || '',
+      location: user.location || '',
+      createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : (user.createdAt || new Date().toISOString()),
     }));
   } catch {
     return await readJsonFile<UserType>(JSON_FILES.USERS);
@@ -483,13 +487,13 @@ export async function readRegistrations(): Promise<RegistrationType[]> {
   try {
     const registrations = await Registration.find({}).sort({ createdAt: -1 }).lean();
     return registrations.map(reg => ({
-      id: reg._id.toString(),
-      name: reg.name,
-      phone: reg.phone,
-      email: reg.email,
-      notes: reg.notes,
-      isNew: reg.isUnread,
-      createdAt: reg.createdAt.toISOString(),
+      id: reg._id?.toString() || '',
+      name: reg.name || 'Unknown',
+      phone: reg.phone || '',
+      email: reg.email || '',
+      notes: reg.notes || '',
+      isNew: reg.isUnread ?? true,
+      createdAt: reg.createdAt instanceof Date ? reg.createdAt.toISOString() : (reg.createdAt || new Date().toISOString()),
     }));
   } catch {
     return await readJsonFile<RegistrationType>(JSON_FILES.REGISTRATIONS);
@@ -540,8 +544,11 @@ export async function markRegistrationsAsRead(): Promise<void> {
 
   if (isDBConnected) {
     try {
-      await Registration.updateMany({ isNew: true }, { isNew: false });
-    } catch { }
+      // Schema field is 'isUnread', not 'isNew'
+      await Registration.updateMany({ isUnread: true }, { isUnread: false });
+    } catch (err) {
+      logger.error('Failed to mark registrations as read:', err);
+    }
   }
 }
 
@@ -553,12 +560,12 @@ export async function readInquiries(): Promise<InquiryType[]> {
   try {
     const inquiries = await Inquiry.find({}).sort({ receivedAt: -1 }).lean();
     return inquiries.map(inq => ({
-      id: inq._id.toString(),
-      plotNumber: inq.plotNumber,
-      name: inq.name,
-      email: inq.email,
-      message: inq.message,
-      receivedAt: inq.receivedAt.toISOString(),
+      id: inq._id?.toString() || '',
+      plotNumber: inq.plotNumber || '',
+      name: inq.name || 'Unknown',
+      email: inq.email || '',
+      message: inq.message || '',
+      receivedAt: inq.receivedAt instanceof Date ? inq.receivedAt.toISOString() : (inq.receivedAt || new Date().toISOString()),
     }));
   } catch {
     return await readJsonFile<InquiryType>(JSON_FILES.INQUIRIES);
@@ -606,12 +613,12 @@ export async function readContacts(): Promise<ContactType[]> {
   try {
     const contacts = await Contact.find({}).sort({ createdAt: -1 }).lean();
     return contacts.map(contact => ({
-      id: contact._id.toString(),
-      name: contact.name,
-      phone: contact.phone,
-      email: contact.email,
-      type: contact.type as 'Seller' | 'Buyer',
-      notes: contact.notes,
+      id: contact._id?.toString() || '',
+      name: contact.name || 'Unknown',
+      phone: contact.phone || '',
+      email: contact.email || '',
+      type: (contact.type as any) || 'Other',
+      notes: contact.notes || '',
     }));
   } catch {
     return await readJsonFile<ContactType>(JSON_FILES.CONTACTS);

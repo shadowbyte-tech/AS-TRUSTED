@@ -793,9 +793,11 @@ export async function createRegistration(prevState: State, formData: FormData): 
       // Don't fail the registration if WhatsApp fails
     }
 
+    /*
     // Revalidate dashboard paths
     revalidatePath('/dashboard/registrations');
     revalidatePath('/dashboard', 'layout');
+    */
 
     logger.info('Registration process completed successfully');
     return {
