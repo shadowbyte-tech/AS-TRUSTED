@@ -7,6 +7,7 @@ const MONGODB_URI = 'mongodb+srv://sukkamanikantagoud_db_user:fsCicMHlSu2vk3iM@a
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────
 const AuditLogSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   action: { type: String, required: true, index: true }, // e.g., 'CREATE_PLOT', 'UPDATE_USER_ROLE'
   category: { type: String, required: true, enum: ['AUTH', 'ADMIN', 'DATABASE', 'SECURITY'] },
   userId: { type: String, index: true }, // User who performed the action
@@ -61,6 +62,7 @@ export async function connectDB() {
 
 // Property Schema (Unified for Plot, House, and Land)
 const PropertySchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   propertyNumber: { type: String, required: true },
   propertyType: { 
     type: String, 
@@ -143,6 +145,7 @@ PropertySchema.index({ propertyNumber: 1, villageName: 1 }, { unique: true });
 
 // User Schema
 const UserSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   role: { type: String, enum: ['Owner', 'User', 'Premium', 'Elite'], required: true },
   name: { type: String, trim: true },
@@ -158,6 +161,7 @@ UserSchema.index({ role: 1 });
 
 // Registration Schema
 const RegistrationSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   name: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String, required: true },
@@ -171,6 +175,7 @@ RegistrationSchema.index({ createdAt: -1 });
 
 // Inquiry Schema
 const InquirySchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   plotNumber: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String, required: true },
@@ -182,6 +187,7 @@ InquirySchema.index({ receivedAt: -1 });
 
 // Contact Schema
 const ContactSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   name: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String, required: true },
@@ -194,6 +200,7 @@ ContactSchema.index({ email: 1 });
 
 // Password Schema (stores bcrypt-hashed passwords only)
 const PasswordSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   hashedPassword: { type: String, required: true }, // Always bcrypt hash — NEVER plain text
   isMigrated: { type: Boolean, default: true },    // true = already bcrypt, false = legacy (plain text)
