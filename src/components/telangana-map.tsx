@@ -245,11 +245,11 @@ export default function TelanganaMap() {
 
                       {/* Inner dot */}
                       <motion.circle
-                        cx={zone.cx || 0} cy={zone.cy || 0} r={Number(isActive ? 7 : 5)}
+                        cx={zone.cx || 0} cy={zone.cy || 0} r={Number(isActive ? 7 : 5) || 0}
                         fill={c.dot} fillOpacity={Number(isActive ? 1 : 0.7)}
                         animate={{ 
                           scale: isActive || isHovered ? 1.2 : 1,
-                          r: Number(isActive ? 7 : isHovered ? 6 : 5)
+                          r: Number(isActive ? 7 : isHovered ? 6 : 5) || 0
                         }}
                         transition={{ duration: 0.2 }}
                       />

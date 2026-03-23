@@ -208,7 +208,11 @@ export default function UserManagement() {
     }
   };
 
-  const handleCreateUser = async () => {
+  const handleCreateUser = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
     if (!newUserEmail || !newUserPassword) {
       toast({
         title: "Error",
@@ -217,6 +221,8 @@ export default function UserManagement() {
       });
       return;
     }
+
+    setCreating(true);
 
     try {
       const response = await fetch('/api/auth/create-user', {
@@ -258,6 +264,8 @@ export default function UserManagement() {
         description: 'Failed to create user',
         variant: 'destructive',
       });
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -333,12 +341,12 @@ export default function UserManagement() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                <Button variant="outline" type="button" onClick={() => setShowCreateDialog(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleCreateUser}>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Create User
+                <Button type="submit" disabled={creating} onClick={handleCreateUser}>
+                  {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                  {creating ? 'Creating...' : 'Create User'}
                 </Button>
               </DialogFooter>
             </DialogContent>

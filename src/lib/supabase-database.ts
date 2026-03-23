@@ -294,21 +294,41 @@ export async function setStoredPassword(email: string, hashedPassword: string): 
 
 // ─── LEAD / INQUIRY / CONTACT OPERATIONS ───────────────────────────
 
-export async function saveLead(lead: RegistrationType): Promise<void> {
+export async function saveLead(
+  lead: Omit<RegistrationType, 'id'> & { id?: string }
+): Promise<RegistrationType> {
   try {
     const supabase = await getSupabase();
-    const { error } = await supabase.from('leads').insert({
-      id: lead.id || `lead_${Date.now()}`,
-      name: lead.name,
-      phone: lead.phone,
-      email: lead.email,
-      notes: lead.notes,
-      is_unread: lead.isNew ?? true,
-      created_at: lead.createdAt || new Date().toISOString()
-    });
+
+    const { data, error } = await supabase
+      .from('leads')
+      .insert({
+        id: lead.id ?? `lead_${Date.now()}`,
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email,
+        notes: lead.notes ?? '',
+        is_unread: lead.isNew ?? true,
+        created_at: lead.createdAt ?? new Date().toISOString(),
+      })
+      .select('*')
+      .single();
+
     if (error) throw error;
+    if (!data) throw new Error('Supabase: saveLead returned empty data');
+
+    return {
+      id: data.id,
+      name: data.name,
+      phone: data.phone,
+      email: data.email,
+      notes: data.notes ?? undefined,
+      isNew: data.is_unread,
+      createdAt: data.created_at,
+    };
   } catch (error) {
     logger.error('Supabase: saveLead failed:', error);
+    throw error;
   }
 }
 
@@ -332,20 +352,54 @@ export async function readRegistrations(): Promise<RegistrationType[]> {
   }
 }
 
-export async function saveInquiry(inq: InquiryType): Promise<void> {
+export async function markRegistrationsAsRead(): Promise<void> {
   try {
     const supabase = await getSupabase();
-    const { error } = await supabase.from('inquiries').insert({
-      id: inq.id || `inq_${Date.now()}`,
-      plot_number: inq.plotNumber,
-      name: inq.name,
-      email: inq.email,
-      message: inq.message,
-      received_at: inq.receivedAt || new Date().toISOString()
-    });
+    const { error } = await supabase
+      .from('leads')
+      .update({ is_unread: false })
+      .eq('is_unread', true);
+
     if (error) throw error;
   } catch (error) {
+    logger.error('Supabase: markRegistrationsAsRead failed:', error);
+    throw error;
+  }
+}
+
+export async function saveInquiry(
+  inq: Omit<InquiryType, 'id'> & { id?: string }
+): Promise<InquiryType> {
+  try {
+    const supabase = await getSupabase();
+
+    const { data, error } = await supabase
+      .from('inquiries')
+      .insert({
+        id: inq.id ?? `inq_${Date.now()}`,
+        plot_number: inq.plotNumber,
+        name: inq.name,
+        email: inq.email,
+        message: inq.message,
+        received_at: inq.receivedAt ?? new Date().toISOString(),
+      })
+      .select('*')
+      .single();
+
+    if (error) throw error;
+    if (!data) throw new Error('Supabase: saveInquiry returned empty data');
+
+    return {
+      id: data.id,
+      plotNumber: data.plot_number,
+      name: data.name,
+      email: data.email,
+      message: data.message,
+      receivedAt: data.received_at,
+    };
+  } catch (error) {
     logger.error('Supabase: saveInquiry failed:', error);
+    throw error;
   }
 }
 

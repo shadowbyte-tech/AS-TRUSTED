@@ -291,9 +291,41 @@ function PropertyDetailsContent() {
       if (response.ok) {
         const result = await response.json();
         
-        // Redirect to appropriate properties page based on type
-        const redirectPage = propertyType === 'premium' ? '/premium-properties' : '/normal-properties';
-        router.push(redirectPage);
+        alert('Property submitted successfully! It will be reviewed shortly.');
+        
+        // Reset form - do NOT redirect
+        setFormData({
+          propertyNumber: '',
+          propertyType: 'Plot',
+          villageName: '',
+          areaName: '',
+          description: '',
+          price: '',
+          priceNegotiable: false,
+          status: 'Available',
+          category: propertyType === 'premium' ? 'Premium' : 'Normal',
+          plotSize: '',
+          plotFacing: 'North',
+          pricePerSqft: '',
+          houseSize: '',
+          bedrooms: '',
+          bathrooms: '',
+          floors: '',
+          houseType: 'Independent',
+          furnished: false,
+          parking: false,
+          amenities: '',
+          yearBuilt: '',
+          landSize: '',
+          landType: 'Residential',
+          zoning: '',
+          roadAccess: false,
+          waterConnection: false,
+          electricityConnection: false,
+          soilType: '',
+          topography: '',
+          images: []
+        });
       } else {
         const error = await response.json();
         throw new Error(error.message || 'Failed to create property');
