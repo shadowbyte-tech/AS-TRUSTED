@@ -32,7 +32,8 @@ const fetchProperties = async () => {
   try {
     const response = await fetch('/api/properties');
     if (!response.ok) throw new Error('Failed to fetch properties');
-    return await response.json();
+    const result = await response.json();
+    return result.success ? result.data : [];
   } catch (error) {
     console.error('Error fetching properties:', error);
     return [];
@@ -43,7 +44,8 @@ const fetchUsers = async () => {
   try {
     const response = await fetch('/api/users');
     if (!response.ok) throw new Error('Failed to fetch users');
-    return await response.json();
+    const result = await response.json();
+    return result.success ? result.data : [];
   } catch (error) {
     console.error('Error fetching users:', error);
     return [];
