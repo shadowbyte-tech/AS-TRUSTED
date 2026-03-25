@@ -1,46 +1,22 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { updateUserProfile } from '@/lib/mongodb-database';
-import { verifyToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const token = request.cookies.get('auth-token')?.value;
-    if (!token) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { name, email, phone } = await request.json();
 
-    const decoded = verifyToken(token);
-    if (!decoded || decoded.role !== 'Owner') {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { name, phone, location } = await request.json();
-
-    // Update user profile in MongoDB
-    const updatedUser = await updateUserProfile(decoded.email, {
-      name,
-      phone,
-      location
-    });
-
-    if (!updatedUser) {
-      return NextResponse.json({ success: false, error: 'Failed to update profile' }, { status: 500 });
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      user: updatedUser,
-      message: 'Profile updated successfully' 
+    // Profile update functionality would need to be implemented in Supabase
+    return NextResponse.json({
+      message: 'Profile update functionality not yet implemented in Supabase',
+      status: 'placeholder'
     });
 
   } catch (error) {
-    console.error('Profile update error:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Internal server error' 
+    console.error('❌ Error:', error);
+    return NextResponse.json({
+      error: 'Failed to update profile',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }
