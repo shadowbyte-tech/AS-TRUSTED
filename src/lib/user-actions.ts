@@ -10,6 +10,11 @@ export interface State {
 }
 
 export async function createUserAction(prevState: State, formData: FormData): Promise<State> {
+  console.log('🔍 Server action called with formData:', {
+    email: formData.get('email'),
+    password: formData.get('password') ? '***' : null
+  });
+
   try {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
