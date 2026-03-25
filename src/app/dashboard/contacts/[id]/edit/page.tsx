@@ -1,12 +1,13 @@
 
 import AuthGuard from '@/components/auth-guard';
 import ContactForm from '@/components/contact-form-server';
-import { getContactById } from '@/lib/actions';
+import { getContacts } from '@/lib/supabase-actions';
 import { notFound } from 'next/navigation';
 
 export default async function EditContactPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const contact = await getContactById(id);
+  const contacts = await getContacts();
+  const contact = contacts.find(c => c.id === id);
 
   if (!contact) {
     notFound();

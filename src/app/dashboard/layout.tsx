@@ -3,7 +3,7 @@ import AuthGuard from '@/components/auth-guard';
 import DashboardSidebar from './sidebar';
 import MobileSidebar from './mobile-sidebar';
 import { Header } from '@/components/header';
-import { getNewRegistrationCount } from '@/lib/actions';
+import { getRegistrations } from '@/lib/supabase-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +12,8 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const newRegistrationCount = await getNewRegistrationCount();
+  const registrations = await getRegistrations();
+  const newRegistrationCount = registrations.length;
 
   return (
     <AuthGuard>

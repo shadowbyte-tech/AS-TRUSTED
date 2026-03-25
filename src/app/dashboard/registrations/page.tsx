@@ -1,5 +1,5 @@
 
-import { getRegistrations, markRegistrationsAsRead } from '@/lib/actions';
+import { getRegistrations } from '@/lib/supabase-actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
   Table,
@@ -23,8 +23,8 @@ function formatDateTime(isoString: string) {
 export default async function RegistrationsPage() {
   const registrations = await getRegistrations();
   
-  // Mark registrations as read when the page is visited
-  await markRegistrationsAsRead();
+  // Mark registrations as read functionality would need to be implemented in Supabase
+  // await markRegistrationsAsRead();
 
   return (
       <div className="space-y-8">

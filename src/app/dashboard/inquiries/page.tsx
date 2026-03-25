@@ -1,5 +1,5 @@
 
-import { getInquiries } from '@/lib/actions';
+import { getInquiries } from '@/lib/supabase-actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
   Table,
