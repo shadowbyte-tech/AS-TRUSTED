@@ -280,7 +280,12 @@ export async function clearAuthCookies() {
  */
 export async function getSessionUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
+  
+  // Check for both auth-token (from our login API) and ACCESS_TOKEN (from auth system)
+  const authToken = cookieStore.get('auth-token')?.value;
+  const accessToken = cookieStore.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
+  
+  const token = authToken || accessToken;
 
   if (!token) {
     return null;
