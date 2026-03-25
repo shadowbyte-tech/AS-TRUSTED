@@ -1,19 +1,29 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
-import { getDBStatus } from '@/lib/mongodb-database';
+import { getUsers, getPlots } from '@/lib/supabase-actions';
 
 export async function GET() {
   try {
-    const status = await getDBStatus();
-    return NextResponse.json(status);
+    const users = await getUsers();
+    const plots = await getPlots();
+
+    return NextResponse.json({
+      status: 'connected',
+      database: 'supabase',
+      stats: {
+        users: users.length,
+        plots: plots.length,
+        tables: ['users', 'plots', 'inquiries', 'registrations', 'contacts']
+      }
+    });
+
   } catch (error) {
-    return NextResponse.json(
-      { 
-        connected: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      }, 
-      { status: 500 }
-    );
+    console.error('❌ Error:', error);
+    return NextResponse.json({
+      status: 'error',
+      database: 'supabase',
+      error: error.message
+    }, { status: 500 });
   }
 }

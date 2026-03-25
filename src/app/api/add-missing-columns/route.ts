@@ -1,38 +1,23 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { supabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    console.log('🔧 Updating MongoDB collections with missing fields...');
-    const client = await clientPromise;
-    const db = client.db('test'); // The database where collections exist
+    console.log('🔧 Updating Supabase tables with missing fields...');
     
-    // Add missing fields to plots collection
-    const result = await db.collection('plots').updateMany(
-      { views: { $exists: false } },
-      { $set: { views: 0 } }
-    );
-    
-    const result2 = await db.collection('plots').updateMany(
-      { last_viewed_at: { $exists: false } },
-      { $set: { last_viewed_at: null } }
-    );
-    
-    console.log('✅ MongoDB fields updated successfully');
-    
+    // This endpoint is no longer needed as Supabase handles schema automatically
     return NextResponse.json({
-      success: true,
-      message: 'Missing MongoDB fields added successfully',
-      modifiedPlots: result.modifiedCount + result2.modifiedCount
+      message: 'Supabase handles schema automatically. No manual column updates needed.',
+      status: 'success'
     });
     
   } catch (error) {
-    console.error('💥 Failed to add missing MongoDB fields:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error'
+    console.error('❌ Error:', error);
+    return NextResponse.json({
+      error: 'Failed to update schema',
+      details: error.message
     }, { status: 500 });
   }
 }
