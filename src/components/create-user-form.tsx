@@ -2,8 +2,7 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
-import { createUserAction } from '@/lib/user-actions';
-import type { State } from '@/lib/definitions';
+import { createUserAction, type State } from '@/lib/user-actions';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Input } from './ui/input';

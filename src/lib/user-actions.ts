@@ -2,13 +2,17 @@
 
 import { createUser } from './supabase-actions';
 import { getUsers } from './supabase-actions';
-import type { State } from './definitions';
+
+export interface State {
+  message: string | null;
+  errors: Record<string, string[] | undefined>;
+  success: boolean;
+}
 
 export async function createUserAction(prevState: State, formData: FormData): Promise<State> {
   try {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const role = 'User'; // Default role for new users
 
     // Validate input
     if (!email || !password) {
@@ -63,18 +67,20 @@ export async function createUserAction(prevState: State, formData: FormData): Pr
     const newUser = await createUser({
       email: email.toLowerCase(),
       name: email.split('@')[0], // Use email prefix as name
-      role: role,
+      role: 'User',
     });
 
     if (!newUser) {
       return {
         message: 'Failed to create user',
+        errors: {},
         success: false,
       };
     }
 
     return {
       message: 'User created successfully',
+      errors: {},
       success: true,
     };
 
@@ -82,6 +88,7 @@ export async function createUserAction(prevState: State, formData: FormData): Pr
     console.error('Error creating user:', error);
     return {
       message: 'An error occurred while creating the user',
+      errors: {},
       success: false,
     };
   }
