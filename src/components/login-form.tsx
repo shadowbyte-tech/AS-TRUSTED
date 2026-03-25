@@ -36,38 +36,20 @@ export default function LoginForm() {
     setIsLoading(true);
     setLockoutInfo(null);
 
-    // Use the main login endpoint
-    const loginEndpoint = '/api/auth/login';
-    
     try {
-      // Ensure proper JSON formatting
-      const loginData = {
-        email: email.trim(),
-        password: password
-      };
+      // Use the auth context login function
+      const result = await login(email, password);
       
-      const response = await fetch(loginEndpoint, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(loginData),
-      });
-
-      const data = await response.json();
-      
-
-      if (response.ok && data.success) {
+      if (result.success) {
         toast({
           title: 'Login Successful',
           description: 'Redirecting to dashboard...',
         });
         
         // Redirect based on user role
-        if (data.user?.role === 'Owner') {
+        if (result.user?.role === 'Owner') {
           window.location.href = '/dashboard';
-        } else if (data.user?.role === 'Premium') {
+        } else if (result.user?.role === 'Premium') {
           window.location.href = '/premium-dashboard';
         } else {
           window.location.href = '/properties';
@@ -76,7 +58,7 @@ export default function LoginForm() {
         toast({
           variant: 'destructive',
           title: 'Login Failed',
-          description: data.error || 'Invalid email or password. Please try again.',
+          description: result.error || 'Invalid email or password. Please try again.',
         });
       }
     } catch (error) {

@@ -5,7 +5,7 @@ import type { AuthUser } from './auth';
 
 interface AuthContextType {
   user: AuthUser | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: AuthUser | null }>;
   logout: () => Promise<void>;
   isLoading: boolean;
   refreshUser: () => Promise<void>;
