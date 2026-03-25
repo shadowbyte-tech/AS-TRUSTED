@@ -9,7 +9,8 @@ export async function GET() {
     const plots = await getPlots();
 
     return NextResponse.json({
-      status: 'connected',
+      connected: true,
+      type: 'Supabase',
       database: 'supabase',
       stats: {
         users: users.length,
@@ -21,7 +22,8 @@ export async function GET() {
   } catch (error) {
     console.error('❌ Error:', error);
     return NextResponse.json({
-      status: 'error',
+      connected: false,
+      type: 'Error',
       database: 'supabase',
       error: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
