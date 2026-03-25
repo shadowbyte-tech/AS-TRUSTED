@@ -7,10 +7,13 @@ import { getUsers } from '@/lib/supabase-actions';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('🔍 Create user API called with:', { ...body, password: body.password ? '***' : null });
+
     const { email, password } = body;
 
     // Validate input
     if (!email || !password) {
+      console.log('❌ Validation failed:', { email: !!email, password: !!password });
       return NextResponse.json({
         success: false,
         message: 'Email and password are required',
@@ -24,6 +27,7 @@ export async function POST(request: NextRequest) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.log('❌ Email format validation failed:', email);
       return NextResponse.json({
         success: false,
         message: 'Invalid email format',
@@ -35,6 +39,7 @@ export async function POST(request: NextRequest) {
 
     // Validate password length
     if (password.length < 8) {
+      console.log('❌ Password length validation failed:', { length: password.length });
       return NextResponse.json({
         success: false,
         message: 'Password must be at least 8 characters long',
