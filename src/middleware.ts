@@ -172,27 +172,29 @@ export function middleware(request: NextRequest) {
   const isAdminPath = PROTECTED_ADMIN_PATHS.some(p => pathname.startsWith(p));
 
   if (isDashboardPath || isAdminPath) {
+    const authToken = request.cookies.get('auth-token')?.value;
     const accessToken = request.cookies.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
     const refreshToken = request.cookies.get(AUTH_COOKIES.REFRESH_TOKEN)?.value;
 
-    if (!accessToken && !refreshToken) {
+    if (!authToken && !accessToken && !refreshToken) {
       const url = new URL('/owner-login', request.url);
       url.searchParams.set('callbackUrl', encodeURI(pathname));
       return NextResponse.redirect(url);
     }
 
     // Attach user token header for downstream API routes to read (no JWT lib in edge)
-    if (accessToken) {
+    if (authToken || accessToken) {
       response.headers.set('x-has-auth', '1');
     }
   }
 
   // ── 6. PREMIUM DASHBOARD PROTECTION ─────────────────────────────────────
   if (pathname.startsWith('/premium-dashboard')) {
+    const authToken = request.cookies.get('auth-token')?.value;
     const accessToken = request.cookies.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
     const refreshToken = request.cookies.get(AUTH_COOKIES.REFRESH_TOKEN)?.value;
 
-    if (!accessToken && !refreshToken) {
+    if (!authToken && !accessToken && !refreshToken) {
       const url = new URL('/user-login', request.url);
       url.searchParams.set('callbackUrl', encodeURI(pathname));
       return NextResponse.redirect(url);
