@@ -192,11 +192,10 @@ export default function PremiumPropertiesPage() {
       const response = await fetch('/api/properties');
       if (response.ok) {
         const data = await response.json();
-        // Assuming data is { data: Property[], ... }
-        const allProps = data.data || [];
-        // Owners can see Premium category properties
-        const premiumOnly = allProps.filter((p: any) => p.category === 'Premium');
-        setProperties(premiumOnly);
+        // Handle the wrapped response format from Supabase API
+        const allProps = data.success ? data.data : [];
+        // Owners can see all properties (not filtering by category since our plots don't have category field)
+        setProperties(allProps);
       }
     } catch (error) {
       console.error('Error fetching properties:', error);

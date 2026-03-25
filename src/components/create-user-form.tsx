@@ -2,7 +2,7 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
-import { createUser } from '@/lib/actions';
+import { createUser } from '@/lib/supabase-actions';
 import type { State } from '@/lib/definitions';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from './ui/card';
