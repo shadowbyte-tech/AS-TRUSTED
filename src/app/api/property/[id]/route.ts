@@ -1,42 +1,33 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getProperty } from '@/lib/mongodb-database';
-import { logger } from '@/lib/logger';
+import { getPlots } from '@/lib/supabase-actions';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
-    logger.info('?? PROPERTY GET API - Fetching property:', id);
+    const plots = await getPlots();
+    const plot = plots.find(p => p.id === params.id);
 
-    const property = await getProperty(id);
-
-    if (property) {
-      logger.info('? PROPERTY GET API - Property found:', property.id);
+    if (!plot) {
       return NextResponse.json({
-        success: true,
-        property
-      });
-    } else {
-      logger.warn('? PROPERTY GET API - Property not found:', id);
-      return NextResponse.json(
-        { error: 'Property not found' },
-        { status: 404 }
-      );
+        success: false,
+        error: 'Property not found'
+      }, { status: 404 });
     }
 
+    return NextResponse.json({
+      success: true,
+      data: plot
+    });
+
   } catch (error) {
-    console.error('❌ PROPERTY GET API - Error:', error);
-    return NextResponse.json(
-      { 
-        error: 'Failed to fetch property',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    console.error('❌ Error fetching property:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
