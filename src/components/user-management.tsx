@@ -225,7 +225,7 @@ export default function UserManagement() {
     setCreating(true);
 
     try {
-      const response = await fetch('/api/auth/create-user', {
+      const response = await fetch('/api/users/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -233,7 +233,6 @@ export default function UserManagement() {
         body: JSON.stringify({
           email: newUserEmail,
           password: newUserPassword,
-          role: newUserRole,
         }),
       });
 
