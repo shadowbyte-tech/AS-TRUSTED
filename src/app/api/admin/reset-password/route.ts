@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     console.error('❌ Error:', error);
     return NextResponse.json({
       error: 'Failed to reset password',
-      details: error.message
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }
