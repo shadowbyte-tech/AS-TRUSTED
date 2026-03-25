@@ -3,7 +3,7 @@
 
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createContact, updateContact } from '@/lib/actions';
+import { createContact, updateContact } from '@/lib/supabase-actions';
 import type { Contact, State } from '@/lib/definitions';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter } from './ui/card';

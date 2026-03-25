@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createContact, updateContact } from '@/lib/actions';
+import { createContact, updateContact } from '@/lib/supabase-actions';
 import type { Contact } from '@/lib/definitions';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter } from './ui/card';
@@ -26,12 +26,21 @@ export default function ContactForm({ contact }: { contact?: Contact }) {
     setErrors({});
 
     try {
-      const action = contact ? updateContact.bind(null, contact.id) : createContact;
+      const contactData = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string,
+        message: formData.get('message') as string
+      };
       
       // Call the server action with proper error handling
       let result;
       try {
-        result = await action({}, formData);
+        if (contact) {
+          result = await updateContact(contact.id, contactData);
+        } else {
+          result = await createContact(contactData);
+        }
       } catch (serverActionError) {
         console.error('Server action error:', serverActionError);
         toast({

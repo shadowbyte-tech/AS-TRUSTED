@@ -110,3 +110,25 @@ export async function createContact(contact: Omit<Database['contacts']['Row'], '
   if (error) throw new Error(error.message)
   return data
 }
+
+export async function updateContact(id: string, contact: Partial<Database['contacts']['Row']>) {
+  const { data, error } = await supabase
+    .from('contacts')
+    .update(contact)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data
+}
+
+export async function deleteContact(id: string) {
+  const { error } = await supabase
+    .from('contacts')
+    .delete()
+    .eq('id', id)
+
+  if (error) throw new Error(error.message)
+  return true
+}

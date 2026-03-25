@@ -1,7 +1,7 @@
 
 'use client';
 
-import { deleteContact } from '@/lib/actions';
+import { deleteContact } from '@/lib/supabase-actions';
 import {
   AlertDialog,
   AlertDialogAction,

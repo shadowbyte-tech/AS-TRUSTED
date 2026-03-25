@@ -15,7 +15,7 @@ import {
   Activity
 } from 'lucide-react';
 import PropertyAnalyticsDashboard from '@/components/property-analytics-dashboard';
-import { readUsers, readPlots } from '@/lib/mongodb-database';
+import { getUsers, getPlots } from '@/lib/supabase-actions';
 
 interface Stats {
   totalPlots: number;
@@ -31,8 +31,8 @@ interface Stats {
 
 async function getAdminStats(): Promise<Stats> {
   try {
-    const plots = await readPlots();
-    const users = await readUsers();
+    const plots = await getPlots();
+    const users = await getUsers();
     
     // In-memory fallbacks for layout demo
     return {
