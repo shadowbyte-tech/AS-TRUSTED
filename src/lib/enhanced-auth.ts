@@ -6,7 +6,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { authenticateUser, registerUser, generateAccessToken, verifyToken } from './auth';
-import { readUsers, createUser as createUserDB } from './mongodb-database';
+import { getUsers, createUser } from './supabase-actions';
 import { setPassword } from './password-storage';
 
 // Password generation options
@@ -201,8 +201,8 @@ export async function createUserWithGeneratedPassword(
 ): Promise<{ user: any; password: string; success: boolean; message: string }> {
   try {
     // Check if user already exists
-    const users = await readUsers();
-    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const users = await getUsers();
+    const existingUser = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
     if (existingUser) {
       return {
         user: null,
@@ -228,8 +228,8 @@ export async function createUserWithGeneratedPassword(
     await setPassword(email, hashedPassword);
 
     // Create user record
-    const userData = { email, role };
-    const savedUser = await createUserDB(userData);
+    const userData = { email, role, name: email };
+    const savedUser = await createUser(userData);
 
     return {
       user: savedUser,
