@@ -2,7 +2,7 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
-import { createUser } from '@/lib/supabase-actions';
+import { createUserAction } from '@/lib/user-actions';
 import type { State } from '@/lib/definitions';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from './ui/card';
@@ -38,7 +38,7 @@ export default function CreateUserForm() {
     const { toast } = useToast();
     const router = useRouter();
     const initialState: State = { message: null, errors: {}, success: false };
-    const [state, dispatch] = useActionState(createUser, initialState);
+    const [state, dispatch] = useActionState(createUserAction, initialState);
 
     useEffect(() => {
         if (state.success) {
