@@ -9,12 +9,6 @@ import mongoose from 'mongoose';
 
 import { logger } from './logger';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI environment variable is not set. Add it to .env.local');
-}
-
 // ─── CONNECTION CACHING (required for Next.js serverless) ────────────────────
 declare global {
   // eslint-disable-next-line no-var
@@ -26,12 +20,19 @@ if (!global._mongooseCache) {
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error(
+      'MONGODB_URI is not set. Add it to Vercel Environment Variables or .env.local'
+    );
+  }
+
   if (global._mongooseCache.conn) {
     return global._mongooseCache.conn;
   }
 
   if (!global._mongooseCache.promise) {
-    global._mongooseCache.promise = mongoose.connect(MONGODB_URI, {
+    global._mongooseCache.promise = mongoose.connect(uri, {
       bufferCommands: false,
       serverSelectionTimeoutMS: 10000,
       connectTimeoutMS: 10000,
