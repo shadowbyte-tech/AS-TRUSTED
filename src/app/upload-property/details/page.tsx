@@ -110,32 +110,48 @@ function PropertyDetailsContent() {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
+    setIsUploading(true);
     const newImages: string[] = [];
-    let processedCount = 0;
 
-    Array.from(files).forEach(file => {
-      if (file.type.startsWith('image/') && formData.images.length + newImages.length < 5) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            newImages.push(event.target.result as string);
-            processedCount++;
-            
-            if (processedCount === Math.min(files.length, 5 - formData.images.length)) {
-              setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages].slice(0, 5)
-              }));
-            }
+    try {
+      for (const file of Array.from(files)) {
+        if (formData.images.length + newImages.length >= 5) break;
+        if (!file.type.startsWith('image/')) continue;
+
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            newImages.push(result.url);
           }
-        };
-        reader.readAsDataURL(file);
+        }
       }
-    });
+
+      if (newImages.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, ...newImages].slice(0, 5)
+        }));
+      }
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      alert('Failed to upload some images. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const removeImage = (index: number) => {
@@ -144,6 +160,7 @@ function PropertyDetailsContent() {
       images: prev.images.filter((_, i) => i !== index)
     }));
   };
+
 
   const handleAIFieldUpdate = (field: string, value: string) => {
     handleInputChange(field, value);
@@ -270,6 +287,8 @@ function PropertyDetailsContent() {
       
       const propertyData = {
         ...formData,
+        imageUrl: formData.images[0] || '/api/placeholder/400/300',
+        imageHint: formData.propertyType,
         propertyType: baseType as any,
         price: parseFloat(formData.price),
         pricePerSqft: formData.pricePerSqft ? parseFloat(formData.pricePerSqft) : undefined,
@@ -278,6 +297,7 @@ function PropertyDetailsContent() {
         floors: formData.floors ? parseInt(formData.floors) : undefined,
         yearBuilt: formData.yearBuilt ? parseInt(formData.yearBuilt) : undefined,
       };
+
 
       // Call property creation API
       const response = await fetch('/api/property/create', {
@@ -908,29 +928,35 @@ function PropertyDetailsContent() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Image Upload Area */}
-              <div className="border-2 border-dashed border-purple-500/50 rounded-lg p-6 text-center hover:border-purple-400/70 transition-colors">
+              <div className={`border-2 border-dashed border-purple-500/50 rounded-lg p-6 text-center hover:border-purple-400/70 transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <input
                   type="file"
                   id="propertyImages"
                   multiple
                   accept="image/png, image/jpeg, image/jpg, image/webp"
                   onChange={handleImageUpload}
+                  disabled={isUploading}
                   className="hidden"
                 />
                 <label 
-                  htmlFor="propertyImages" 
-                  className="cursor-pointer flex flex-col items-center space-y-3"
+                  htmlFor={isUploading ? undefined : "propertyImages"} 
+                  className={`flex flex-col items-center space-y-3 ${isUploading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center">
-                    <Upload className="h-8 w-8 text-purple-400" />
+                    {isUploading ? (
+                      <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Upload className="h-8 w-8 text-purple-400" />
+                    )}
                   </div>
                   <div>
-                    <p className="text-white font-medium">Click to upload images</p>
+                    <p className="text-white font-medium">{isUploading ? 'Uploading images...' : 'Click to upload images'}</p>
                     <p className="text-gray-400 text-sm">or drag and drop</p>
-                    <p className="text-gray-500 text-xs mt-1">PNG, JPG, WebP up to 10MB each</p>
+                    <p className="text-gray-500 text-xs mt-1">PNG, JPG, WebP up to 5MB each</p>
                   </div>
                 </label>
               </div>
+
 
               {/* Image Previews */}
               {formData.images.length > 0 && (

@@ -1,34 +1,34 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUser } from '@/lib/supabase-auth';
+import { verifyToken, generateAccessToken, setAuthCookies } from '@/lib/auth';
+import { connectDB, User } from '@/lib/models';
+import { AUTH_COOKIES } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUser();
-    
-    if (!user) {
-      return NextResponse.json({
-        success: false,
-        error: 'No authenticated user found'
-      }, { status: 401 });
+    const refreshToken = request.cookies.get(AUTH_COOKIES.REFRESH_TOKEN)?.value;
+    if (!refreshToken) {
+      return NextResponse.json({ error: 'No refresh token' }, { status: 401 });
     }
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.user_metadata?.role || 'User',
-        name: user.user_metadata?.name || user.email
-      }
-    });
+    const decoded = verifyToken(refreshToken);
+    if (!decoded?.id) {
+      return NextResponse.json({ error: 'Invalid or expired refresh token' }, { status: 401 });
+    }
 
+    await connectDB();
+    const user = await User.findById(decoded.id).lean();
+    if (!user || !user.isActive || user.isBlocked) {
+      return NextResponse.json({ error: 'User not found or disabled' }, { status: 401 });
+    }
+
+    const authUser = { id: String(user._id), email: user.email, role: user.role, name: user.name };
+    await setAuthCookies(authUser);
+
+    return NextResponse.json({ success: true, user: { id: authUser.id, email: authUser.email, role: authUser.role, name: authUser.name } });
   } catch (error) {
-    console.error('❌ Error refreshing user:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error('Refresh error:', error);
+    return NextResponse.json({ error: 'Token refresh failed' }, { status: 500 });
   }
 }

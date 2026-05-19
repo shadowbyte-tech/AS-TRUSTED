@@ -1,31 +1,41 @@
-export const dynamic = 'force-dynamic';
-
 import { NextResponse } from 'next/server';
-import { getUsers, getPlots } from '@/lib/supabase-actions';
+import mongoose from 'mongoose';
+import { connectDB, Property, User, Inquiry, Lead, Contact } from '@/lib/models';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const users = await getUsers();
-    const plots = await getPlots();
+    await connectDB();
+
+    const [users, properties, inquiries, leads, contacts] = await Promise.all([
+      User.countDocuments(),
+      Property.countDocuments(),
+      Inquiry.countDocuments(),
+      Lead.countDocuments(),
+      Contact.countDocuments(),
+    ]);
 
     return NextResponse.json({
-      connected: true,
-      type: 'Supabase',
-      database: 'supabase',
+      success: true,
+      status: 'healthy',
+      database: 'MongoDB Atlas',
+      mongooseState: mongoose.connection.readyState,
       stats: {
-        users: users.length,
-        plots: plots.length,
-        tables: ['users', 'plots', 'inquiries', 'registrations', 'contacts']
-      }
+        users,
+        properties,
+        inquiries,
+        leads,
+        contacts,
+        collections: ['users', 'passwords', 'properties', 'inquiries', 'leads', 'contacts', 'favorites', 'comparisons', 'auditlogs', 'sitevisits'],
+      },
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json({
-      connected: false,
-      type: 'Error',
-      database: 'supabase',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error('DB Status Error:', error);
+    return NextResponse.json(
+      { success: false, status: 'error', database: 'MongoDB Atlas', error: String(error) },
+      { status: 500 }
+    );
   }
 }

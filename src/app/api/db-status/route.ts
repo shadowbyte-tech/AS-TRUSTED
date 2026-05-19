@@ -1,29 +1,20 @@
-export const dynamic = 'force-dynamic';
-
+/**
+ * @file src/app/api/db-status/route.ts
+ * Health check — tests MongoDB connection.
+ */
 import { NextResponse } from 'next/server';
-import { getUsers, getPlots } from '@/lib/supabase-actions';
+import { connectDB } from '@/lib/models';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const users = await getUsers();
-    const plots = await getPlots();
-
-    return NextResponse.json({
-      status: 'connected',
-      database: 'supabase',
-      stats: {
-        users: users.length,
-        plots: plots.length,
-        tables: ['users', 'plots', 'inquiries', 'registrations', 'contacts']
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json({
-      status: 'error',
-      database: 'supabase',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    await connectDB();
+    return NextResponse.json({ status: 'ok', database: 'MongoDB Atlas', connected: true });
+  } catch (err: any) {
+    return NextResponse.json(
+      { status: 'error', database: 'MongoDB Atlas', connected: false, error: err?.message },
+      { status: 503 }
+    );
   }
 }

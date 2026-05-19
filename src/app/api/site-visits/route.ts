@@ -1,38 +1,51 @@
+/**
+ * @file src/app/api/site-visits/route.ts
+ * Site visit bookings — MongoDB.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB, SiteVisit } from '@/lib/models';
+import { requireOwner } from '@/lib/api-auth';
+import { logger } from '@/lib/logger';
+
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
+export async function GET(request: NextRequest) {
+  const authError = await requireOwner(request);
+  if (authError) return authError;
 
-export async function GET() {
   try {
-    // Site visits analytics placeholder
-    return NextResponse.json({
-      message: 'Site visits analytics not yet implemented in Supabase',
-      status: 'placeholder',
-      visits: 0
-    });
-
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json({
-      error: 'Failed to fetch site visits',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    await connectDB();
+    const visits = await SiteVisit.find({}).sort({ createdAt: -1 }).lean();
+    return NextResponse.json({ success: true, data: visits });
+  } catch (err) {
+    logger.error('GET /api/site-visits failed', err);
+    return NextResponse.json({ error: 'Failed to fetch site visits' }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Site visit tracking placeholder
-    return NextResponse.json({
-      message: 'Site visit tracking not yet implemented in Supabase',
-      status: 'placeholder'
+    await connectDB();
+    const body = await request.json();
+    const { name, phone, email, preferredDate, preferredTime, location, message } = body;
+
+    if (!name || !phone || !email || !preferredDate || !preferredTime || !location) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const visit = await SiteVisit.create({
+      name: name.trim(), phone: phone.trim(),
+      email: email.trim().toLowerCase(),
+      preferredDate, preferredTime,
+      location: location.trim(),
+      message: message?.trim(),
+      status: 'Pending',
     });
 
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json({
-      error: 'Failed to track site visit',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    logger.info(`✅ Site visit booked: ${email}`);
+    return NextResponse.json({ success: true, data: visit }, { status: 201 });
+  } catch (err) {
+    logger.error('POST /api/site-visits failed', err);
+    return NextResponse.json({ error: 'Failed to book site visit' }, { status: 500 });
   }
 }

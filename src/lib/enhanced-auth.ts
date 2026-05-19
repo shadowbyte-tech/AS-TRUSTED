@@ -6,8 +6,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { authenticateUser, registerUser, generateAccessToken, verifyToken } from './auth';
-import { getUsers, createUser } from './supabase-actions';
-import { setPassword } from './password-storage';
+import { connectDB, User, Password } from './models';
 
 // Password generation options
 interface PasswordOptions {
@@ -200,51 +199,24 @@ export async function createUserWithGeneratedPassword(
   passwordOptions?: PasswordOptions
 ): Promise<{ user: any; password: string; success: boolean; message: string }> {
   try {
-    // Check if user already exists
-    const users = await getUsers();
-    const existingUser = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
-    if (existingUser) {
-      return {
-        user: null,
-        password: '',
-        success: false,
-        message: 'User with this email already exists',
-      };
+    await connectDB();
+    const existing = await User.findOne({ email: email.toLowerCase() }).lean();
+    if (existing) {
+      return { user: null, password: '', success: false, message: 'User with this email already exists' };
     }
 
-    // Generate secure password
     const generatedPassword = generateSecurePassword(passwordOptions);
-
-    // Validate the generated password (should always pass)
     const validation = validatePasswordStrength(generatedPassword);
-    if (!validation.isValid) {
-      throw new Error('Generated password failed validation');
-    }
+    if (!validation.isValid) throw new Error('Generated password failed validation');
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(generatedPassword, 12); // Higher rounds for admin-generated passwords
+    const hashedPassword = await bcrypt.hash(generatedPassword, 12);
+    const user = await User.create({ email: email.toLowerCase(), role, name: email, isActive: true, isBlocked: false });
+    await Password.create({ email: email.toLowerCase(), hashedPassword });
 
-    // Store password
-    await setPassword(email, hashedPassword);
-
-    // Create user record
-    const userData = { email, role, name: email };
-    const savedUser = await createUser(userData);
-
-    return {
-      user: savedUser,
-      password: generatedPassword, // Return plain password for admin to share
-      success: true,
-      message: 'User created successfully with generated password',
-    };
+    return { user: user.toObject(), password: generatedPassword, success: true, message: 'User created successfully with generated password' };
   } catch (error) {
     console.error('Error creating user with generated password:', error);
-    return {
-      user: null,
-      password: '',
-      success: false,
-      message: 'Failed to create user',
-    };
+    return { user: null, password: '', success: false, message: 'Failed to create user' };
   }
 }
 

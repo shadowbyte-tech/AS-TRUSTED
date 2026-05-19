@@ -1,19 +1,24 @@
+/**
+ * @file src/lib/auth.ts
+ * Complete authentication system using ONLY MongoDB + bcryptjs + JWT.
+ * All Supabase references removed.
+ */
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { readUsers, getUserByEmail, saveUser } from './supabase-database';
-import type { User } from './definitions';
-import { AuthenticationError, ValidationError } from './errors';
-import { getPassword, setPassword } from './password-storage';
-import { VALIDATION, JWT_CONFIG, AUTH_COOKIES } from './constants';
-import { validateAndLogEnv } from './env-validation';
+import { cookies } from 'next/headers';
+import { connectDB, User, Password } from './models';
 import { logger } from './logger';
+import { AUTH_COOKIES, JWT_CONFIG, VALIDATION } from './constants';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET must be set and at least 32 characters long.');
+}
+
 const BCRYPT_SALT_ROUNDS = 12;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-// Validate env on module load (warns in dev, throws in prod)
-validateAndLogEnv();
-
+// ─── TYPES ────────────────────────────────────────────────────────────────────
 export interface AuthUser {
   id: string;
   email: string;
@@ -35,331 +40,198 @@ export interface RegisterData {
   role?: string;
 }
 
-/**
- * Checks if a stored password string is a bcrypt hash.
- * Bcrypt hashes always start with $2a$, $2b$, or $2y$.
- */
-function isBcryptHash(value: string): boolean {
-  return /^\$2[aby]\$/.test(value);
-}
-
-/**
- * Validates password strength
- */
-function validatePassword(password: string): void {
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function validatePasswordStrength(password: string): void {
   if (password.length < VALIDATION.PASSWORD_MIN_LENGTH) {
-    throw new ValidationError(`Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters long`);
+    throw new Error(`Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`);
   }
   if (password.length > VALIDATION.PASSWORD_MAX_LENGTH) {
-    throw new ValidationError(`Password must be less than ${VALIDATION.PASSWORD_MAX_LENGTH} characters`);
+    throw new Error(`Password must be less than ${VALIDATION.PASSWORD_MAX_LENGTH} characters`);
   }
 }
 
-/**
- * Verifies a password against a stored value.
- * Handles BOTH plain-text (legacy) and bcrypt (new) passwords.
- * If plain-text is matched, transparently re-hashes and updates storage.
- *
- * @returns `{ valid: boolean, migrated: boolean }` — migrated=true means the password was re-hashed.
- */
-async function verifyAndMigratePassword(
-  inputPassword: string,
-  storedValue: string,
-  userEmail: string
-): Promise<{ valid: boolean; migrated: boolean }> {
-  console.log('🔍 Password Debug:', {
-    inputLength: inputPassword.length,
-    storedValue,
-    isBcryptHash: isBcryptHash(storedValue),
-    userEmail
-  });
-
-  // Case 1: Already a bcrypt hash — use bcrypt.compare
-  if (isBcryptHash(storedValue)) {
-    console.log('🔍 Using bcrypt comparison');
-    const valid = await bcrypt.compare(inputPassword, storedValue);
-    console.log('🔍 Bcrypt compare result:', valid);
-    return { valid, migrated: false };
-  }
-
-  // Case 2: Plain-text password (legacy) — transparent migration
-  const valid = inputPassword === storedValue;
-  if (valid) {
-    // Silently upgrade to bcrypt hash
-    const newHash = await bcrypt.hash(inputPassword, BCRYPT_SALT_ROUNDS);
-    await setPassword(userEmail, newHash);
-    logger.info(`✅ Password migrated to bcrypt for: ${userEmail}`);
-    return { valid: true, migrated: true };
-  }
-
-  return { valid: false, migrated: false };
-}
-
-/**
- * Authenticates specifically an owner account.
- */
-export async function authenticateOwner(credentials: LoginCredentials): Promise<AuthUser | null> {
-  const { email, password } = credentials;
-
-  if (!email || !password) {
-    throw new ValidationError('Email and password are required');
-  }
-
-  const user = await getUserByEmail(email);
-
-  if (!user || user.role !== 'Owner') {
-    return null;
-  }
-
-  const storedPassword = await getPassword(user.email);
-  if (!storedPassword) {
-    logger.error(`No password record found in Supabase for: ${user.email}`);
-    return null;
-  }
-
-  const { valid } = await verifyAndMigratePassword(password, storedPassword, user.email);
-  if (!valid) {
-    return null;
-  }
-
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-  };
-}
-
-/**
- * Authenticates a standard or premium user.
- */
-export async function authenticateUser(credentials: LoginCredentials): Promise<AuthUser | null> {
-  const { email, password } = credentials;
-
-  if (!email || !password) {
-    throw new ValidationError('Email and password are required');
-  }
-
-  const user = await getUserByEmail(email);
-  
-  if (!user || user.role === 'Owner') {
-    return null;
-  }
-
-  const storedPassword = await getPassword(user.email);
-  if (!storedPassword) {
-    logger.error(`No password record found in Supabase for: ${user.email}`);
-    return null;
-  }
-
-  const { valid } = await verifyAndMigratePassword(password, storedPassword, user.email);
-  if (!valid) {
-    return null;
-  }
-
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-  };
-}
-
-/**
- * Registers a new user — password is hashed with bcrypt before storage.
- */
-export async function registerUser(data: RegisterData): Promise<AuthUser | null> {
-  const { email, password, role = 'User' } = data;
-
-  if (!email || !password) {
-    throw new ValidationError('Email and password are required');
-  }
-
-  validatePassword(password);
-
-  const users = await readUsers();
-  const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (existingUser) {
-    return null;
-  }
-
-  // Hash password before storing — NEVER store plain text
-  const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-  await setPassword(email, hashedPassword);
-
-  const savedUser = await saveUser({
-    email,
-    role: role as 'User' | 'Owner' | 'Premium',
-  });
-
-  return {
-    id: savedUser.id,
-    email: savedUser.email,
-    role: savedUser.role,
-  };
-}
-
-import { cookies } from 'next/headers';
-
-/**
- * Generates an access token for a user
- */
+// ─── TOKEN OPERATIONS ────────────────────────────────────────────────────────
 export function generateAccessToken(user: AuthUser): string {
   return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    },
-    JWT_SECRET,
-    { expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN }
+    { id: user.id, email: user.email, role: user.role },
+    JWT_SECRET!,
+    { expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN, algorithm: 'HS256' }
   );
 }
 
-/**
- * Generates a refresh token for a user
- */
 export function generateRefreshToken(user: AuthUser): string {
   return jwt.sign(
     { id: user.id },
-    JWT_SECRET,
-    { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRES_IN }
+    JWT_SECRET!,
+    { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRES_IN, algorithm: 'HS256' }
   );
 }
 
-/**
- * Verifies a JWT token and returns its payload
- */
 export function verifyToken(token: string): any {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, JWT_SECRET!, { algorithms: ['HS256'] });
   } catch {
     return null;
   }
 }
 
-/**
- * Sets authentication cookies in the response.
- * Enforces secure=true in production.
- */
-export async function setAuthCookies(user: AuthUser) {
-  const accessToken = generateAccessToken(user);
+// ─── COOKIE OPERATIONS ───────────────────────────────────────────────────────
+export async function setAuthCookies(user: AuthUser): Promise<{ accessToken: string; refreshToken: string }> {
+  const accessToken  = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
-  const isProduction = process.env.NODE_ENV === 'production';
+  const cookieStore  = await cookies();
 
-  const cookieStore = await cookies();
+  const cookieOpts = {
+    httpOnly: true,
+    secure:   IS_PRODUCTION,
+    sameSite: 'strict' as const,
+    path:     '/',
+  };
 
   cookieStore.set(AUTH_COOKIES.ACCESS_TOKEN, accessToken, {
-    httpOnly: true,
-    secure: false, // ⚠️ TEMPORARY: Disable secure flag for Vercel deployment
-    sameSite: 'lax', // ⚠️ TEMPORARY: Use lax for cross-site requests
+    ...cookieOpts,
     maxAge: AUTH_COOKIES.MAX_AGE_ACCESS,
-    path: '/',
   });
 
   cookieStore.set(AUTH_COOKIES.REFRESH_TOKEN, refreshToken, {
-    httpOnly: true,
-    secure: false, // ⚠️ TEMPORARY: Disable secure flag for Vercel deployment
-    sameSite: 'lax', // ⚠️ TEMPORARY: Use lax for cross-site requests
+    ...cookieOpts,
     maxAge: AUTH_COOKIES.MAX_AGE_REFRESH,
-    path: '/',
   });
+
+  // Persist refresh token to DB for rotation/invalidation
+  await connectDB();
+  await User.findByIdAndUpdate(user.id, { refreshToken });
 
   return { accessToken, refreshToken };
 }
 
-/**
- * Clears authentication cookies
- */
-export async function clearAuthCookies() {
+export async function clearAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(AUTH_COOKIES.ACCESS_TOKEN);
   cookieStore.delete(AUTH_COOKIES.REFRESH_TOKEN);
 }
 
-/**
- * Extracts and verifies the session user from cookies
- */
+// ─── SESSION ─────────────────────────────────────────────────────────────────
 export async function getSessionUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
-  
-  // Check for both auth-token (from our login API) and ACCESS_TOKEN (from auth system)
-  const authToken = cookieStore.get('auth-token')?.value;
-  const accessToken = cookieStore.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
-  
-  const token = authToken || accessToken;
-
-  if (!token) {
-    return null;
-  }
+  const token = cookieStore.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
+  if (!token) return null;
 
   const decoded = verifyToken(token);
-  if (!decoded || !decoded.id) {
-    return null;
-  }
+  if (!decoded?.id) return null;
 
   try {
-    const user = await getUserByEmail(decoded.email || ''); // Assuming email is in token or we fetch by ID
-
-    if (!user && decoded.id) {
-       // Fallback: finding by ID if email not directly available/trusted in token
-       const users = await readUsers();
-       const foundUser = users.find(u => u.id === decoded.id);
-       if (!foundUser) return null;
-       return {
-         id: foundUser.id,
-         email: foundUser.email,
-         role: foundUser.role,
-         name: foundUser.name,
-         phone: foundUser.phone,
-         location: foundUser.location,
-       };
-    }
-
-    if (!user) return null;
+    await connectDB();
+    const user = await User.findById(decoded.id).lean();
+    if (!user || !user.isActive || user.isBlocked) return null;
 
     return {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      name: user.name,
-      phone: user.phone,
+      id:       String(user._id),
+      email:    user.email,
+      role:     user.role,
+      name:     user.name,
+      phone:    user.phone,
       location: user.location,
     };
-  } catch (error) {
-    logger.error('Error fetching user data:', error);
+  } catch (err) {
+    logger.error('getSessionUser failed', err);
     return null;
   }
 }
 
-/**
- * Changes a user's password. New password is hashed with bcrypt.
- */
-export async function changePassword(
-  userId: string,
-  currentPassword: string,
-  newPassword: string
-): Promise<boolean> {
-  const users = await readUsers();
-  const user = users.find(u => u.id === userId);
+// ─── AUTHENTICATE (LOGIN) ────────────────────────────────────────────────────
+export async function authenticateUser(credentials: LoginCredentials): Promise<AuthUser | null> {
+  const { email, password } = credentials;
+  if (!email || !password) throw new Error('Email and password are required');
 
-  if (!user) {
-    throw new AuthenticationError('User not found');
+  await connectDB();
+
+  const user = await User.findOne({ email: email.toLowerCase() }).lean();
+  if (!user || user.isBlocked || !user.isActive) return null;
+
+  const passwordDoc = await Password.findOne({ email: email.toLowerCase() }).select('+hashedPassword').lean();
+  if (!passwordDoc) {
+    logger.warn(`No password record found for: ${email}`);
+    return null;
   }
 
-  validatePassword(newPassword);
+  const valid = await bcrypt.compare(password, passwordDoc.hashedPassword);
+  if (!valid) return null;
 
-  const storedPassword = await getPassword(user.email);
-  if (!storedPassword) {
-    throw new AuthenticationError('No password set for this user');
-  }
+  // Update last login time
+  await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
 
-  const { valid } = await verifyAndMigratePassword(currentPassword, storedPassword, user.email);
-  if (!valid) {
-    throw new AuthenticationError('Current password is incorrect');
-  }
+  return {
+    id:       String(user._id),
+    email:    user.email,
+    role:     user.role,
+    name:     user.name,
+    phone:    user.phone,
+    location: user.location,
+  };
+}
 
-  // Store the NEW password hashed
-  const hashedNew = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
-  await setPassword(user.email, hashedNew);
+export async function authenticateOwner(credentials: LoginCredentials): Promise<AuthUser | null> {
+  const user = await authenticateUser(credentials);
+  if (!user || user.role !== 'Owner') return null;
+  return user;
+}
 
-  return true;
+// ─── REGISTER ────────────────────────────────────────────────────────────────
+export async function registerUser(data: RegisterData): Promise<AuthUser> {
+  const { email, password, name, role = 'User' } = data;
+  if (!email || !password) throw new Error('Email and password are required');
+
+  validatePasswordStrength(password);
+  await connectDB();
+
+  const existing = await User.findOne({ email: email.toLowerCase() });
+  if (existing) throw new Error('A user with this email already exists');
+
+  const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+
+  const user = await User.create({ email: email.toLowerCase(), role, name });
+  await Password.create({ email: email.toLowerCase(), hashedPassword });
+
+  logger.info(`✅ User registered: ${email}`);
+
+  return {
+    id:    String(user._id),
+    email: user.email,
+    role:  user.role,
+    name:  user.name,
+  };
+}
+
+// ─── CHANGE PASSWORD ─────────────────────────────────────────────────────────
+export async function changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+  validatePasswordStrength(newPassword);
+  await connectDB();
+
+  const user = await User.findById(userId).lean();
+  if (!user) throw new Error('User not found');
+
+  const passwordDoc = await Password.findOne({ email: user.email }).select('+hashedPassword').lean();
+  if (!passwordDoc) throw new Error('No password record found');
+
+  const valid = await bcrypt.compare(currentPassword, passwordDoc.hashedPassword);
+  if (!valid) throw new Error('Current password is incorrect');
+
+  const hashed = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+  await Password.findOneAndUpdate({ email: user.email }, { hashedPassword: hashed });
+}
+
+// ─── GET USER BY EMAIL (utility) ─────────────────────────────────────────────
+export async function getUserByEmail(email: string): Promise<AuthUser | null> {
+  await connectDB();
+  const user = await User.findOne({ email: email.toLowerCase() }).lean();
+  if (!user) return null;
+  return {
+    id:       String(user._id),
+    email:    user.email,
+    role:     user.role,
+    name:     user.name,
+    phone:    user.phone,
+    location: user.location,
+  };
 }

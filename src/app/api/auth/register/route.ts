@@ -1,50 +1,49 @@
-export const dynamic = 'force-dynamic';
-
+/**
+ * @file src/app/api/auth/register/route.ts
+ * User registration — MongoDB only.
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { registerUser, setAuthCookies } from '@/lib/auth';
-import { handleError, ValidationError } from '@/lib/errors';
-import { API_MESSAGES, VALIDATION } from '@/lib/constants';
+import { logger } from '@/lib/logger';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name, role } = body;
+    const { email, password, name } = body;
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: API_MESSAGES.ERROR.MISSING_FIELDS, fields: ['email', 'password'] },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    if (password.length < VALIDATION.PASSWORD_MIN_LENGTH) {
-      return NextResponse.json(
-        { error: `Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters long` },
-        { status: 400 }
-      );
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const user = await registerUser({ email, password, name, role });
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: API_MESSAGES.ERROR.USER_EXISTS },
-        { status: 409 }
-      );
-    }
+    const user = await registerUser({
+      email: email.trim().toLowerCase(),
+      password,
+      name: name?.trim(),
+      role: 'User',
+    });
 
-    // Set secure HTTP-only cookies
     await setAuthCookies(user);
+
+    logger.info(`✅ User registered: ${user.email}`);
 
     return NextResponse.json({
       success: true,
-      user,
-    });
-  } catch (error) {
-    const { message, statusCode } = handleError(error);
-    return NextResponse.json(
-      { error: message },
-      { status: statusCode }
-    );
+      user: {
+        id:    user.id,
+        email: user.email,
+        role:  user.role,
+        name:  user.name,
+      },
+    }, { status: 201 });
+  } catch (err: any) {
+    const message = err?.message || 'Registration failed';
+    const isConflict = message.includes('already exists');
+    return NextResponse.json({ error: message }, { status: isConflict ? 409 : 500 });
   }
 }

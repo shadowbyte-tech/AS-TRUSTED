@@ -1,24 +1,37 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB, User } from '@/lib/models';
+import { requireOwner } from '@/lib/api-auth';
+import { logger } from '@/lib/logger';
+
 export const dynamic = 'force-dynamic';
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getUsers } from '@/lib/supabase-actions';
-
 export async function POST(request: NextRequest) {
+  const authError = await requireOwner(request);
+  if (authError) return authError;
+
   try {
-    const { email, action } = await request.json();
+    await connectDB();
+    const { userId, action } = await request.json();
 
-    // For now, return a placeholder response
-    // User blocking functionality would need to be implemented in Supabase
-    return NextResponse.json({
-      message: `User ${action} functionality not yet implemented in Supabase`,
-      status: 'placeholder'
-    });
+    if (!userId || !['block', 'unblock'].includes(action)) {
+      return NextResponse.json({ error: 'userId and action (block/unblock) are required' }, { status: 400 });
+    }
 
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json({
-      error: 'Failed to process user action',
-      details: error.message
-    }, { status: 500 });
+    const isBlocked = action === 'block';
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isBlocked, isActive: !isBlocked },
+      { new: true }
+    ).select('-refreshToken').lean();
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    logger.info(`✅ User ${action}ed: ${user.email}`);
+    return NextResponse.json({ success: true, user, message: `User ${action}ed successfully` });
+  } catch (err) {
+    logger.error('block-user failed', err);
+    return NextResponse.json({ error: 'Failed to process user action' }, { status: 500 });
   }
 }

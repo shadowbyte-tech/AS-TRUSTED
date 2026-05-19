@@ -1,23 +1,23 @@
+/**
+ * @file src/app/api/auth/logout/route.ts
+ */
 import { NextRequest, NextResponse } from 'next/server';
-import { clearAuthCookies } from '@/lib/auth';
+import { clearAuthCookies, getSessionUser } from '@/lib/auth';
+import { connectDB, User } from '@/lib/models';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    // Clear the secure JWT authentication cookies
+    const sessionUser = await getSessionUser();
+    if (sessionUser) {
+      await connectDB();
+      await User.findByIdAndUpdate(sessionUser.id, { refreshToken: null });
+    }
     await clearAuthCookies();
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Logged out successfully' 
-    });
-    
-  } catch (error) {
-    console.error('Logout error:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to log out' 
-    }, { status: 500 });
+    return NextResponse.json({ success: true });
+  } catch {
+    await clearAuthCookies();
+    return NextResponse.json({ success: true });
   }
 }

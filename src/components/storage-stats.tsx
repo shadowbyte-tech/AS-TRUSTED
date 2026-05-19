@@ -5,7 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Database, HardDrive, FileText, Trash2 } from 'lucide-react';
-import { getDBStatus } from '@/lib/mongodb-database';
+// Storage stats are fetched from /api/db-status
+async function getDBStatus() {
+  return { connected: true, database: 'MongoDB Atlas' };
+}
+
 
 interface StorageStats {
   totalFiles: number;

@@ -4,7 +4,7 @@ const nextConfig = {
   // output: 'standalone' enables Docker/containerized deployments
   // Uncomment for Docker: output: 'standalone',
   
-  serverExternalPackages: ['@libsql/client', 'bcryptjs'],
+  serverExternalPackages: ['bcryptjs', 'mongoose'],
   
   allowedDevOrigins: [
     'localhost',
@@ -17,6 +17,8 @@ const nextConfig = {
     },
   },
   typescript: {
+    // Type checking OOMs locally due to large JSON imports (plot-data.json).
+    // Webpack compilation is clean. Run tsc separately or fix in Vercel (more RAM).
     ignoreBuildErrors: true,
   },
   eslint: {
@@ -42,7 +44,7 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://lh3.googleusercontent.com https://www.transparenttextures.com",
               "font-src 'self' https://fonts.gstatic.com",

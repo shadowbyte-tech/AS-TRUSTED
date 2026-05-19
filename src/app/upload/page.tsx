@@ -204,7 +204,7 @@ export default function UploadPropertyPage() {
 
       
 
-      const response = await fetch('/api/debug-property-upload', {
+      const response = await fetch('/api/property/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -212,13 +212,15 @@ export default function UploadPropertyPage() {
         body: JSON.stringify(propertyData),
       });
 
+
       
       
 
       if (response.ok) {
         const result = await response.json();
         
-        alert(`Property uploaded successfully! Property ID: ${result.propertyId}`);
+        alert(`Property uploaded successfully! Property ID: ${result.data.id}`);
+
         router.push('/dashboard?success=Property uploaded successfully');
       } else {
         const error = await response.json();

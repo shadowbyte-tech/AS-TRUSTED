@@ -1,134 +1,91 @@
-import { supabase, Database } from './supabase'
-import type { User, Plot, Inquiry, Contact, Registration } from './definitions'
+/**
+ * @file src/lib/supabase-actions.ts
+ * COMPATIBILITY SHIM — re-exports MongoDB implementations under the old Supabase function names.
+ * All callers that previously imported from supabase-actions now transparently use MongoDB.
+ * TODO: Gradually migrate callers to import directly from @/lib/models or dedicated service files.
+ */
+import { connectDB, User, Property, Inquiry, Lead, Contact, SiteVisit } from './models';
 
-// Users
+// ─── USERS ───────────────────────────────────────────────────────────────────
 export async function getUsers() {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data || []
+  await connectDB();
+  return User.find({}).select('-refreshToken').sort({ createdAt: -1 }).lean();
 }
 
-export async function createUser(user: Omit<Database['users']['Row'], 'id' | 'created_at'>) {
-  const { data, error } = await supabase
-    .from('users')
-    .insert([user])
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+export async function createUser(data: { email: string; role: string; name?: string; password?: string }) {
+  await connectDB();
+  const user = await User.create({ email: data.email.toLowerCase(), role: data.role, name: data.name });
+  return user.toObject();
 }
 
-// Plots
+// ─── PLOTS (now backed by Property collection with type=Plot) ────────────────
 export async function getPlots() {
-  const { data, error } = await supabase
-    .from('plots')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data || []
+  await connectDB();
+  return Property.find({ propertyType: 'Plot' }).sort({ createdAt: -1 }).lean();
 }
 
-export async function createPlot(plot: Omit<Database['plots']['Row'], 'id' | 'created_at' | 'updated_at'>) {
-  const { data, error } = await supabase
-    .from('plots')
-    .insert([plot])
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+export async function createPlot(data: any) {
+  await connectDB();
+  const property = await Property.create({ ...data, propertyType: 'Plot' });
+  return property.toObject();
 }
 
-// Inquiries
+// ─── PROPERTIES ──────────────────────────────────────────────────────────────
+export async function getProperties() {
+  await connectDB();
+  return Property.find({}).sort({ createdAt: -1 }).lean();
+}
+
+export async function createPropertyRecord(data: any) {
+  await connectDB();
+  const property = await Property.create(data);
+  return property.toObject();
+}
+
+// ─── INQUIRIES ───────────────────────────────────────────────────────────────
 export async function getInquiries() {
-  const { data, error } = await supabase
-    .from('inquiries')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data || []
+  await connectDB();
+  return Inquiry.find({}).sort({ createdAt: -1 }).lean();
 }
 
-export async function createInquiry(inquiry: Omit<Database['inquiries']['Row'], 'id' | 'created_at'>) {
-  const { data, error } = await supabase
-    .from('inquiries')
-    .insert([inquiry])
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+export async function createInquiry(data: { plotNumber: string; name: string; email: string; message: string }) {
+  await connectDB();
+  const inquiry = await Inquiry.create({ ...data, email: data.email.toLowerCase() });
+  return inquiry.toObject();
 }
 
-// Registrations
+// ─── REGISTRATIONS (leads) ───────────────────────────────────────────────────
 export async function getRegistrations() {
-  const { data, error } = await supabase
-    .from('registrations')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data || []
+  await connectDB();
+  return Lead.find({}).sort({ createdAt: -1 }).lean();
 }
 
-export async function createRegistration(registration: Omit<Database['registrations']['Row'], 'id' | 'created_at'>) {
-  const { data, error } = await supabase
-    .from('registrations')
-    .insert([registration])
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+export async function createRegistration(data: { name: string; phone: string; email: string; notes?: string }) {
+  await connectDB();
+  const lead = await Lead.create({ ...data, email: data.email.toLowerCase(), isUnread: true });
+  return lead.toObject();
 }
 
-// Contacts
+// ─── CONTACTS ────────────────────────────────────────────────────────────────
 export async function getContacts() {
-  const { data, error } = await supabase
-    .from('contacts')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data || []
+  await connectDB();
+  return Contact.find({}).sort({ createdAt: -1 }).lean();
 }
 
-export async function createContact(contact: Omit<Database['contacts']['Row'], 'id' | 'created_at'>) {
-  const { data, error } = await supabase
-    .from('contacts')
-    .insert([contact])
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+export async function createContact(data: { name: string; phone: string; email: string; type: string; notes?: string }) {
+  await connectDB();
+  const contact = await Contact.create({ ...data, email: data.email.toLowerCase() });
+  return contact.toObject();
 }
 
-export async function updateContact(id: string, contact: Partial<Database['contacts']['Row']>) {
-  const { data, error } = await supabase
-    .from('contacts')
-    .update(contact)
-    .eq('id', id)
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+export async function updateContact(id: string, data: Partial<{ name: string; phone: string; email: string; type: string; notes: string }>) {
+  await connectDB();
+  const contact = await Contact.findByIdAndUpdate(id, data, { new: true }).lean();
+  return contact;
 }
 
 export async function deleteContact(id: string) {
-  const { error } = await supabase
-    .from('contacts')
-    .delete()
-    .eq('id', id)
-
-  if (error) throw new Error(error.message)
-  return true
+  await connectDB();
+  await Contact.findByIdAndDelete(id);
+  return true;
 }

@@ -1,35 +1,42 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB, User, Property, Inquiry, Lead, Contact, SiteVisit } from '@/lib/models';
+import { requireOwner } from '@/lib/api-auth';
+import { logger } from '@/lib/logger';
+
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
-import { getUsers, getPlots, getInquiries, getRegistrations, getContacts } from '@/lib/supabase-actions';
+export async function GET(request: NextRequest) {
+  const authError = await requireOwner(request);
+  if (authError) return authError;
 
-export async function GET() {
   try {
-    const [users, plots, inquiries, registrations, contacts] = await Promise.all([
-      getUsers(),
-      getPlots(),
-      getInquiries(),
-      getRegistrations(),
-      getContacts()
+    await connectDB();
+
+    const [users, properties, inquiries, leads, contacts, siteVisits, unreadLeads] = await Promise.all([
+      User.countDocuments(),
+      Property.countDocuments(),
+      Inquiry.countDocuments(),
+      Lead.countDocuments(),
+      Contact.countDocuments(),
+      SiteVisit.countDocuments(),
+      Lead.countDocuments({ isUnread: true }),
     ]);
 
     return NextResponse.json({
       success: true,
+      database: 'MongoDB Atlas',
       stats: {
-        totalUsers: users.length,
-        totalPlots: plots.length,
-        totalInquiries: inquiries.length,
-        totalRegistrations: registrations.length,
-        totalContacts: contacts.length,
-        database: 'supabase'
-      }
+        users,
+        properties,
+        inquiries,
+        leads,
+        contacts,
+        siteVisits,
+        unreadLeads,
+      },
     });
-
-  } catch (error) {
-    console.error('❌ Error fetching stats:', error);
-    return NextResponse.json({
-      success: false,
-      error: error.message
-    }, { status: 500 });
+  } catch (err) {
+    logger.error('admin/stats failed', err);
+    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
 }

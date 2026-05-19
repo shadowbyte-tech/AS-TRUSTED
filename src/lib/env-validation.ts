@@ -1,3 +1,8 @@
+/**
+ * @file src/lib/env-validation.ts
+ * Validates required environment variables.
+ * ONLY MongoDB + Cloudinary + JWT. Supabase/Turso removed.
+ */
 import { logger } from './logger';
 
 interface EnvVar {
@@ -7,132 +12,51 @@ interface EnvVar {
   description: string;
 }
 
-const REQUIRED_ENV_VARS: EnvVar[] = [
-  {
-    key: 'MONGODB_URI',
-    required: true,
-    description: 'MongoDB connection string (e.g., mongodb+srv://user:pass@cluster.mongodb.net/dbname)',
-  },
-  {
-    key: 'JWT_SECRET',
-    required: true,
-    minLength: 32,
-    description: 'Secret key for signing JWTs. Must be at least 32 characters long.',
-  },
-  {
-    key: 'CLOUDINARY_CLOUD_NAME',
-    required: false,
-    description: 'Cloudinary cloud name for image uploads.',
-  },
-  {
-    key: 'CLOUDINARY_API_KEY',
-    required: false,
-    description: 'Cloudinary API key.',
-  },
-  {
-    key: 'CLOUDINARY_API_SECRET',
-    required: false,
-    description: 'Cloudinary API secret.',
-  },
-  {
-    key: 'NEXTAUTH_URL',
-    required: false,
-    description: 'The canonical URL of your site (required for production). e.g. https://astrustedconsultancy.com',
-  },
-  {
-    key: 'NEXT_PUBLIC_SUPABASE_URL',
-    required: true,
-    description: 'Supabase Project URL.',
-  },
-  {
-    key: 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY',
-    required: true,
-    description: 'Supabase Publishable Key.',
-  },
+const ENV_VARS: EnvVar[] = [
+  { key: 'MONGODB_URI',           required: true,  description: 'MongoDB Atlas connection string' },
+  { key: 'JWT_SECRET',            required: true,  minLength: 32, description: 'JWT signing secret (min 32 chars)' },
+  { key: 'CLOUDINARY_CLOUD_NAME', required: false, description: 'Cloudinary cloud name' },
+  { key: 'CLOUDINARY_API_KEY',    required: false, description: 'Cloudinary API key' },
+  { key: 'CLOUDINARY_API_SECRET', required: false, description: 'Cloudinary API secret' },
+  { key: 'NEXTAUTH_URL',          required: false, description: 'Canonical site URL (production)' },
 ];
 
-export interface ValidationResult {
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-}
+const INSECURE_DEFAULTS = [
+  'your-secret-key-change-in-production',
+  'dev-secret-change-in-production',
+  'changeme',
+];
 
-/**
- * Validates all environment variables.
- * Throws in production for missing required vars.
- * Warns in development.
- */
-export function validateEnv(): ValidationResult {
-  const errors: string[] = [];
+export function validateAndLogEnv(): void {
+  const errors: string[]   = [];
   const warnings: string[] = [];
   const isProduction = process.env.NODE_ENV === 'production';
 
-  for (const envVar of REQUIRED_ENV_VARS) {
-    const value = process.env[envVar.key];
-
-    if (!value) {
-      const message = `Missing env var: ${envVar.key} — ${envVar.description}`;
-      if (envVar.required) {
-        errors.push(message);
-      } else {
-        warnings.push(`⚠️  Optional ${message}`);
-      }
+  for (const v of ENV_VARS) {
+    const val = process.env[v.key];
+    if (!val) {
+      const msg = `Missing env var: ${v.key} — ${v.description}`;
+      v.required ? errors.push(msg) : warnings.push(`⚠️  Optional ${msg}`);
       continue;
     }
-
-    if (envVar.minLength && value.length < envVar.minLength) {
-      const message = `Env var ${envVar.key} is too short (${value.length} chars). Minimum: ${envVar.minLength} chars.`;
-      if (envVar.required) {
-        errors.push(message);
-      } else {
-        warnings.push(`⚠️  ${message}`);
-      }
+    if (v.minLength && val.length < v.minLength) {
+      errors.push(`${v.key} is too short (${val.length} chars). Minimum: ${v.minLength}`);
     }
   }
 
-  // Special check: warn if JWT_SECRET is default
-  if (process.env.JWT_SECRET === 'your-secret-key-change-in-production') {
-    errors.push('JWT_SECRET is set to the default insecure value. Please set a unique secret.');
+  const jwtSecret = process.env.JWT_SECRET || '';
+  if (INSECURE_DEFAULTS.some(d => jwtSecret.includes(d))) {
+    errors.push('JWT_SECRET is set to an insecure default value. Generate a proper secret.');
   }
 
-  if (errors.length > 0 && isProduction) {
-    const errorMessage = [
-      '⚠️  ATTENTION: Missing or invalid required environment variables (proceeding with hardcoded fallbacks):',
-      ...errors.map((e) => `  → ${e}`),
-      '',
-      'Please set these variables in your Vercel project settings to enable full configuration flexibility.',
-    ].join('\n');
-    logger.warn(errorMessage);
-    // REMOVED: throw new Error(errorMessage); — Preventing production crashes due to hardcoded fallbacks
-  }
+  warnings.forEach(w => logger.warn(w));
 
-  return {
-    valid: errors.length === 0,
-    errors,
-    warnings,
-  };
-}
-
-/**
- * Logs validation results (dev-friendly).
- * In production, throws if invalid.
- */
-export function validateAndLogEnv(): void {
-  try {
-    const result = validateEnv();
-    if (result.warnings.length > 0) {
-      result.warnings.forEach((w) => logger.warn(w));
+  if (errors.length > 0) {
+    errors.forEach(e => logger.error(`🔴 ${e}`));
+    if (isProduction) {
+      throw new Error(`Environment validation failed:\n${errors.join('\n')}`);
     }
-    if (result.errors.length > 0) {
-      result.errors.forEach((e) => logger.error(`🔴 ${e}`));
-    } else {
-      logger.info('✅ Environment variables validated successfully.');
-    }
-  } catch (error) {
-    logger.error(error instanceof Error ? error.message : String(error));
-    if (process.env.NODE_ENV === 'production') {
-      // process.exit(1); 
-      // Proceed with hardcoded fallbacks defined in models.ts and lib/mongodb.ts
-    }
+  } else {
+    logger.info('✅ Environment variables validated.');
   }
 }

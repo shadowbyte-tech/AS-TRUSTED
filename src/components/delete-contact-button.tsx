@@ -1,17 +1,9 @@
-
 'use client';
 
-import { deleteContact } from '@/lib/supabase-actions';
+import { useRouter } from 'next/navigation';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
@@ -19,13 +11,20 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function DeleteContactButton({ contactId, trigger }: { contactId: string; trigger?: 'button' | 'menuitem' }) {
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDelete = async () => {
-    await deleteContact(contactId);
-    toast({
-      title: 'Success!',
-      description: 'The contact has been deleted.',
-    });
+    try {
+      const res = await fetch(`/api/contacts/${contactId}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast({ title: 'Deleted', description: 'Contact deleted successfully.' });
+        router.refresh();
+      } else {
+        toast({ title: 'Error', description: 'Failed to delete contact.', variant: 'destructive' });
+      }
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    }
   };
 
   const triggerElement = trigger === 'menuitem' ? (
@@ -39,25 +38,15 @@ export default function DeleteContactButton({ contactId, trigger }: { contactId:
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        {triggerElement}
-      </AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{triggerElement}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this contact
-            from your records.
-          </AlertDialogDescription>
+          <AlertDialogDescription>This action cannot be undone. This will permanently delete this contact from your records.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            className="bg-destructive hover:bg-destructive/90"
-          >
-            Continue
-          </AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
