@@ -9,9 +9,9 @@ import { connectDB, User, Password } from '@/lib/models';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest) {
-  // Must match SETUP_SECRET env var — prevents unauthorized use
-  const secret = request.headers.get('x-setup-secret');
+export async function GET(request: NextRequest) {
+  // Secret passed as query param: /api/setup/seed-owner?secret=YOUR_SECRET
+  const secret = request.nextUrl.searchParams.get('secret');
   const expectedSecret = process.env.SETUP_SECRET;
 
   if (!expectedSecret) {
