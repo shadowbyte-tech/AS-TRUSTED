@@ -1,7 +1,6 @@
 /**
- * /api/setup/seed-owner
- * ONE-TIME route to create the initial owner account.
- * Protected by SETUP_SECRET env var. Delete this route after first use.
+ * /api/setup/seed-owner — ONE-TIME owner account creator.
+ * DELETE THIS ROUTE after the owner account is created.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
@@ -9,33 +8,32 @@ import { connectDB, User, Password } from '@/lib/models';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
-  // Secret passed as query param: /api/setup/seed-owner?secret=YOUR_SECRET
-  const secret = request.nextUrl.searchParams.get('secret');
-  const expectedSecret = process.env.SETUP_SECRET;
+// Hardcoded token — no env var dependency
+const SEED_TOKEN = 'ast-init-7x9k2m';
 
-  if (!expectedSecret) {
-    return NextResponse.json({ error: 'SETUP_SECRET not configured. Add it to Vercel env vars.' }, { status: 500 });
-  }
-  if (!secret || secret !== expectedSecret) {
-    return NextResponse.json({ error: 'Invalid setup secret' }, { status: 401 });
+export async function GET(request: NextRequest) {
+  const token = request.nextUrl.searchParams.get('token');
+
+  if (token !== SEED_TOKEN) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     await connectDB();
 
-    const email = 'owner@astrustedconsultancy.com';
+    const email    = 'owner@astrustedconsultancy.com';
+    const password = 'ASTrusted@Admin2024!';
 
     const existing = await User.findOne({ email }).lean();
     if (existing) {
       return NextResponse.json({
         success: true,
-        message: 'Owner already exists — nothing to do.',
+        message: 'Owner already exists.',
         email,
+        loginWith: password,
       });
     }
 
-    const password = process.env.OWNER_PASSWORD || 'ASTrusted@Admin2024!';
     const hashedPassword = await bcrypt.hash(password, 12);
 
     await User.create({
@@ -49,9 +47,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: '✅ Owner account created successfully!',
+      message: '✅ Owner account created!',
       email,
-      note: 'IMPORTANT: Remove SETUP_SECRET from Vercel env vars now, or delete this route.',
+      password,
+      note: 'Delete this route from your codebase now.',
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
