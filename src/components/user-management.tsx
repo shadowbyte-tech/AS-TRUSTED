@@ -233,6 +233,7 @@ export default function UserManagement() {
         body: JSON.stringify({
           email: newUserEmail,
           password: newUserPassword,
+          role: newUserRole,
         }),
       });
 
@@ -252,7 +253,7 @@ export default function UserManagement() {
       } else {
         toast({
           title: "Error",
-          description: result.error || 'Failed to create user',
+          description: result.message || result.error || 'Failed to create user',
           variant: 'destructive',
         });
       }
