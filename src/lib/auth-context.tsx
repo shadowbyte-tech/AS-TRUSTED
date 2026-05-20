@@ -45,10 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = React.useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string; user?: { id: string; email: string; role: string } | null }> => {
     try {
-      
-      
-      
-      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,20 +52,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
-      
-
-      // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         return { success: false, error: `Server error (${response.status}). Please try again later.` };
       }
 
       const data = await response.json();
-      
 
       if (response.ok && data.success) {
-        
+        // Set user from login response immediately
         setUser(data.user);
+
+        // Then verify the server can read the cookie by calling /api/auth/me
+        // This confirms the cookie round-trip works before we redirect
+        try {
+          const meRes = await fetch('/api/auth/me', {
+            method: 'GET',
+            credentials: 'include',
+          });
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            if (meData.user) {
+              setUser(meData.user);
+              return { success: true, user: meData.user };
+            }
+          }
+        } catch {}
+
+        // Fallback: use login response data directly
         return { success: true, user: data.user };
       } else {
         return { success: false, error: data.error || 'Login failed. Please check your credentials.' };
