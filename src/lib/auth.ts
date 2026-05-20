@@ -10,13 +10,16 @@ import { connectDB, User, Password } from './models';
 import { logger } from './logger';
 import { AUTH_COOKIES, JWT_CONFIG, VALIDATION } from './constants';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  throw new Error('JWT_SECRET must be set and at least 32 characters long.');
-}
-
 const BCRYPT_SALT_ROUNDS = 12;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error('JWT_SECRET must be set and at least 32 characters long.');
+  }
+  return secret;
+}
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 export interface AuthUser {
@@ -69,7 +72,7 @@ export function generateRefreshToken(user: AuthUser): string {
 
 export function verifyToken(token: string): any {
   try {
-    return jwt.verify(token, JWT_SECRET!, { algorithms: ['HS256'] });
+    return jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
   } catch {
     return null;
   }
