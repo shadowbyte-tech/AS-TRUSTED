@@ -12,10 +12,14 @@ export default function DBStatusIndicator() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await fetch('/api/admin/db-status');
+        const res = await fetch('/api/db-status');
         if (res.ok) {
           const data = await res.json();
-          setStatus(data);
+          setStatus({
+            connected: data.connected,
+            type: data.database || 'MongoDB Atlas',
+            error: data.error
+          });
         } else {
           setStatus({ connected: false, type: 'Error', error: 'Failed to fetch status' });
         }

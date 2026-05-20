@@ -31,7 +31,7 @@ export default function DatabaseManagePage() {
     const fetchDatabaseStats = async () => {
       try {
         // Fetch database status
-        const statusRes = await fetch('/api/admin/db-status');
+        const statusRes = await fetch('/api/db-status');
         const statusData = await statusRes.json();
         
         // Fetch table counts
@@ -51,7 +51,7 @@ export default function DatabaseManagePage() {
           inquiries: { count: inquiries.length || 0, size: '128 KB' },
           registrations: { count: 0, size: '32 KB' },
           totalSize: '2.7 MB',
-          status: statusData.mongodb ? 'connected' : 'disconnected'
+          status: statusData.connected ? 'connected' : 'disconnected'
         });
       } catch (error) {
         console.error('Error fetching database stats:', error);
