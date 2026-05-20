@@ -3,7 +3,17 @@ import AuthGuard from '@/components/auth-guard';
 import DashboardSidebar from './sidebar';
 import MobileSidebar from './mobile-sidebar';
 import { Header } from '@/components/header';
-import { getRegistrations } from '@/lib/supabase-actions';
+import { connectDB, Lead } from '@/lib/models';
+
+async function getRegistrationCount(): Promise<number> {
+  try {
+    await connectDB();
+    return Lead.countDocuments({});
+  } catch {
+    return 0;
+  }
+}
+
 
 export const dynamic = 'force-dynamic';
 
@@ -12,8 +22,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const registrations = await getRegistrations();
-  const newRegistrationCount = registrations.length;
+  const newRegistrationCount = await getRegistrationCount();
 
   return (
     <AuthGuard>

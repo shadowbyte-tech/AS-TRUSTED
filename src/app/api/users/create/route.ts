@@ -1,95 +1,96 @@
+/**
+ * @file src/app/api/users/create/route.ts
+ * Admin: create a new user — owner-only, MongoDB + bcrypt.
+ */
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createUser } from '@/lib/supabase-actions';
-import { getUsers } from '@/lib/supabase-actions';
+import bcrypt from 'bcryptjs';
+import { connectDB, User, Password } from '@/lib/models';
+import { requireOwner } from '@/lib/api-auth';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
+  const authError = await requireOwner(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    console.log('🔍 Create user API called with:', { ...body, password: body.password ? '***' : null });
+    const { email, password, name, role = 'User' } = body;
 
-    const { email, password } = body;
-
-    // Validate input
     if (!email || !password) {
-      console.log('❌ Validation failed:', { email: !!email, password: !!password });
-      return NextResponse.json({
-        success: false,
-        message: 'Email and password are required',
-        errors: {
-          email: !email ? ['Email is required'] : undefined,
-          password: !password ? ['Password is required'] : undefined,
-        }
-      }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Email and password are required.' },
+        { status: 400 }
+      );
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      console.log('❌ Email format validation failed:', email);
-      return NextResponse.json({
-        success: false,
-        message: 'Invalid email format',
-        errors: {
-          email: ['Please enter a valid email address'],
-        }
-      }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Invalid email format.' },
+        { status: 400 }
+      );
     }
 
-    // Validate password length
     if (password.length < 8) {
-      console.log('❌ Password length validation failed:', { length: password.length });
-      return NextResponse.json({
-        success: false,
-        message: 'Password must be at least 8 characters long',
-        errors: {
-          password: ['Password must be at least 8 characters long'],
-        }
-      }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Password must be at least 8 characters.' },
+        { status: 400 }
+      );
     }
 
-    // Check if user already exists
-    const existingUsers = await getUsers();
-    const existingUser = existingUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (existingUser) {
-      return NextResponse.json({
-        success: false,
-        message: 'A user with this email already exists',
-        errors: {
-          email: ['A user with this email already exists'],
-        }
-      }, { status: 400 });
+    const validRoles = ['Owner', 'User', 'Premium', 'Elite'];
+    if (!validRoles.includes(role)) {
+      return NextResponse.json(
+        { success: false, message: `Role must be one of: ${validRoles.join(', ')}` },
+        { status: 400 }
+      );
     }
 
-    // Create the user
-    const newUser = await createUser({
+    await connectDB();
+
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return NextResponse.json(
+        { success: false, message: 'A user with this email already exists.' },
+        { status: 409 }
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const newUser = await User.create({
       email: email.toLowerCase(),
-      name: email.split('@')[0], // Use email prefix as name
-      role: 'User',
+      name:  name?.trim() || email.split('@')[0],
+      role,
+      isActive:  true,
+      isBlocked: false,
     });
 
-    if (!newUser) {
-      return NextResponse.json({
-        success: false,
-        message: 'Failed to create user',
-        errors: {}
-      }, { status: 500 });
-    }
+    await Password.create({
+      email: email.toLowerCase(),
+      hashedPassword,
+    });
+
+    logger.info(`✅ User created by admin: ${email} (${role})`);
 
     return NextResponse.json({
       success: true,
-      message: 'User created successfully',
-      user: newUser
+      message: 'User created successfully.',
+      user: {
+        id:    String(newUser._id),
+        email: newUser.email,
+        name:  newUser.name,
+        role:  newUser.role,
+      },
     });
 
-  } catch (error) {
-    console.error('Error creating user:', error);
-    return NextResponse.json({
-      success: false,
-      message: 'An error occurred while creating the user',
-      errors: {}
-    }, { status: 500 });
+  } catch (error: any) {
+    logger.error('POST /api/users/create failed', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to create user.' },
+      { status: 500 }
+    );
   }
 }

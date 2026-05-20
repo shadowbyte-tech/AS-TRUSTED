@@ -1,3 +1,7 @@
+/**
+ * @file src/app/api/auth/change-password/route.ts
+ * Change password for the currently authenticated user.
+ */
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,8 +11,9 @@ import { API_MESSAGES, VALIDATION } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getSessionUser();
-    
+    // getSessionUser() is async — was called without await (critical bug)
+    const user = await getSessionUser();
+
     if (!user) {
       return NextResponse.json(
         { error: API_MESSAGES.ERROR.UNAUTHORIZED },
@@ -21,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
-        { error: API_MESSAGES.ERROR.MISSING_FIELDS, fields: ['currentPassword', 'newPassword'] },
+        { error: API_MESSAGES.ERROR.MISSING_FIELDS },
         { status: 400 }
       );
     }
@@ -33,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await changePassword((user as any)?.id || '', currentPassword, newPassword);
+    await changePassword(user.id, currentPassword, newPassword);
 
     return NextResponse.json({
       success: true,
@@ -41,9 +46,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const { message, statusCode } = handleError(error);
-    return NextResponse.json(
-      { error: message },
-      { status: statusCode }
-    );
+    return NextResponse.json({ error: message }, { status: statusCode });
   }
 }

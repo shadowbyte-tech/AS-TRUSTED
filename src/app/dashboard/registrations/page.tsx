@@ -1,5 +1,5 @@
 
-import { getRegistrations } from '@/lib/supabase-actions';
+import { connectDB, Lead } from '@/lib/models';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
   Table,
@@ -21,10 +21,16 @@ function formatDateTime(isoString: string) {
 }
 
 export default async function RegistrationsPage() {
-  const registrations = await getRegistrations();
-  
-  // Mark registrations as read functionality would need to be implemented in Supabase
-  // await markRegistrationsAsRead();
+  await connectDB();
+  const registrations = await Lead.find({}).sort({ createdAt: -1 }).lean();
+
+  // Normalize: add isNew/createdAt fields for template compatibility
+  const normalizedRegs = registrations.map((r: any) => ({
+    ...r,
+    id: String(r._id),
+    isNew: r.isUnread ?? false,
+    createdAt: r.createdAt?.toISOString?.() || new Date().toISOString(),
+  }));
 
   return (
       <div className="space-y-8">
@@ -43,11 +49,11 @@ export default async function RegistrationsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {registrations.length > 0 ? (
+            {normalizedRegs.length > 0 ? (
                 <>
                 {/* Mobile View */}
                 <div className="grid gap-4 sm:hidden">
-                {registrations.map((reg: Registration) => (
+                {normalizedRegs.map((reg: any) => (
                     <Card key={reg.id} className={cn(reg.isNew && "border-primary border-2")}>
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center">
@@ -94,7 +100,7 @@ export default async function RegistrationsPage() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {registrations.map((reg: Registration) => (
+                    {normalizedRegs.map((reg: any) => (
                     <TableRow key={reg.id} className={cn(reg.isNew && "bg-primary/10 hover:bg-primary/20 data-[state=selected]:bg-primary/20")}>
                         <TableCell className="w-[200px] text-muted-foreground text-xs">
                              {formatDateTime(reg.createdAt)}

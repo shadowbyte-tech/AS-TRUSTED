@@ -1,33 +1,28 @@
+/**
+ * @file src/app/api/plots/[id]/route.ts
+ * Single plot lookup — MongoDB-backed, uses Property model.
+ */
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getPlots } from '@/lib/supabase-actions';
+import { connectDB, Property } from '@/lib/models';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const plots = await getPlots();
-    const plot = plots.find(p => p.id === params.id);
+    await connectDB();
+    const plot = await Property.findById(params.id).lean();
 
     if (!plot) {
-      return NextResponse.json({
-        success: false,
-        error: 'Plot not found'
-      }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'Plot not found' }, { status: 404 });
     }
 
-    return NextResponse.json({
-      success: true,
-      data: plot
-    });
-
+    return NextResponse.json({ success: true, data: plot });
   } catch (error) {
-    console.error('❌ Error fetching plot:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    logger.error('GET /api/plots/[id] failed', error);
+    return NextResponse.json({ success: false, error: 'Failed to fetch plot' }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 
-import { getContacts } from '@/lib/supabase-actions';
+import { connectDB, Contact as ContactModel } from '@/lib/models';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -18,7 +18,9 @@ import { UserPlus, MoreVertical, Pencil, Mail, Phone, User, ShoppingCart, Landma
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export default async function ManageContactsPage() {
-  const contacts = await getContacts();
+  await connectDB();
+  const rawContacts = await ContactModel.find({}).sort({ createdAt: -1 }).lean();
+  const contacts = rawContacts.map((c: any) => ({ ...c, id: String(c._id) }));
 
   const RoleIcon = ({ role }: { role: 'Seller' | 'Buyer' | 'Investor' | 'Agent' | 'Other' }) => {
     switch (role) {

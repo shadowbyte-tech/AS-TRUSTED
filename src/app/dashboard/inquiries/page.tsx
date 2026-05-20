@@ -1,5 +1,5 @@
 
-import { getInquiries } from '@/lib/supabase-actions';
+import { connectDB, Inquiry } from '@/lib/models';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
   Table,
@@ -19,7 +19,13 @@ function formatDateTime(isoString: string) {
 }
 
 export default async function InquiriesPage() {
-  const inquiries = await getInquiries();
+  await connectDB();
+  const rawInquiries = await Inquiry.find({}).sort({ createdAt: -1 }).lean();
+  const inquiries = rawInquiries.map((i: any) => ({
+    ...i,
+    id: String(i._id),
+    receivedAt: i.createdAt?.toISOString?.() || new Date().toISOString(),
+  }));
 
   return (
       <div className="space-y-8">

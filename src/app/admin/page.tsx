@@ -15,7 +15,7 @@ import {
   Activity
 } from 'lucide-react';
 import PropertyAnalyticsDashboard from '@/components/property-analytics-dashboard';
-import { getUsers, getPlots } from '@/lib/supabase-actions';
+import { connectDB, User, Property, Inquiry, Lead } from '@/lib/models';
 
 interface Stats {
   totalPlots: number;
@@ -31,29 +31,27 @@ interface Stats {
 
 async function getAdminStats(): Promise<Stats> {
   try {
-    const plots = await getPlots();
-    const users = await getUsers();
-    
-    // In-memory fallbacks for layout demo
+    await connectDB();
+    const [totalPlots, totalUsers, totalInquiries, totalRegistrations] = await Promise.all([
+      Property.countDocuments(),
+      User.countDocuments({ role: { $ne: 'Owner' } }),
+      Inquiry.countDocuments(),
+      Lead.countDocuments(),
+    ]);
     return {
-      totalPlots: plots.length,
-      totalUsers: Math.max(0, users.length - 1),
-      totalInquiries: 2, 
-      totalRegistrations: 2,
+      totalPlots,
+      totalUsers,
+      totalInquiries,
+      totalRegistrations,
       recentActivity: [
-        { type: 'plot', description: `${plots.length} entries registered`, timestamp: new Date().toISOString() },
-        { type: 'user', description: `${users.length} active users`, timestamp: new Date().toISOString() }
-      ]
+        { type: 'plot', description: `${totalPlots} properties listed`, timestamp: new Date().toISOString() },
+        { type: 'user', description: `${totalUsers} registered users`, timestamp: new Date().toISOString() },
+        { type: 'inquiry', description: `${totalInquiries} inquiries received`, timestamp: new Date().toISOString() },
+      ],
     };
   } catch (err) {
-    console.error("Server data fetch error:", err);
-    return {
-      totalPlots: 0,
-      totalUsers: 0,
-      totalInquiries: 0,
-      totalRegistrations: 0,
-      recentActivity: []
-    };
+    console.error('Admin stats error:', err);
+    return { totalPlots: 0, totalUsers: 0, totalInquiries: 0, totalRegistrations: 0, recentActivity: [] };
   }
 }
 
