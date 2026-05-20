@@ -54,6 +54,11 @@ export default function UserManagement() {
   const [showRoleChangeDialog, setShowRoleChangeDialog] = useState(false);
   const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<string | null>(null);
   const [newRole, setNewRole] = useState<'User' | 'Premium' | 'Owner'>('User');
+  // Password reset dialog state
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [selectedUserForPasswordReset, setSelectedUserForPasswordReset] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetting, setResetting] = useState(false);
   const { toast } = useToast();
 
   // Load users
@@ -133,9 +138,9 @@ export default function UserManagement() {
     }
   }, [newUserPassword]);
 
-  // Change Role
-  const handleChangeRole = async (email: string, currentRole: string) => {
-    setSelectedUserForRoleChange(email);
+  // Change Role – now expects user ID
+  const handleChangeRole = async (userId: string, currentRole: string) => {
+    setSelectedUserForRoleChange(userId);
     setNewRole(currentRole as 'User' | 'Premium' | 'Owner');
     setShowRoleChangeDialog(true);
   };
@@ -150,7 +155,9 @@ export default function UserManagement() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: selectedUserForRoleChange, role: newRole }),
+        credentials: 'include',
+        // The backend expects `userId` and `newRole`
+        body: JSON.stringify({ userId: selectedUserForRoleChange, newRole: newRole }),
       });
 
       const result = await response.json();
@@ -178,6 +185,49 @@ export default function UserManagement() {
         description: 'Failed to update user role',
         variant: 'destructive',
       });
+    }
+  };
+
+  // Open Reset Password Dialog
+  const openResetPasswordDialog = (userId: string) => {
+    setSelectedUserForPasswordReset(userId);
+    setNewPassword('');
+    setShowResetDialog(true);
+  };
+
+  // Confirm Password Reset
+  const handleConfirmPasswordReset = async () => {
+    if (!selectedUserForPasswordReset) return;
+    if (!newPassword || newPassword.length < 8) {
+      toast({
+        title: "Error",
+        description: 'Password must be at least 8 characters.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setResetting(true);
+    try {
+      const response = await fetch('/api/owner/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId: selectedUserForPasswordReset, newPassword }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast({ title: "Success!", description: result.message || 'Password reset successfully' });
+        setShowResetDialog(false);
+        setSelectedUserForPasswordReset(null);
+        loadUsers();
+      } else {
+        toast({ title: "Error", description: result.error || 'Failed to reset password', variant: 'destructive' });
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      toast({ title: "Error", description: 'Failed to reset password', variant: 'destructive' });
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -223,51 +273,52 @@ export default function UserManagement() {
       return;
     }
 
-    setCreating(true);
+      setCreating(true);
 
-    try {
-      const response = await fetch('/api/users/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: newUserEmail,
-          password: newUserPassword,
-          role: newUserRole,
-        }),
-      });
+        try {
+          const response = await fetch('/api/users/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              email: newUserEmail,
+              password: newUserPassword,
+              role: newUserRole,
+            }),
+          });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success) {
-        toast({
-          title: "Success!",
-          description: `User ${newUserEmail} created successfully`,
-        });
-        
-        setShowCreateDialog(false);
-        setNewUserEmail('');
-        setNewUserPassword('');
-        setNewUserRole('User');
-        loadUsers();
-      } else {
+        if (result.success) {
+          toast({
+            title: "Success!",
+            description: `User ${newUserEmail} created successfully`,
+          });
+
+          setShowCreateDialog(false);
+          setNewUserEmail('');
+          setNewUserPassword('');
+          setNewUserRole('User');
+          loadUsers();
+        } else {
+          toast({
+            title: "Error",
+            description: result.message || result.error || 'Failed to create user',
+            variant: 'destructive',
+          });
+        }
+      } catch (error) {
+        console.error('Error creating user:', error);
         toast({
           title: "Error",
-          description: result.message || result.error || 'Failed to create user',
+          description: 'Failed to create user',
           variant: 'destructive',
         });
+      } finally {
+        setCreating(false);
       }
-    } catch (error) {
-      console.error('Error creating user:', error);
-      toast({
-        title: "Error",
-        description: 'Failed to create user',
-        variant: 'destructive',
-      });
-    } finally {
-      setCreating(false);
-    }
   };
 
   return (
@@ -345,7 +396,7 @@ export default function UserManagement() {
                 <Button variant="outline" type="button" onClick={() => setShowCreateDialog(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={creating} onClick={handleCreateUser}>
+                <Button type="button" disabled={creating} onClick={handleCreateUser}>
                   {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
                   {creating ? 'Creating...' : 'Create User'}
                 </Button>
@@ -385,7 +436,7 @@ export default function UserManagement() {
                     variant="outline" 
                     size="sm"
                     className="flex-1 sm:flex-none"
-                    onClick={() => {/* Reset password functionality */}}
+                    onClick={() => openResetPasswordDialog(user.id)}
                   >
                     <Key className="h-4 w-4 mr-1" />
                     Reset
@@ -396,7 +447,7 @@ export default function UserManagement() {
                       variant="outline" 
                       size="sm"
                       className="flex-1 sm:flex-none"
-                      onClick={() => handleChangeRole(user.email, user.role)}
+                      onClick={() => handleChangeRole(user.id, user.role)}
                     >
                       <Shield className="h-4 w-4 mr-1" />
                       Role
@@ -419,27 +470,55 @@ export default function UserManagement() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="newRole">New Role</Label>
-              <Select value={newRole} onValueChange={(value: 'User' | 'Premium' | 'Owner') => setNewRole(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select new role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="User">User</SelectItem>
-                  <SelectItem value="Premium">Premium</SelectItem>
-                  <SelectItem value="Owner">Owner</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={newRole} onValueChange={(value: 'User' | 'Premium' | 'Owner') => setNewRole(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="User">User</SelectItem>
+                <SelectItem value="Premium">Premium</SelectItem>
+                <SelectItem value="Owner">Owner</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRoleChangeDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleConfirmRoleChange}>
-              <Shield className="mr-2 h-4 w-4" />
-              Change Role
+            <Button onClick={handleConfirmRoleChange}>Update Role</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Reset Dialog */}
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset User Password</DialogTitle>
+            <DialogDescription>
+              Enter a new password for the selected user. Minimum 8 characters.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="resetPassword">New Password</Label>
+              <input
+                id="resetPassword"
+                type={showPassword ? "text" : "password"}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowResetDialog(false)} disabled={resetting}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmPasswordReset} disabled={resetting}>
+              {resetting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Reset Password
             </Button>
           </DialogFooter>
         </DialogContent>
