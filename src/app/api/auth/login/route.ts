@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find password doc
-    const passwordDoc = await Password.findOne({ email });
+    // Find password doc — MUST use .select('+hashedPassword') because schema has select:false
+    const passwordDoc = await Password.findOne({ email }).select('+hashedPassword');
 
     console.log('🔑 Password Doc Found:', !!passwordDoc);
 

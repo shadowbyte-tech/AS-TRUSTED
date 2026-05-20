@@ -169,7 +169,7 @@ const UserSchema = new mongoose.Schema(
 const PasswordSchema = new mongoose.Schema(
   {
     email:          { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-    hashedPassword: { type: String, required: true, select: false },
+    hashedPassword: { type: String, required: true },
     isMigrated:     { type: Boolean, default: true },
   },
   { timestamps: true }
