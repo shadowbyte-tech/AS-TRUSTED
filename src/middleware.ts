@@ -3,7 +3,7 @@
  * Production-grade Next.js middleware.
  * - Rate limiting (auth routes + global)
  * - Security headers (HSTS, CSP, X-Frame-Options, etc.)
- * - Route protection (dashboard, admin, premium)
+ * - Route protection (dashboard, owner-portal, premium)
  * - CSRF validation for mutating API routes
  */
 import { NextResponse } from 'next/server';
@@ -60,7 +60,7 @@ function getClientIP(request: NextRequest): string {
 // ─── ROUTE GROUPS ────────────────────────────────────────────────────────────
 const AUTH_API_PATHS       = ['/api/auth/login', '/api/auth/register', '/api/auth/owner-login'];
 const PUBLIC_API_PREFIXES  = ['/api/properties', '/api/plots', '/api/inquiries', '/api/registrations', '/api/site-visits', '/api/db-status'];
-const OWNER_PATHS          = ['/dashboard', '/admin', '/upload-property', '/upload'];
+const OWNER_PATHS          = ['/dashboard', '/owner-portal', '/upload-property', '/upload'];
 const PREMIUM_PATHS        = ['/premium-dashboard'];
 const IS_PRODUCTION        = process.env.NODE_ENV === 'production';
 

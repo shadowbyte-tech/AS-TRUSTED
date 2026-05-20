@@ -9,7 +9,7 @@
 
 export interface PageContext {
   path: string;
-  pageType: 'dashboard' | 'inquiries' | 'registrations' | 'upload' | 'properties' | 'premium' | 'admin' | 'home' | 'other';
+  pageType: 'dashboard' | 'inquiries' | 'registrations' | 'upload' | 'properties' | 'premium' | 'owner-portal' | 'home' | 'other';
   label: string;
   buddyHint: string; // What Buddy says proactively on this page
 }
@@ -21,7 +21,7 @@ const PAGE_MAP: Record<string, Omit<PageContext, 'path'>> = {
   '/upload':                  { pageType: 'upload',        label: 'Upload Property', buddyHint: 'Need a title or description? I\'m here to help!' },
   '/properties':              { pageType: 'properties',    label: 'Properties',      buddyHint: 'Ask me to search — "plots in Kamareddy" or "plots above 10L".' },
   '/premium-properties':      { pageType: 'premium',       label: 'Premium',         buddyHint: 'Premium listings page. I can generate marketing content!' },
-  '/admin':                   { pageType: 'admin',         label: 'Admin Panel',     buddyHint: 'I can show you system stats and security status.' },
+  '/owner-portal':               { pageType: 'owner-portal',    label: 'Owner Portal',    buddyHint: 'I can show you system stats and security status.' },
   '/':                        { pageType: 'home',          label: 'Home',            buddyHint: 'Type "briefing" for today\'s summary or ask me anything!' },
 };
 
@@ -89,7 +89,7 @@ const NAVIGATION_INTENTS: [RegExp, string, string][] = [
   [/premium.*prop|vip.*prop/i,                                    '/premium-properties',      '⭐ Opening Premium Properties...'],
   [/home\s*page|\bgo\s*home\b/i,                                  '/',                        '🏠 Taking you Home!'],
   [/properties|all\s*prop|show\s*prop/i,                          '/properties',              '🏘️ Opening Properties...'],
-  [/admin|admin\s*panel/i,                                        '/admin',                   '🔐 Opening Admin Panel...'],
+  [/owner.?portal|owner\s*panel/i,                                   '/owner-portal',            '🔐 Opening Owner Portal...'],
   [/site\s*visit|visits/i,                                        '/dashboard',               '📍 Site visits are in your Dashboard!'],
   [/add\s*prop|new\s*prop/i,                                      '/upload',                  '⬆️ Opening property form...'],
 ];
@@ -339,7 +339,7 @@ export const SYSTEM_KNOWLEDGE = {
     upload: { path: '/upload', purpose: 'Upload new properties (plot/house/land)' },
     properties: { path: '/properties', purpose: 'View all property listings' },
     premium: { path: '/premium-properties', purpose: 'Premium property showcase' },
-    admin: { path: '/admin', purpose: 'Admin panel with system stats' },
+    ownerPortal: { path: '/owner-portal', purpose: 'Owner portal with system stats' },
   },
 } as const;
 

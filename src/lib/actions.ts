@@ -156,7 +156,7 @@ export async function deleteUser(id: string): Promise<{ success: boolean; messag
     await User.findByIdAndDelete(id);
     await Password.findOneAndDelete({ email: user.email });
 
-    revalidatePath('/admin');
+    revalidatePath('/owner-portal');
     return { success: true, message: 'User deleted.' };
   } catch (err: any) {
     logger.error('deleteUser failed', err);
@@ -201,7 +201,7 @@ export async function saveInquiry(formData: FormData): Promise<State> {
     await connectDB();
     await Inquiry.create({ plotNumber, name, email, message });
 
-    revalidatePath('/admin');
+    revalidatePath('/owner-portal');
     return { message: 'Inquiry saved successfully.', errors: {}, success: true };
   } catch (err: any) {
     logger.error('saveInquiry failed', err);

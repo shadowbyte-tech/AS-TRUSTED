@@ -167,7 +167,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-2 lg:flex lg:flex-row gap-3 w-full lg:w-auto">
               <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border border-white/30 hover:bg-white/20 transition-all shadow-xl">
-                <Link href="/admin">
+                <Link href="/owner-portal">
                   <Activity className="mr-2 h-4 w-4 text-slate-300" />
                   Site Statistics
                 </Link>

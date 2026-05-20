@@ -1,4 +1,4 @@
-// src/app/admin/page.tsx
+// src/app/owner-portal/page.tsx
 import { Suspense } from 'react';
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
@@ -29,7 +29,7 @@ interface Stats {
   }>;
 }
 
-async function getAdminStats(): Promise<Stats> {
+async function getOwnerStats(): Promise<Stats> {
   try {
     await connectDB();
     const [totalPlots, totalUsers, totalInquiries, totalRegistrations] = await Promise.all([
@@ -50,13 +50,13 @@ async function getAdminStats(): Promise<Stats> {
       ],
     };
   } catch (err) {
-    console.error('Admin stats error:', err);
+    console.error('Owner stats error:', err);
     return { totalPlots: 0, totalUsers: 0, totalInquiries: 0, totalRegistrations: 0, recentActivity: [] };
   }
 }
 
-export default async function AdminPage() {
-  const stats = await getAdminStats();
+export default async function OwnerPortalPage() {
+  const stats = await getOwnerStats();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-20">
@@ -65,7 +65,7 @@ export default async function AdminPage() {
           {/* Header */}
           <div className="text-center mb-8 pt-4">
             <h1 className="text-4xl md:text-5xl font-black text-white mb-2 font-outfit">
-              Admin <span className="text-amber-500">Dashboard</span>
+              Owner <span className="text-amber-500">Portal</span>
             </h1>
             <p className="text-slate-400">
               Complete platform management for AS Trusted Consultancy

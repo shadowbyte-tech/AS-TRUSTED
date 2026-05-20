@@ -144,7 +144,7 @@ export default function UserManagement() {
     if (!selectedUserForRoleChange) return;
 
     try {
-      const response = await fetch('/api/admin/update-user-role', {
+      const response = await fetch('/api/owner/update-user-role', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

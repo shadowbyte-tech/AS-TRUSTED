@@ -85,7 +85,7 @@ export default function AnalyticsPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <Link href="/admin" className="text-blue-400 hover:text-blue-300">
+            <Link href="/owner-portal" className="text-blue-400 hover:text-blue-300">
               <ArrowLeft className="h-6 w-6" />
             </Link>
             <div>

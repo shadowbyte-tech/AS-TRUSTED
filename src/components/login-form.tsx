@@ -285,7 +285,7 @@ export default function LoginForm() {
             Executive Portal Access
         </CardTitle>
         <CardDescription className="text-muted-foreground dark:text-purple-200/80">
-            Enter your credentials to access the administrative dashboard.
+            Enter your credentials to access the owner dashboard.
         </CardDescription>
     </div>
 </CardHeader>

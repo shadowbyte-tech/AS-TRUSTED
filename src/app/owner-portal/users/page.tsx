@@ -23,7 +23,7 @@ import {
 interface User {
   id: string;
   email: string;
-  role: 'admin' | 'user' | 'premium';
+  role: 'Owner' | 'User' | 'Premium';
   status: 'active' | 'inactive' | 'banned';
   createdAt: string;
   lastLogin?: string;
@@ -64,7 +64,7 @@ export default function UsersManagePage() {
           {
             id: '1',
             email: 'swamy@consult.com',
-            role: 'admin',
+            role: 'Owner',
             status: 'active',
             createdAt: '2024-01-15T10:30:00Z',
             lastLogin: '2026-03-16T08:45:00Z',
@@ -109,7 +109,7 @@ export default function UsersManagePage() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-red-600 text-white';
+      case 'Owner': return 'bg-amber-600 text-white';
       case 'premium': return 'bg-purple-600 text-white';
       default: return 'bg-blue-600 text-white';
     }
@@ -138,7 +138,7 @@ export default function UsersManagePage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <Link href="/admin" className="text-blue-400 hover:text-blue-300">
+            <Link href="/owner-portal" className="text-blue-400 hover:text-blue-300">
               <ArrowLeft className="h-6 w-6" />
             </Link>
             <div>
@@ -197,9 +197,9 @@ export default function UsersManagePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Admins</p>
+                    <p className="text-slate-400 text-sm">Owners</p>
                     <p className="text-3xl font-bold text-red-400">
-                      {users.filter(u => u.role === 'admin').length}
+                      {users.filter(u => u.role === 'Owner').length}
                     </p>
                   </div>
                   <Shield className="h-8 w-8 text-red-500" />
@@ -229,7 +229,7 @@ export default function UsersManagePage() {
                   className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white"
                 >
                   <option value="all">All Roles</option>
-                  <option value="admin">Admin</option>
+                  <option value="Owner">Owner</option>
                   <option value="premium">Premium</option>
                   <option value="user">User</option>
                 </select>

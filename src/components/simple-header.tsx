@@ -36,9 +36,9 @@ export function SimpleHeader() {
         <div className="flex items-center gap-3">
           {user.role === 'Owner' && (
             <Button asChild variant="ghost" className="hidden sm:inline-flex rounded-full hover:bg-accent/5 hover:text-accent transition-all">
-              <Link href="/admin">
+              <Link href="/owner-portal">
                 <PanelLeft className="mr-2 h-4 w-4" />
-                Admin Portal
+                Owner Portal
               </Link>
             </Button>
           )}
