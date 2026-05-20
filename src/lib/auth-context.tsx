@@ -87,7 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch {}
     setUser(null);
-    
+    // Hard redirect to clear any protected page state
+    window.location.href = '/owner-login';
   }, []);
 
   const updateUser = React.useCallback((userData: Partial<AuthUser>) => {

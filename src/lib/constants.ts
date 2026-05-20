@@ -102,8 +102,8 @@ export const API_MESSAGES = {
 
 // JWT configuration
 export const JWT_CONFIG = {
-  ACCESS_TOKEN_EXPIRES_IN: '15m',
-  REFRESH_TOKEN_EXPIRES_IN: '7d',
+  ACCESS_TOKEN_EXPIRES_IN: '7d',
+  REFRESH_TOKEN_EXPIRES_IN: '30d',
   ALGORITHM: 'HS256',
 } as const;
 
@@ -111,6 +111,6 @@ export const JWT_CONFIG = {
 export const AUTH_COOKIES = {
   ACCESS_TOKEN: 'auth_access_token',
   REFRESH_TOKEN: 'auth_refresh_token',
-  MAX_AGE_ACCESS: 15 * 60, // 15 minutes in seconds
-  MAX_AGE_REFRESH: 7 * 24 * 60 * 60, // 7 days in seconds
+  MAX_AGE_ACCESS: 7 * 24 * 60 * 60,   // 7 days in seconds
+  MAX_AGE_REFRESH: 30 * 24 * 60 * 60, // 30 days in seconds
 } as const;

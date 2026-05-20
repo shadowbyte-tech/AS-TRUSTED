@@ -1,7 +1,6 @@
 
 'use client';
 
-import { getProperties } from '@/lib/actions';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
@@ -73,7 +72,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/login');
+      router.push('/owner-login');
     }
   }, [user, router]);
 

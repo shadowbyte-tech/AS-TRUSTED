@@ -57,7 +57,7 @@ function validatePasswordStrength(password: string): void {
 export function generateAccessToken(user: AuthUser): string {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    JWT_SECRET!,
+    getJwtSecret(),
     { expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN, algorithm: 'HS256' }
   );
 }
@@ -65,7 +65,7 @@ export function generateAccessToken(user: AuthUser): string {
 export function generateRefreshToken(user: AuthUser): string {
   return jwt.sign(
     { id: user.id },
-    JWT_SECRET!,
+    getJwtSecret(),
     { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRES_IN, algorithm: 'HS256' }
   );
 }
