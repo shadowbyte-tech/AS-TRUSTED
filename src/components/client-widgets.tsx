@@ -4,11 +4,7 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 
 // Dynamically import heavy client-side components with ssr: false
-const WhatsAppButton = dynamic(() => import('@/components/whatsapp-button'), { ssr: false });
-const MobileStickyActions = dynamic(
-  () => import('@/components/mobile-sticky-actions').then((mod) => ({ default: mod.MobileStickyActions })),
-  { ssr: false }
-);
+const QuickActionDock = dynamic(() => import('@/components/quick-action-dock'), { ssr: false });
 const AIAgentWrapper = dynamic(() => import('@/components/ai-agent-wrapper'), { ssr: false });
 
 export default function ClientWidgets() {
@@ -23,8 +19,7 @@ export default function ClientWidgets() {
 
   return (
     <>
-      <WhatsAppButton />
-      <MobileStickyActions />
+      <QuickActionDock />
       <AIAgentWrapper />
     </>
   );

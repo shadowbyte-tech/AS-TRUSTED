@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { SimpleHeader } from '@/components/simple-header';
 import { Footer } from '@/components/footer';
-import { MobileStickyActions } from '@/components/mobile-sticky-actions';
 import HeroSection from '@/components/hero-section';
 import TrustBadges from '@/components/trust-badges';
 import InvestmentStats from '@/components/investment-stats';
@@ -440,7 +439,6 @@ export default function HomePage() {
       </main>
 
       <Footer />
-      <MobileStickyActions />
     </div>
 
   );

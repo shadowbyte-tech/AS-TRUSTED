@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { usePathname } from 'next/navigation';
 import { 
   getMemory, 
   saveMemory, 
@@ -107,6 +108,7 @@ class AIClient {
 }
 
 function Buddy() {
+  const pathname = usePathname();
   const [phase, setPhase] = useState<'closed'|'welcome'|'chat'>('closed');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -117,6 +119,13 @@ function Buddy() {
 
   useEffect(() => { const c = () => setIsMobile(window.innerWidth < 768); c(); window.addEventListener('resize', c); return () => window.removeEventListener('resize', c); }, []);
   useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, typing]);
+  useEffect(() => {
+    const openAI = () => setPhase('welcome');
+    window.addEventListener('as-open-ai-assistant', openAI);
+    return () => window.removeEventListener('as-open-ai-assistant', openAI);
+  }, []);
+
+  const hideStandaloneToggle = ['/', '/about', '/services'].includes(pathname);
 
   const addReply = useCallback(async (msg: string) => {
     setMessages(prev => [...prev, { id: Date.now()+'u', role: 'user', text: msg, timestamp: new Date() }]);
@@ -150,9 +159,11 @@ function Buddy() {
       `}</style>
 
       {/* Toggle */}
-      <div style={{position:'fixed',bottom:20,right:20,zIndex:9999}}>
-        <button onClick={()=>setPhase(p=>p==='closed'?'welcome':'closed')} style={{width:64,height:64,borderRadius:'50%',background:'linear-gradient(135deg,#c9a84c,#8b6914)',border:'2px solid #fff',boxShadow:'0 10px 40px rgba(0,0,0,0.5)',cursor:'pointer',fontSize:28,display:'flex',justifyContent:'center',alignItems:'center'}}>{phase!=='closed'?'✕':'🤖'}</button>
-      </div>
+      {!hideStandaloneToggle && (
+        <div style={{position:'fixed',bottom:20,right:20,zIndex:9999}}>
+          <button onClick={()=>setPhase(p=>p==='closed'?'welcome':'closed')} style={{width:64,height:64,borderRadius:'50%',background:'linear-gradient(135deg,#c9a84c,#8b6914)',border:'2px solid #fff',boxShadow:'0 10px 40px rgba(0,0,0,0.5)',cursor:'pointer',fontSize:18,fontWeight:900,display:'flex',justifyContent:'center',alignItems:'center',color:'#000'}}>{phase!=='closed'?'✕':'AI'}</button>
+        </div>
+      )}
 
       {phase!=='closed' && (
         <div className="b-win" style={{position:'fixed', bottom:isMobile?0:95, right:isMobile?0:20, width:isMobile?'100vw':420, height:isMobile?'100dvh':'680px', maxHeight:isMobile?'100dvh':'calc(100vh - 120px)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:isMobile?0:24, display:'flex', flexDirection:'column', overflow:'hidden', zIndex:9998, boxShadow:'0 30px 60px rgba(0,0,0,1)'}}>

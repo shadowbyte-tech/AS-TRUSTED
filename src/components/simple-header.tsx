@@ -1,13 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ASLogo } from '@/components/as-logo';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
+  CalendarCheck,
+  ChevronDown,
   LogOut, 
   UserPlus, 
   User, 
@@ -21,7 +30,14 @@ import {
 export function SimpleHeader() {
   const { user, logout, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/services', label: 'Services' },
+  ];
 
   const handleLogout = async () => {
     await logout();
@@ -51,34 +67,43 @@ export function SimpleHeader() {
     }
 
     return (
-      <div className="flex items-center gap-3">
-        <Button 
-          asChild 
-          className="enterprise-button-primary"
-        >
-          <Link href="/register" className="flex items-center justify-center gap-2 h-full w-full">
-            <UserPlus className="h-4 w-4 text-white" />
-            <span className="enterprise-text-primary">Get Started</span>
-          </Link>
-        </Button>
-        
-        <Button 
-          asChild 
-          className="enterprise-button-secondary"
-        >
-          <Link href="/user-login" className="flex items-center justify-center gap-2 h-full w-full">
-            <User className="h-4 w-4 text-white" />
-            <span className="enterprise-text-premium">Premium Access</span>
-          </Link>
-        </Button>
-        
-        <Button 
-          asChild 
-          className="enterprise-button-secondary"
-        >
-          <Link href="/login" className="flex items-center justify-center gap-2 h-full w-full">
-            <UserCog className="h-4 w-4 text-white" />
-            <span className="enterprise-text-secondary">Executive Portal</span>
+      <div className="flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-10 rounded-full px-4 text-sm font-semibold text-muted-foreground hover:bg-amber-500/10 hover:text-amber-700"
+            >
+              Access
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 rounded-xl border-amber-500/20 p-2">
+            <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5">
+              <Link href="/user-login" className="flex items-center gap-3">
+                <User className="h-4 w-4 text-amber-600" />
+                <span className="font-medium">Premium Access</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5">
+              <Link href="/login" className="flex items-center gap-3">
+                <UserCog className="h-4 w-4 text-sky-600" />
+                <span className="font-medium">Executive Portal</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5">
+              <Link href="/book-site-visit" className="flex items-center gap-3">
+                <CalendarCheck className="h-4 w-4 text-emerald-600" />
+                <span className="font-medium">Book Site Visit</span>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Button asChild className="h-10 rounded-full bg-amber-600 px-5 text-sm font-bold text-white shadow-sm hover:bg-amber-700">
+          <Link href="/register" className="flex items-center justify-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            Get Started
           </Link>
         </Button>
       </div>
@@ -87,61 +112,47 @@ export function SimpleHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-4 group" aria-label="AS Trusted Consultancy - Home">
+          <Link href="/" className="flex items-center space-x-3 group" aria-label="AS Trusted Consultancy - Home">
             <div className="relative">
               {/* Premium glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-orange-500/30 blur-2xl rounded-full group-hover:from-amber-400/50 group-hover:to-orange-500/50 transition-all duration-700" aria-hidden="true"></div>
               <div className="relative">
-                <ASLogo className="h-10 w-10" />
+                <ASLogo className="h-9 w-9" />
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+              <span className="text-lg font-bold leading-tight bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                 AS Trusted
               </span>
-              <span className="text-xl font-semibold text-foreground">
+              <span className="text-lg font-semibold leading-tight text-foreground">
                 Consultancy
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
-            <Link 
-              href="/" 
-              className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200 relative group"
-              aria-label="Home page"
-            >
-              Home
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-600 group-hover:w-full transition-all duration-200" aria-hidden="true"></span>
-            </Link>
-            <Link 
-              href="/about" 
-              className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200 relative group"
-              aria-label="About us"
-            >
-              About
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-600 group-hover:w-full transition-all duration-200" aria-hidden="true"></span>
-            </Link>
-            <Link 
-              href="/services" 
-              className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200 relative group"
-              aria-label="Our services"
-            >
-              Services
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-600 group-hover:w-full transition-all duration-200" aria-hidden="true"></span>
-            </Link>
-            <Link 
-              href="/properties" 
-              className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200 relative group"
-              aria-label="Property listings"
-            >
-              Properties
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-600 group-hover:w-full transition-all duration-200" aria-hidden="true"></span>
-            </Link>
+          <nav className="hidden lg:flex items-center gap-1 rounded-full border border-border/60 bg-background/70 p-1 shadow-sm" aria-label="Main navigation">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'rounded-full px-4 py-2 text-sm font-semibold transition-all',
+                    isActive
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'text-muted-foreground hover:bg-amber-500/10 hover:text-amber-700'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -172,37 +183,28 @@ export function SimpleHeader() {
           <div className="container mx-auto px-4 py-4">
             <nav className="flex flex-col space-y-4" aria-label="Mobile navigation">
               <Link 
-                href="/" 
-                className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200"
-                aria-label="Home page"
+                href="/properties"
+                className="flex items-center justify-between rounded-xl bg-amber-600 px-4 py-3 text-sm font-bold text-white shadow-sm"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Home
+                Browse Properties
+                <span className="text-xs opacity-80">Start here</span>
               </Link>
-              <Link 
-                href="/about" 
-                className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200"
-                aria-label="About us"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link 
-                href="/services" 
-                className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200"
-                aria-label="Our services"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Services
-              </Link>
-              <Link 
-                href="/properties" 
-                className="text-lg font-bold text-foreground hover:text-amber-600 transition-colors duration-200"
-                aria-label="Property listings"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Properties
-              </Link>
+              {navItems.filter((item) => item.href !== '/properties').map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'rounded-xl px-4 py-3 text-sm font-semibold transition-colors',
+                    pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+                      ? 'bg-amber-500/10 text-amber-700'
+                      : 'text-foreground hover:bg-muted'
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
               
               <div className="pt-4 border-t">
                 {user ? (
@@ -217,6 +219,13 @@ export function SimpleHeader() {
                       >
                         <UserPlus className="h-5 w-5" />
                         <span className="font-bold">Get Started</span>
+                      </Link>
+                      <Link
+                        href="/book-site-visit"
+                        className="flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-emerald-700 bg-emerald-500/10 border border-emerald-500/20"
+                      >
+                        <CalendarCheck className="h-5 w-5" />
+                        <span className="font-bold">Book Site Visit</span>
                       </Link>
                       <div className="grid grid-cols-2 gap-2">
                          <Link

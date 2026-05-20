@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { KeyRound, Mail, ShieldQuestion, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, KeyRound, LockKeyhole, Mail, ShieldQuestion } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ASLogo } from './as-logo';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -158,47 +158,48 @@ export default function LoginForm() {
         case 'reset-password':
             return (
                 <form onSubmit={handlePasswordReset}>
-                    <CardHeader>
-                        <CardTitle>Reset Password</CardTitle>
-                        <CardDescription>Enter and confirm your new password.</CardDescription>
+                    <CardHeader className="space-y-3 px-6 pt-6 text-center sm:px-8">
+                        <CardTitle className="text-2xl font-bold text-white">Reset Password</CardTitle>
+                        <CardDescription className="text-zinc-400">Enter and confirm your new password.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 px-6 sm:px-8">
                         <div className="space-y-2">
-                            <Label htmlFor="newPassword">New Password</Label>
+                            <Label htmlFor="newPassword" className="text-zinc-200">New Password</Label>
                             <div className="relative">
-                                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                                 <Input 
                                     id="newPassword" 
                                     type="password" 
-                                    placeholder="••••••••" 
+                                    placeholder="Enter new password" 
                                     required 
-                                    className="pl-10" 
+                                    className="h-12 rounded-xl border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-zinc-500 focus-visible:ring-amber-400/30" 
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                            <Label htmlFor="confirmPassword" className="text-zinc-200">Confirm New Password</Label>
                             <div className="relative">
-                                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                                 <Input 
                                     id="confirmPassword" 
                                     type="password" 
-                                    placeholder="••••••••" 
+                                    placeholder="Confirm new password" 
                                     required 
-                                    className="pl-10" 
+                                    className="h-12 rounded-xl border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-zinc-500 focus-visible:ring-amber-400/30" 
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex-col gap-4">
-                        <Button type="submit" className="w-full">
+                    <CardFooter className="flex-col gap-4 px-6 pb-6 sm:px-8">
+                        <Button type="submit" className="h-12 w-full rounded-xl bg-amber-500 font-bold text-black hover:bg-amber-400">
                             Set New Password
                         </Button>
-                         <Button variant="link" type="button" onClick={() => setView('manual')} className="p-0 h-auto">
+                         <Button variant="ghost" type="button" onClick={() => setView('manual')} className="h-auto p-0 text-sm text-zinc-400 hover:bg-transparent hover:text-amber-200">
+                            <ArrowLeft className="h-4 w-4" />
                             Back to Login
                         </Button>
                     </CardFooter>
@@ -207,57 +208,55 @@ export default function LoginForm() {
         case 'forgot-password':
             return (
                  <form onSubmit={handleSecurityQuestionSubmit}>
-                    <CardHeader className="items-center text-center space-y-4">
-    <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-amber-500/20 rounded-full blur-xl"></div>
-        <ASLogo className="h-16 w-16 mb-2 relative z-10" />
-    </div>
-    <div className="space-y-2">
-        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent dark:from-white dark:to-purple-200">
-            Password Recovery
-        </CardTitle>
-        <CardDescription className="text-muted-foreground dark:text-purple-200/80">
-            Enter your email and answer the security question to reset your password.
-        </CardDescription>
-    </div>
-</CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardHeader className="items-center space-y-4 px-6 pt-6 text-center sm:px-8">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-400/20 bg-black/50 shadow-lg shadow-amber-500/5">
+                            <ASLogo className="h-12 w-12" />
+                        </div>
                         <div className="space-y-2">
-                            <Label htmlFor="resetEmail">Email</Label>
+                            <CardTitle className="text-2xl font-bold text-white">Password Recovery</CardTitle>
+                            <CardDescription className="text-zinc-400">
+                                Enter your email and answer the security question to reset your password.
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 px-6 sm:px-8">
+                        <div className="space-y-2">
+                            <Label htmlFor="resetEmail" className="text-zinc-200">Email</Label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                                 <Input
                                     id="resetEmail"
                                     type="email"
                                     placeholder="Enter your email"
                                     required
-                                    className="pl-10 bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder:text-purple-300/60 dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
+                                    className="h-12 rounded-xl border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-zinc-500 focus-visible:ring-amber-400/30"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="securityQuestion">Who is your favorite person?</Label>
+                            <Label htmlFor="securityQuestion" className="text-zinc-200">Who is your favorite person?</Label>
                             <div className="relative">
-                                <ShieldQuestion className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <ShieldQuestion className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                                 <Input 
                                     id="securityQuestion" 
                                     type="text" 
                                     placeholder="Enter your answer" 
                                     required 
-                                    className="pl-10 bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder:text-purple-300/60 dark:focus:border-purple-400 dark:focus:ring-purple-400/20" 
+                                    className="h-12 rounded-xl border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-zinc-500 focus-visible:ring-amber-400/30" 
                                     value={securityAnswer}
                                     onChange={(e) => setSecurityAnswer(e.target.value)}
                                 />
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex-col gap-4">
-                        <Button type="submit" className="w-full">
+                    <CardFooter className="flex-col gap-4 px-6 pb-6 sm:px-8">
+                        <Button type="submit" className="h-12 w-full rounded-xl bg-amber-500 font-bold text-black hover:bg-amber-400">
                             Submit Answer
                         </Button>
-                        <Button variant="link" type="button" onClick={() => setView('manual')} className="p-0 h-auto">
+                        <Button variant="ghost" type="button" onClick={() => setView('manual')} className="h-auto p-0 text-sm text-zinc-400 hover:bg-transparent hover:text-amber-200">
+                            <ArrowLeft className="h-4 w-4" />
                             Back to Login
                         </Button>
                     </CardFooter>
@@ -267,31 +266,34 @@ export default function LoginForm() {
         default:
              return (
                  <form onSubmit={handleManualLogin} autoComplete="off">
-                    <CardHeader className="items-center text-center space-y-4">
-    <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-amber-500/20 rounded-full blur-xl"></div>
-        <ASLogo className="h-16 w-16 mb-2 relative z-10" />
-    </div>
-    <div className="space-y-2">
-        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent dark:from-white dark:to-purple-200">
-            Executive Portal Access
-        </CardTitle>
-        <CardDescription className="text-muted-foreground dark:text-purple-200/80">
-            Enter your credentials to access the owner dashboard.
-        </CardDescription>
-    </div>
-</CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardHeader className="items-center space-y-4 px-6 pt-6 text-center sm:px-8">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-400/20 bg-black/50 shadow-lg shadow-amber-500/5">
+                            <ASLogo className="h-12 w-12" />
+                        </div>
+                        <div className="space-y-2">
+                            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-amber-400/15 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200">
+                                <LockKeyhole className="h-3.5 w-3.5" />
+                                Secure Owner Login
+                            </div>
+                            <CardTitle className="text-2xl font-bold tracking-tight text-white">
+                                Executive Portal
+                            </CardTitle>
+                            <CardDescription className="text-zinc-400">
+                                Enter your credentials to access the owner dashboard.
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 px-6 sm:px-8">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="font-medium dark:text-purple-200">Email Address</Label>
+                        <Label htmlFor="email" className="font-medium text-zinc-200">Email Address</Label>
                         <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-purple-300/60" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input 
                             id="email" 
                             type="email" 
                             placeholder="Enter your email address" 
                             required 
-                            className="pl-10 bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder:text-purple-300/60 dark:focus:border-purple-400 dark:focus:ring-purple-400/20" 
+                            className="h-12 rounded-xl border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-zinc-500 focus-visible:ring-amber-400/30" 
                             value={email} 
                             onChange={(e) => setEmail(e.target.value)} 
                             autoComplete="off" 
@@ -302,15 +304,15 @@ export default function LoginForm() {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="password" className="font-medium dark:text-purple-200">Password</Label>
+                        <Label htmlFor="password" className="font-medium text-zinc-200">Password</Label>
                         <div className="relative">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-purple-300/60" />
+                        <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input
                             id="password"
                             type="password"
                             placeholder="Enter your password"
                             required
-                            className="pl-10 bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder:text-purple-300/60 dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
+                            className="h-12 rounded-xl border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-zinc-500 focus-visible:ring-amber-400/30"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             autoComplete="new-password"
@@ -321,9 +323,9 @@ export default function LoginForm() {
                         </div>
                     </div>
                     </CardContent>
-                    <CardFooter className="flex-col gap-4">
+                    <CardFooter className="flex-col gap-4 px-6 pb-6 sm:px-8">
                         {lockoutInfo?.locked && (
-                            <Alert className="w-full">
+                            <Alert className="w-full border-red-400/20 bg-red-500/10 text-red-100">
                                 <AlertTriangle className="h-4 w-4" />
                                 <AlertDescription>
                                     Account temporarily locked due to multiple failed login attempts. 
@@ -333,12 +335,12 @@ export default function LoginForm() {
                         )}
                         <Button 
                             type="submit" 
-                            className="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 border-0"
+                            className="h-12 w-full rounded-xl bg-amber-500 font-bold text-black shadow-lg shadow-amber-500/15 transition-all duration-300 hover:bg-amber-400 hover:shadow-amber-500/25"
                             disabled={isLoading || lockoutInfo?.locked}
                         >
                             {isLoading ? 'Authenticating...' : 'Access Executive Portal'}
                         </Button>
-                         <Button variant="link" type="button" disabled className="p-0 h-auto text-sm text-muted-foreground dark:text-purple-200/80">
+                         <Button variant="ghost" type="button" disabled className="h-auto p-0 text-sm text-zinc-500">
                             Password reset requires owner support
                         </Button>
                     </CardFooter>
@@ -348,7 +350,7 @@ export default function LoginForm() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80 text-white shadow-2xl shadow-black/40 backdrop-blur-xl">
         {renderContent()}
     </Card>
   );

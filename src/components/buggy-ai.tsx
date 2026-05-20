@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const FREE_MESSAGE_LIMIT = 5;
 
@@ -29,6 +30,7 @@ const SAMPLE_PROPERTIES = [
 ];
 
 function BuggyAI() {
+  const pathname = usePathname();
   const [phase, setPhase] = useState<'closed' | 'welcome' | 'chat'>('closed');
   const [messages, setMessages] = useState<{ role: string; text: string; showHint: boolean }[]>([]);
   const [input, setInput] = useState('');
@@ -50,7 +52,14 @@ function BuggyAI() {
     }
   }, [phase, showUpgrade]);
 
+  useEffect(() => {
+    const openAI = () => setPhase('welcome');
+    window.addEventListener('as-open-ai-assistant', openAI);
+    return () => window.removeEventListener('as-open-ai-assistant', openAI);
+  }, []);
+
   const isLimitReached = msgCount >= FREE_MESSAGE_LIMIT;
+  const hideStandaloneToggle = ['/', '/about', '/services'].includes(pathname);
 
   const reply = (msg: string) => {
     if (isLimitReached) {
@@ -138,15 +147,17 @@ function BuggyAI() {
       )}
 
       {/* Toggle Button */}
-      <div style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 9999 }}>
-        <button
-          onClick={() => setPhase(p => p === 'closed' ? 'welcome' : 'closed')}
-          style={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg,#c9a84c,#8b6914)', border: '2px solid rgba(255,255,255,0.4)', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', cursor: 'pointer', fontSize: 30, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          aria-label="Toggle Buggy AI chat"
-        >
-          {phase !== 'closed' ? '✕' : '🐞'}
-        </button>
-      </div>
+      {!hideStandaloneToggle && (
+        <div style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 9999 }}>
+          <button
+            onClick={() => setPhase(p => p === 'closed' ? 'welcome' : 'closed')}
+            style={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg,#c9a84c,#8b6914)', border: '2px solid rgba(255,255,255,0.4)', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', cursor: 'pointer', fontSize: 30, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Toggle Buggy AI chat"
+          >
+            {phase !== 'closed' ? '✕' : 'AI'}
+          </button>
+        </div>
+      )}
 
       {phase !== 'closed' && (
         <div className="bug-bg" style={{ position: 'fixed', bottom: 100, right: 28, width: 380, maxWidth: 'calc(100vw - 40px)', height: 560, borderRadius: 24, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 9998, boxShadow: '0 20px 80px rgba(0,0,0,0.9)' }}>

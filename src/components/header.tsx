@@ -4,23 +4,28 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { 
-  Home, LogOut, PanelLeft, MapPin, ShieldCheck, Info, User, Star, 
+  CalendarCheck, ChevronDown, Home, LogOut, PanelLeft, MapPin, ShieldCheck, Info,
   LayoutDashboard, UserCheck, MessageSquare, Landmark, Users as UsersIcon, 
-  Settings, FileUp, UserPlus, Crown, Brain, UserCog 
+  Settings, FileUp, UserPlus, Crown, UserCog 
 } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { ASLogo } from './as-logo';
 import { ThemeToggle } from './theme-toggle';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
+import { Sheet, SheetContent } from './ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 import { useState } from 'react';
 
 const publicNavItems = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/properties', label: 'Explore Plots', icon: MapPin },
-  { href: '/ai-access', label: 'AI Features', icon: Brain },
-  { href: '/services', label: 'Our Services', icon: ShieldCheck },
-  { href: '/about', label: 'Elite Legacy', icon: Info },
+  { href: '/about', label: 'About', icon: Info },
+  { href: '/services', label: 'Services', icon: ShieldCheck },
+  { href: '/properties', label: 'Properties', icon: MapPin },
 ];
 
 const dashboardNavItems = [
@@ -39,9 +44,7 @@ export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/premium-dashboard');
   const isPlotsPage = pathname.startsWith('/properties/') || pathname === '/properties';
-  const isHomePage = pathname === '/';
   const isAuthPage = pathname.startsWith('/user-login') || pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/ai-access');
 
   const handleLogout = async () => {
@@ -58,10 +61,10 @@ export function Header() {
         </div>
       </div>
       <div className="flex flex-col">
-        <span className="font-bold text-lg sm:text-xl lg:text-2xl font-serif tracking-wide leading-none text-white group-hover:text-amber-300 transition-all duration-500 drop-shadow-lg uppercase text-nowrap">
+        <span className="font-bold text-lg sm:text-xl font-serif tracking-wide leading-none text-white group-hover:text-amber-300 transition-all duration-500 drop-shadow-lg uppercase text-nowrap">
           AS <span className="text-amber-400 font-extrabold">TRUSTED</span>
         </span>
-        <span className="text-[11px] font-light text-amber-300/90 uppercase tracking-[0.3em] leading-none mt-1.5 drop-shadow text-nowrap">
+        <span className="text-[10px] font-light text-amber-300/90 uppercase tracking-[0.24em] leading-none mt-1.5 drop-shadow text-nowrap">
           Consultancy Services
         </span>
       </div>
@@ -92,31 +95,58 @@ export function Header() {
 
     if (isPlotsPage) {
       return (
-        <div className="flex items-center gap-3">
-          <Button asChild size="sm" className="rounded-full bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6">
-            <Link href="/register">Register</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline" className="rounded-full border-amber-500/30 text-amber-200 font-black uppercase tracking-widest text-[10px] h-10 px-6">
-            <Link href="/login">Sign In</Link>
-          </Button>
-        </div>
+        <PublicAccessActions />
       )
     }
 
     return (
-      <div className="hidden md:flex items-center gap-3">
-        <Button asChild size="sm" className="h-10 px-6 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-bold uppercase tracking-wider text-[10px]">
-          <Link href="/register">Get Started</Link>
-        </Button>
-        <Button asChild size="sm" className="h-10 px-6 rounded-full bg-slate-900 border border-amber-500/30 text-amber-400 font-bold uppercase tracking-wider text-[10px]">
-          <Link href="/user-login">Premium Access</Link>
-        </Button>
-        <Button asChild size="sm" variant="ghost" className="h-10 px-4 rounded-full text-blue-400 hover:bg-blue-400/5 font-bold uppercase tracking-wider text-[10px]">
-          <Link href="/login">Executive Portal</Link>
-        </Button>
-      </div>
+      <PublicAccessActions />
     )
   }
+
+  const PublicAccessActions = () => (
+    <div className="hidden md:flex items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-10 rounded-full px-4 text-xs font-bold uppercase tracking-[0.16em] text-zinc-300 hover:bg-white/5 hover:text-amber-300"
+          >
+            Access
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56 rounded-xl border-amber-500/20 bg-zinc-950/95 p-2 text-zinc-100">
+          <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-amber-500/10 focus:text-amber-200">
+            <Link href="/user-login" className="flex items-center gap-3">
+              <Crown className="h-4 w-4 text-amber-400" />
+              <span className="font-medium">Premium Access</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-blue-500/10 focus:text-blue-200">
+            <Link href="/login" className="flex items-center gap-3">
+              <UserCog className="h-4 w-4 text-blue-400" />
+              <span className="font-medium">Executive Portal</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-emerald-500/10 focus:text-emerald-200">
+            <Link href="/book-site-visit" className="flex items-center gap-3">
+              <CalendarCheck className="h-4 w-4 text-emerald-400" />
+              <span className="font-medium">Book Site Visit</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Button asChild size="sm" className="h-10 rounded-full bg-amber-500 px-5 text-xs font-black uppercase tracking-[0.14em] text-black hover:bg-amber-400">
+        <Link href="/register">
+          <UserPlus className="h-4 w-4" />
+          Get Started
+        </Link>
+      </Button>
+    </div>
+  );
 
   if (isAuthPage) return null;
 
@@ -125,7 +155,7 @@ export function Header() {
       {/* Decorative Top Line */}
       <div className="h-[2px] w-full bg-gradient-to-r from-amber-600 via-amber-200 to-amber-600 shadow-[0_0_20px_rgba(245,158,11,0.5)]" />
       
-      <div className="container flex h-20 items-center justify-between px-4 sm:px-6">
+      <div className="container flex h-[72px] items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-2">
           {/* Side Panel Trigger for Mobile */}
           {!isAuthPage && (
@@ -147,6 +177,15 @@ export function Header() {
                     </div>
                     
                     <nav className="flex-1 px-4 py-8 overflow-y-auto scrollbar-none">
+                      <Link
+                        href="/properties"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="mb-6 flex items-center justify-between rounded-2xl bg-amber-500 px-4 py-4 text-black shadow-lg shadow-amber-500/10"
+                      >
+                        <span className="font-black uppercase tracking-widest text-xs">Browse Properties</span>
+                        <span className="text-[10px] font-black uppercase tracking-wider opacity-70">Start</span>
+                      </Link>
+
                       <p className="px-4 text-[10px] font-black uppercase tracking-[0.3em] text-amber-500/60 mb-6">Navigation</p>
                       <div className="space-y-2">
                         {publicNavItems.map((item) => (
@@ -156,12 +195,12 @@ export function Header() {
                             onClick={() => setIsMobileMenuOpen(false)}
                             className={cn(
                               'flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group',
-                              pathname === item.href
+                              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
                                 ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                                 : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                             )}
                           >
-                            <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-amber-500" : "text-zinc-500 group-hover:text-amber-400 transition-colors")} />
+                            <item.icon className={cn("h-5 w-5", pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)) ? "text-amber-500" : "text-zinc-500 group-hover:text-amber-400 transition-colors")} />
                             <span className="font-bold uppercase tracking-widest text-xs">{item.label}</span>
                           </Link>
                         ))}
@@ -207,6 +246,12 @@ export function Header() {
                             <Button asChild className="w-full h-14 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-xs">
                               <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
                             </Button>
+                            <Button asChild variant="outline" className="w-full h-12 rounded-xl border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 font-black uppercase tracking-widest text-[10px]">
+                              <Link href="/book-site-visit" onClick={() => setIsMobileMenuOpen(false)}>
+                                <CalendarCheck className="h-4 w-4" />
+                                Book Site Visit
+                              </Link>
+                            </Button>
                             <div className="grid grid-cols-2 gap-2">
                               <Button asChild variant="outline" className="h-12 rounded-xl border-amber-500/20 text-amber-500 hover:bg-amber-500/10 font-black uppercase tracking-tighter text-[10px]">
                                 <Link href="/user-login" onClick={() => setIsMobileMenuOpen(false)}>Premium</Link>
@@ -228,17 +273,25 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-4 lg:gap-8">
-          <nav className="hidden lg:flex items-center gap-8">
-            {(isHomePage ? ['Properties', 'Services', 'About'] : ['Home', 'Properties', 'Services', 'About']).map((item) => (
-              <Link
-                key={item}
-                href={item === 'Home' ? '/' : item === 'Properties' ? '/properties' : `/${item.toLowerCase()}`}
-                className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-amber-500 transition-all relative group"
-              >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-amber-500 transition-all duration-500 group-hover:w-full" />
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1">
+            {publicNavItems.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition-all',
+                    isActive
+                      ? 'bg-amber-500 text-black shadow-sm shadow-amber-500/20'
+                      : 'text-zinc-400 hover:bg-white/5 hover:text-amber-300'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
           
           <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 'use client';
 
-import WhatsAppButton from '@/components/whatsapp-button';
+import QuickActionDock from '@/components/quick-action-dock';
 
 export default function RootLayout({
   children,
@@ -10,7 +10,7 @@ export default function RootLayout({
   return (
     <>
       {children}
-      <WhatsAppButton />
+      <QuickActionDock />
     </>
   );
 }
