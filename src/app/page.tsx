@@ -8,7 +8,7 @@ import TrustBadges from '@/components/trust-badges';
 import InvestmentStats from '@/components/investment-stats';
 import InvestmentZones from '@/components/investment-zones';
 import MarketIntelligence from '@/components/market-intelligence';
-import Testimonials from '@/components/testimonials';
+import Testimonials from '@/components/testimonials-fixed';
 import InvestmentJourney from '@/components/investment-journey';
 import TelanganaMap from '@/components/telangana-map';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

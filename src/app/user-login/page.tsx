@@ -1,7 +1,7 @@
 
 import UserLoginForm from '@/components/user-login-form';
 import { Header } from '@/components/header';
-import PhonePeQR from '@/components/phonepe-qr';
+import PhonePeQR from '@/components/phonepe-qr-fixed';
 import { CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 

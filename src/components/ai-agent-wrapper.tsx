@@ -1,14 +1,11 @@
 'use client';
 
-import { useAuth } from '@/lib/auth-context';
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 
 const AIAgent = dynamic(() => import('./ai-agent'), { ssr: false });
-const BuggyAI = dynamic(() => import('./buggy-ai'), { ssr: false });
 
 export default function AIAgentWrapper() {
-  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   // Defer AI widget mount to avoid blocking critical LCP
@@ -19,11 +16,6 @@ export default function AIAgentWrapper() {
 
   if (!mounted) return null;
 
-  // Show Buddy AI (full capability) for Premium, Elite, and Owner users
-  if (user && ['Premium', 'Elite', 'Owner'].includes(user.role)) {
-    return <AIAgent />;
-  }
-
-  // Buggy AI (conversion funnel) for everyone else — including guests
-  return <BuggyAI />;
+  // Render the premium Buddy AI engine with built-in daily limit and local fallback checks
+  return <AIAgent />;
 }

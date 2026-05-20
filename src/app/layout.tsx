@@ -40,14 +40,14 @@ const cinzel = Cinzel({
 export const metadata: Metadata = {
   metadataBase: new URL('https://astrustedconsultancy.com'),
   title: {
-    default: 'AS Trusted Consultancy - Premium Real Estate Services',
-    template: '%s | AS Trusted Consultancy'
+    default: 'AS Trusted — Premium Real Estate & Strategic Land Investments',
+    template: '%s | AS Trusted'
   },
-  description: 'Discover premium real estate investment opportunities with AS Trusted Consultancy. Expert property management, advanced analytics, and AI-powered insights for smart investors.',
-  keywords: ['real estate', 'property investment', 'consultancy', 'analytics', 'premium properties', 'AS Trusted'],
-  authors: [{ name: 'AS Trusted Consultancy' }],
-  creator: 'AS Trusted Consultancy',
-  publisher: 'AS Trusted Consultancy',
+  description: 'Discover premium land investments and luxury real estate opportunities with AS Trusted. Institutional-grade property advisory, DTCP-approved plots, and wealth-building strategies in Telangana\'s fastest-growing corridors.',
+  keywords: ['premium real estate', 'land investment', 'luxury property', 'DTCP approved plots', 'real estate advisory', 'Telangana real estate', 'wealth building', 'property investment India', 'AS Trusted'],
+  authors: [{ name: 'AS Trusted' }],
+  creator: 'AS Trusted',
+  publisher: 'AS Trusted',
   robots: 'index, follow',
   verification: {
     google: 'your-google-verification-code',
@@ -56,22 +56,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://astrustedconsultancy.com',
-    siteName: 'AS Trusted Consultancy',
-    title: 'AS Trusted Consultancy - Premium Real Estate Services',
-    description: 'Discover premium real estate investment opportunities with AS Trusted Consultancy. Expert property management, advanced analytics, and AI-powered insights.',
+    siteName: 'AS Trusted',
+    title: 'AS Trusted — Premium Real Estate & Strategic Land Investments',
+    description: 'Institutional-grade land investments in Telangana\'s highest-growth corridors. DTCP-approved, legally verified, with proven 80%+ ROI for discerning investors.',
     images: [
       {
         url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'AS Trusted Consultancy - Premium Real Estate Services',
+        alt: 'AS Trusted — Premium Real Estate & Strategic Land Investments',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AS Trusted Consultancy - Premium Real Estate Services',
-    description: 'Discover premium real estate investment opportunities with AS Trusted Consultancy. Expert property management, advanced analytics, and AI-powered insights.',
+    title: 'AS Trusted — Premium Real Estate & Strategic Land Investments',
+    description: 'Institutional-grade land investments in Telangana\'s highest-growth corridors. DTCP-approved, legally verified, with proven 80%+ ROI.',
     images: ['/images/twitter-image.jpg'],
   },
   icons: {
@@ -86,8 +86,8 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   other: {
-    'theme-color': '#f59e0b',
-    'msapplication-TileColor': '#f59e0b',
+    'theme-color': '#D4AF37',
+    'msapplication-TileColor': '#D4AF37',
   },
 };
 
@@ -96,7 +96,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
-  themeColor: '#f59e0b',
+  themeColor: '#D4AF37',
 };
 
 export default function RootLayout({
