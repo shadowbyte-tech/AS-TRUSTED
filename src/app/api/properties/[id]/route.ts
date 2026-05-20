@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, Property } from '@/lib/models';
-import { requireOwner } from '@/lib/api-auth';
+import { requirePremium } from '@/lib/api-auth';
 import { logger } from '@/lib/logger';
 
 // ─── GET /api/properties/[id] ─────────────────────────────────────────────────
@@ -34,7 +34,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authError = await requireOwner(request);
+  const authError = await requirePremium(request);
   if (authError) return authError;
 
   try {
@@ -64,7 +64,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authError = await requireOwner(request);
+  const authError = await requirePremium(request);
   if (authError) return authError;
 
   try {
