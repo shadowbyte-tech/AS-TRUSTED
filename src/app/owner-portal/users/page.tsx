@@ -29,6 +29,7 @@ interface User {
   lastLogin?: string;
   plotsViewed?: number;
   inquiriesMade?: number;
+  passwordHash?: string;
 }
 
 export default function UsersManagePage() {
@@ -42,18 +43,20 @@ export default function UsersManagePage() {
     const fetchUsers = async () => {
       try {
         const response = await fetch('/api/users');
-        const userData = await response.json();
+        const json = await response.json();
+        const userData = json.success && Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
         
         // Transform the data to match our interface
         const transformedUsers: User[] = userData.map((user: any) => ({
-          id: user.id || Math.random().toString(36).substring(2, 9),
+          id: user._id || user.id || Math.random().toString(36).substring(2, 9),
           email: user.email,
           role: user.role || 'user',
           status: user.status || 'active',
           createdAt: user.createdAt || new Date().toISOString(),
-          lastLogin: user.lastLogin,
+          lastLogin: user.lastLoginAt || user.lastLogin,
           plotsViewed: Math.floor(Math.random() * 50),
-          inquiriesMade: Math.floor(Math.random() * 10)
+          inquiriesMade: Math.floor(Math.random() * 10),
+          passwordHash: user.passwordHash
         }));
 
         setUsers(transformedUsers);
@@ -290,6 +293,11 @@ export default function UsersManagePage() {
                             </span>
                           )}
                         </div>
+                        {user.passwordHash && (
+                          <div className="text-xs text-amber-400 mt-1 font-mono break-all max-w-[300px]">
+                            Hash: {user.passwordHash}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-4">

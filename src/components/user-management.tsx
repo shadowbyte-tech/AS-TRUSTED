@@ -31,6 +31,7 @@ interface User {
   blockedAt?: string;
   createdAt?: string;
   lastLogin?: string;
+  passwordHash?: string;
 }
 
 interface PasswordStrengthResult {
@@ -65,8 +66,8 @@ export default function UserManagement() {
         throw new Error(`Server error (${response.status}). Please try again later.`);
       }
       if (response.ok) {
-        const usersData = await response.json();
-        const usersArray = Array.isArray(usersData) ? usersData : [];
+        const json = await response.json();
+        const usersArray = json.success && Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
         setUsers(usersArray);
       } else {
         const errorData = await response.json();
@@ -372,6 +373,11 @@ export default function UserManagement() {
                   <div>
                     <p className="font-medium truncate max-w-[200px] sm:max-w-none">{user.email}</p>
                     <p className="text-sm text-muted-foreground">Role: {user.role}</p>
+                    {user.passwordHash && (
+                      <p className="text-xs text-amber-500 font-mono break-all mt-1">
+                        Hash: {user.passwordHash}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
