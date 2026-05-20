@@ -36,20 +36,15 @@ export default function UserLoginForm() {
         description: 'Welcome! Taking you to available properties...',
       });
       
-      // Brief delay to let user state settle
-      setTimeout(() => {
-        
-        
-        // Redirect based on user role
-        const user = (result as any).user;
-        if (user.role === 'Owner') {
-          window.location.href = '/dashboard';
-        } else if (user.role === 'Premium') {
-          window.location.href = '/premium-properties';
-        } else {
-          window.location.href = '/normal-properties';
-        }
-      }, 1000);
+      // Use router.push (client-side nav) — preserves React/AuthProvider state
+      const role = (result as any).user?.role?.toLowerCase();
+      if (role === 'owner') {
+        router.push('/dashboard');
+      } else if (role === 'premium' || role === 'elite') {
+        router.push('/premium-properties');
+      } else {
+        router.push('/normal-properties');
+      }
     } else {
       toast({
         variant: 'destructive',

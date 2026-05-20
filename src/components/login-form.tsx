@@ -46,13 +46,15 @@ export default function LoginForm() {
           description: 'Redirecting to dashboard...',
         });
         
-        // Redirect based on user role
-        if (result.user?.role === 'Owner') {
-          window.location.href = '/dashboard';
-        } else if (result.user?.role === 'Premium') {
-          window.location.href = '/premium-dashboard';
+        // Use router.push (client-side nav) to preserve AuthProvider state
+        // window.location.href would destroy React state and force a full re-auth
+        const role = result.user?.role?.toLowerCase();
+        if (role === 'owner') {
+          router.push('/dashboard');
+        } else if (role === 'premium' || role === 'elite') {
+          router.push('/premium-dashboard');
         } else {
-          window.location.href = '/properties';
+          router.push('/properties');
         }
       } else {
         toast({
