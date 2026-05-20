@@ -54,7 +54,7 @@ const fetchUsers = async () => {
 
 const PropertyAnalyticsDashboard = dynamic(() => import('@/components/property-analytics-dashboard'), {
   ssr: false,
-  loading: () => <div className="h-[400px] w-full animate-pulse bg-slate-800/50 rounded-xl" />
+  loading: () => <div className="h-[400px] w-full animate-pulse bg-muted rounded-xl" />
 });
 
 const ChartContainerDynamic = dynamic(() => import('@/components/ui/chart').then(mod => mod.ChartContainer), { ssr: false });
@@ -203,10 +203,10 @@ export default function DashboardPage() {
           {/* Premium Header */}
           <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between mb-8 gap-6 text-center lg:text-left">
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight font-headline bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-transparent">
-                Hi {user?.name || 'Owner'}
+              <h1 className="text-3xl font-bold tracking-tight font-headline bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Owner Dashboard
               </h1>
-              <p className="text-slate-300 text-base sm:text-lg font-medium mt-2">
+              <p className="text-muted-foreground text-base sm:text-lg font-medium mt-2">
                 Welcome to your premium investment management center
               </p>
               <div className="mt-4 flex justify-center lg:justify-start">
@@ -214,21 +214,21 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 lg:flex lg:flex-row gap-3 w-full lg:w-auto">
-              <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border border-white/30 hover:bg-white/20 transition-all shadow-xl">
+              <Button asChild variant="outline" className="bg-background/50 backdrop-blur-md border border-border hover:bg-muted transition-all shadow-xl">
                 <Link href="/owner-portal">
-                  <Activity className="mr-2 h-4 w-4 text-slate-300" />
+                  <Activity className="mr-2 h-4 w-4 text-muted-foreground" />
                   Site Statistics
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border border-white/30 hover:bg-white/20 transition-all shadow-xl">
+              <Button asChild variant="outline" className="bg-background/50 backdrop-blur-md border border-border hover:bg-muted transition-all shadow-xl">
                 <Link href="/properties">
-                  <Home className="mr-2 h-4 w-4 text-slate-300" />
+                  <Home className="mr-2 h-4 w-4 text-muted-foreground" />
                   View All Properties
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="bg-gradient-to-r from-amber-500/20 to-amber-600/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all shadow-xl">
+              <Button asChild variant="outline" className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 backdrop-blur-md border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-xl">
                 <Link href="/properties?filter=premium">
-                  <Star className="mr-2 h-4 w-4 text-amber-300" />
+                  <Star className="mr-2 h-4 w-4 text-amber-500" />
                   View Premium Properties
                 </Link>
               </Button>
@@ -243,10 +243,10 @@ export default function DashboardPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Total Plots Card */}
-            <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
+            <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                <CardTitle className="text-sm font-bold text-slate-200">Total Plots</CardTitle>
+                <CardTitle className="text-sm font-bold text-foreground">Total Plots</CardTitle>
                 <div className="flex -space-x-3">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center shadow-lg">
                     <Home className="h-5 w-5 text-white" />
@@ -260,17 +260,17 @@ export default function DashboardPage() {
                 <div className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {totalProperties}
                 </div>
-                <p className="text-xs text-slate-400 mt-2 font-medium">
+                <p className="text-xs text-muted-foreground mt-2 font-medium">
                   Currently listed on platform
                 </p>
               </CardContent>
             </Card>
 
             {/* Total Users Card */}
-            <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
+            <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                <CardTitle className="text-sm font-bold text-slate-200">Total Users</CardTitle>
+                <CardTitle className="text-sm font-bold text-foreground">Total Users</CardTitle>
                 <div className="flex -space-x-3">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center shadow-lg">
                     <Users className="h-5 w-5 text-white" />
@@ -284,12 +284,12 @@ export default function DashboardPage() {
                 <div className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {totalUsers}
                 </div>
-                <p className="text-xs text-slate-400 mt-2 font-medium">
+                <p className="text-xs text-muted-foreground mt-2 font-medium">
                   (Excluding owner)
                 </p>
-                <div className="mt-2 text-xs text-slate-400">
-                  <span className="text-green-400">Premium: {premiumUsers}</span>
-                  <span className="text-blue-400">Regular: {regularUsers}</span>
+                <div className="mt-2 text-xs text-muted-foreground flex gap-3">
+                  <span className="text-emerald-500 font-semibold">Premium: {premiumUsers}</span>
+                  <span className="text-blue-500 font-semibold">Regular: {regularUsers}</span>
                 </div>
               </CardContent>
             </Card>
@@ -302,11 +302,11 @@ export default function DashboardPage() {
 
           <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-1 w-full">
             {/* Plot Distribution Chart */}
-            <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm w-full">
-              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
+            <Card className="relative overflow-hidden border border-border shadow-md bg-card w-full">
+              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 animate-pulse-slow" />
               <CardHeader className="relative z-10">
-                <CardTitle className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center shadow-lg">
                     <BarChart className="h-4 w-4 text-white" />
                   </div>
                   Plot Distribution by Facing
@@ -325,8 +325,8 @@ export default function DashboardPage() {
             </Card>
 
             {/* Current Listings Card */}
-            <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
+            <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+              <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
               <CardHeader className="relative z-10">
                 <CardTitle>Current Listings</CardTitle>
                 <CardDescription className="mt-1">
@@ -343,7 +343,7 @@ export default function DashboardPage() {
                       className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
                         statusFilter === status
                           ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-muted/30 text-muted-foreground border-muted hover:border-primary/50'
+                          : 'bg-muted text-muted-foreground border-border hover:border-primary/50'
                       }`}
                     >
                       {status === 'all' ? 'All' : status}
@@ -352,10 +352,10 @@ export default function DashboardPage() {
                 </div>
 
                 {properties.length === 0 ? (
-                  <div className="text-center py-16 border-2 border-dashed rounded-lg border-slate-700">
-                    <Home className="mx-auto h-16 w-16 text-slate-500 mb-4" />
-                    <h3 className="text-2xl font-bold text-slate-200 mb-4">No Properties Found</h3>
-                    <p className="text-slate-400 mb-6">Get started by uploading your first property.</p>
+                  <div className="text-center py-16 border-2 border-dashed rounded-lg border-border">
+                    <Home className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+                    <h3 className="text-2xl font-bold text-foreground mb-4">No Properties Found</h3>
+                    <p className="text-muted-foreground mb-6">Get started by uploading your first property.</p>
                     <Button asChild className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-2xl">
                       <Link href="/upload-property/select-type">
                         <FileUp className="mr-2 h-4 w-4" />
@@ -375,7 +375,7 @@ export default function DashboardPage() {
                       {/* Mobile Cards */}
                       <div className="grid gap-4 sm:hidden">
                         {filtered.map((property: Property) => (
-                          <Card key={property.id} className="border-0 shadow-lg hover:shadow-xl transition-all">
+                          <Card key={property.id} className="border border-border shadow-md bg-card hover:shadow-lg transition-all">
                             <CardHeader className="flex flex-row items-start gap-4 p-4">
                               <Image
                                 src={property.imageUrl || '/placeholder-property.jpg'}
@@ -387,9 +387,9 @@ export default function DashboardPage() {
                                 loading="lazy"
                               />
                               <div className="flex-1">
-                                <CardTitle className="text-lg font-bold text-slate-200">{`${property.propertyType} No. ${property.propertyNumber}`}</CardTitle>
-                                <div className="text-sm text-slate-400 mt-1">
-                                  <p className='flex items-center text-slate-300'>
+                                <CardTitle className="text-lg font-bold text-foreground">{`${property.propertyType} No. ${property.propertyNumber}`}</CardTitle>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  <p className='flex items-center text-foreground/80'>
                                     <MapPin className="mr-2 h-3 w-3" />
                                     {`${property.areaName}, ${property.villageName}`}
                                   </p>
@@ -397,13 +397,13 @@ export default function DashboardPage() {
                               </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-200">
+                                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/properties/${property.id}/edit`} className="text-slate-300">Edit</Link>
+                                    <Link href={`/properties/${property.id}/edit`} className="text-foreground">Edit</Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem asChild>
                                     <div className="w-full">
@@ -444,21 +444,21 @@ export default function DashboardPage() {
                                   loading="lazy"
                                 />
                               </TableCell>
-                              <TableCell className="font-medium text-slate-200">{property.propertyNumber}</TableCell>
+                              <TableCell className="font-medium text-foreground">{property.propertyNumber}</TableCell>
                               <TableCell>
                                 <Badge variant="outline" className="border-primary/30 text-primary">{property.propertyType}</Badge>
                               </TableCell>
-                              <TableCell className="text-slate-300">{`${property.areaName}, ${property.villageName}`}</TableCell>
+                              <TableCell className="text-foreground/80">{`${property.areaName}, ${property.villageName}`}</TableCell>
                               <TableCell className="hidden md:table-cell">
                                 <PropertyStatusDropdown plotId={property.id} currentStatus={property.status} />
                               </TableCell>
-                              <TableCell className="hidden lg:table-cell text-slate-300">
+                              <TableCell className="hidden lg:table-cell text-foreground/80">
                                 {property.propertyType === 'Plot' && 'plotSize' in property ? property.plotSize :
                                  property.propertyType === 'House' && 'houseSize' in property ? property.houseSize :
                                  property.propertyType === 'Land' && 'landSize' in property ? property.landSize : 'N/A'}
                               </TableCell>
                               <TableCell className="text-right space-x-2">
-                                <Button asChild variant="outline" size="icon" className="text-slate-400 hover:text-slate-200">
+                                <Button asChild variant="outline" size="icon" className="text-muted-foreground hover:text-foreground">
                                   <Link href={`/properties/${property.id}/edit`}>
                                     <Pencil className="h-4 w-4" />
                                     <span className="sr-only">Edit</span>

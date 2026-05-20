@@ -144,8 +144,8 @@ export default function EditPropertyPage() {
       <form onSubmit={handleSave} className="space-y-6">
 
         {/* Core Details */}
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50">
-          <CardHeader><CardTitle>Core Details</CardTitle></CardHeader>
+        <Card className="border border-border shadow-md bg-card">
+          <CardHeader><CardTitle className="text-foreground">Core Details</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
               <Label>Property Number</Label>
@@ -192,8 +192,8 @@ export default function EditPropertyPage() {
 
         {/* Type-specific fields */}
         {baseType === 'Plot' && (
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50">
-            <CardHeader><CardTitle>Plot Details</CardTitle></CardHeader>
+          <Card className="border border-border shadow-md bg-card">
+            <CardHeader><CardTitle className="text-foreground">Plot Details</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label>Plot Size (e.g. 200 Sq Yards)</Label>
@@ -219,8 +219,8 @@ export default function EditPropertyPage() {
         )}
 
         {baseType === 'House' && (
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50">
-            <CardHeader><CardTitle>House Details</CardTitle></CardHeader>
+          <Card className="border border-border shadow-md bg-card">
+            <CardHeader><CardTitle className="text-foreground">House Details</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label>House Size (e.g. 1200 Sq Ft)</Label>
@@ -243,8 +243,8 @@ export default function EditPropertyPage() {
         )}
 
         {baseType === 'Land' && (
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50">
-            <CardHeader><CardTitle>Land Details</CardTitle></CardHeader>
+          <Card className="border border-border shadow-md bg-card">
+            <CardHeader><CardTitle className="text-foreground">Land Details</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label>Land Size (e.g. 2 Acres)</Label>
@@ -266,12 +266,12 @@ export default function EditPropertyPage() {
         )}
 
         {/* Images */}
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50">
-          <CardHeader><CardTitle className="flex items-center gap-2"><ImageIcon className="h-5 w-5" /> Property Images</CardTitle></CardHeader>
+        <Card className="border border-border shadow-md bg-card">
+          <CardHeader><CardTitle className="flex items-center gap-2 text-foreground"><ImageIcon className="h-5 w-5 text-primary" /> Property Images</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-3">
               {(formData?.images || []).map((img: string, i: number) => (
-                <div key={i} className="relative h-24 w-24 rounded-xl overflow-hidden border border-slate-600 group">
+                <div key={i} className="relative h-24 w-24 rounded-xl overflow-hidden border border-border group">
                   <img src={img} alt={`property-${i}`} className="h-full w-full object-cover" />
                   <button
                     type="button"
@@ -283,9 +283,9 @@ export default function EditPropertyPage() {
                 </div>
               ))}
               {(formData?.images?.length || 0) < 5 && (
-                <label className="h-24 w-24 border-2 border-dashed border-slate-600 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary/60 transition-colors">
-                  {isUploading ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : <Upload className="h-5 w-5 text-slate-400" />}
-                  <span className="text-xs text-slate-400 mt-1">{isUploading ? 'Uploading...' : 'Add Image'}</span>
+                <label className="h-24 w-24 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary/60 transition-colors">
+                  {isUploading ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : <Upload className="h-5 w-5 text-muted-foreground" />}
+                  <span className="text-xs text-muted-foreground mt-1">{isUploading ? 'Uploading...' : 'Add Image'}</span>
                   <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={isUploading} />
                 </label>
               )}

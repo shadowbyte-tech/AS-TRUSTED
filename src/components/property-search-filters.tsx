@@ -20,7 +20,9 @@ import {
   Square,
   Bed,
   Bath,
-  Car
+  Car,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import type { PropertyType } from '@/lib/definitions';
 import { useAuth } from '@/lib/auth-context';
@@ -71,6 +73,72 @@ export default function PropertySearchFilters({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumFeature, setPremiumFeature] = useState({ name: '', description: '' });
+  const [isListening, setIsListening] = useState(false);
+
+  const startVoiceSearch = () => {
+    const SpeechRecognition = 
+      (window as any).SpeechRecognition || 
+      (window as any).webkitSpeechRecognition;
+      
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser. Please try Google Chrome or MS Edge.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-IN'; // Works great for Indian accents and keywords (e.g. Kamareddy, plot)
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      updateFilter('searchTerm', transcript);
+      
+      const speech = transcript.toLowerCase();
+      
+      // Auto-extract type
+      if (speech.includes('plot')) {
+        updateFilter('propertyType', 'Plot');
+      } else if (speech.includes('house') || speech.includes('villa')) {
+        updateFilter('propertyType', 'House');
+      } else if (speech.includes('land')) {
+        updateFilter('propertyType', 'Land');
+      }
+
+      // Auto-extract village name
+      const villages = ['devanpally', 'tekrial', 'adloor', 'kyasampally', 'rameshwarpally', 'kamareddy', 'vidhya nagar'];
+      for (const v of villages) {
+        if (speech.includes(v)) {
+          const match = v === 'vidhya nagar' ? 'Vidhya Nagar Colony' : v.charAt(0).toUpperCase() + v.slice(1);
+          updateFilter('village', match);
+          break;
+        }
+      }
+
+      // Auto-extract category
+      if (speech.includes('premium') || speech.includes('vip')) {
+        updateFilter('category', 'Premium');
+      } else if (speech.includes('luxury')) {
+        updateFilter('category', 'Luxury');
+      } else if (speech.includes('normal') || speech.includes('budget')) {
+        updateFilter('category', 'Normal');
+      }
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
 
   // Handle premium category selection
   const handleCategoryChange = (value: string) => {
@@ -167,15 +235,26 @@ export default function PropertySearchFilters({
       <CardContent className="space-y-4">
         {/* Search Input */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Search</label>
+          <label className="text-sm font-medium text-foreground">Search</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by location, description..."
+              placeholder={isListening ? "Listening... Speak now" : "Search by location, description..."}
               value={filters.searchTerm}
               onChange={(e) => updateFilter('searchTerm', e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10 bg-background text-foreground border-input"
+              disabled={isListening}
             />
+            <button
+              type="button"
+              onClick={startVoiceSearch}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-muted transition-colors ${
+                isListening ? 'text-red-500 animate-pulse bg-red-500/10' : 'text-muted-foreground'
+              }`}
+              title="Voice Search"
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
           </div>
         </div>
 

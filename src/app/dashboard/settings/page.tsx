@@ -183,66 +183,66 @@ export default function SettingsPage() {
         </div>
 
         {/* Profile Information */}
-        <Card className="relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5" />
+        <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
           <CardHeader className="relative z-10">
-            <CardTitle className="flex items-center gap-3 text-slate-200">
+            <CardTitle className="flex items-center gap-3 text-foreground">
               <div className="p-2 rounded-full bg-gradient-to-r from-primary to-accent">
                 <User className="h-4 w-4 text-white" />
               </div>
               Profile Information
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-muted-foreground">
               Update your personal information and contact details.
             </CardDescription>
           </CardHeader>
           <CardContent className="relative z-10 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300">Full Name</Label>
+                <Label className="text-foreground/90">Full Name</Label>
                 <Input 
                   placeholder="John Doe" 
                   value={profileData.name}
                   onChange={(e) => handleProfileInputChange('name', e.target.value)}
-                  className="bg-slate-800/50 border-slate-700 text-slate-200" 
+                  className="bg-background border-input text-foreground" 
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Email Address</Label>
+                <Label className="text-foreground/90">Email Address</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
                     type="email" 
                     placeholder="john@example.com" 
-                    className="pl-10 bg-slate-800/50 border-slate-700 text-slate-200" 
+                    className="pl-10 bg-background border-input text-foreground" 
                     value={user?.email}
                     readOnly
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Phone Number</Label>
+                <Label className="text-foreground/90">Phone Number</Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
                     type="tel" 
                     placeholder="+1 234 567 8900" 
                     value={profileData.phone}
                     onChange={(e) => handleProfileInputChange('phone', e.target.value)}
-                    className="pl-10 bg-slate-800/50 border-slate-700 text-slate-200" 
+                    className="pl-10 bg-background border-input text-foreground" 
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Location</Label>
+                <Label className="text-foreground/90">Location</Label>
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
                     type="text" 
                     placeholder="City, Country" 
                     value={profileData.location}
                     onChange={(e) => handleProfileInputChange('location', e.target.value)}
-                    className="pl-10 bg-slate-800/50 border-slate-700 text-slate-200" 
+                    className="pl-10 bg-background border-input text-foreground" 
                   />
                 </div>
               </div>
@@ -260,16 +260,16 @@ export default function SettingsPage() {
         </Card>
 
         {/* Security Settings */}
-        <Card className="relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5" />
+        <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
           <CardHeader className="relative z-10">
-            <CardTitle className="flex items-center gap-3 text-slate-200">
+            <CardTitle className="flex items-center gap-3 text-foreground">
               <div className="p-2 rounded-full bg-gradient-to-r from-primary to-accent">
                 <Lock className="h-4 w-4 text-white" />
               </div>
               Security Settings
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-muted-foreground">
               Manage your password and security preferences.
             </CardDescription>
           </CardHeader>
@@ -277,15 +277,15 @@ export default function SettingsPage() {
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Current Password</Label>
+                  <Label className="text-foreground/90">Current Password</Label>
                   <div className="relative">
-                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                       id="currentPassword" 
                       type={showPasswords.current ? "text" : "password"} 
                       placeholder="••••••••" 
                       required 
-                      className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-slate-200" 
+                      className="pl-10 pr-10 bg-background border-input text-foreground" 
                       value={passwords.current} 
                       onChange={e => setPasswords({...passwords, current: e.target.value})}
                     />
@@ -293,7 +293,7 @@ export default function SettingsPage() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-slate-400 hover:text-slate-200"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
                     >
                       {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -301,15 +301,15 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-300">New Password</Label>
+                  <Label className="text-foreground/90">New Password</Label>
                   <div className="relative">
-                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                       id="newPassword" 
                       type={showPasswords.new ? "text" : "password"} 
                       placeholder="••••••••" 
                       required 
-                      className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-slate-200" 
+                      className="pl-10 pr-10 bg-background border-input text-foreground" 
                       value={passwords.new} 
                       onChange={e => setPasswords({...passwords, new: e.target.value})}
                     />
@@ -317,7 +317,7 @@ export default function SettingsPage() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-slate-400 hover:text-slate-200"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
                     >
                       {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -325,15 +325,15 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Confirm New Password</Label>
+                  <Label className="text-foreground/90">Confirm New Password</Label>
                   <div className="relative">
-                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                       id="confirmPassword" 
                       type={showPasswords.confirm ? "text" : "password"} 
                       placeholder="••••••••" 
                       required 
-                      className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-slate-200" 
+                      className="pl-10 pr-10 bg-background border-input text-foreground" 
                       value={passwords.confirm} 
                       onChange={e => setPasswords({...passwords, confirm: e.target.value})}
                     />
@@ -341,7 +341,7 @@ export default function SettingsPage() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-slate-400 hover:text-slate-200"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
                     >
                       {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -354,15 +354,15 @@ export default function SettingsPage() {
               </Button>
             </form>
             
-            <Separator className="bg-slate-700" />
+            <Separator className="bg-border" />
             
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base flex items-center text-slate-300">
-                  <Smartphone className="mr-2 h-4 w-4" />
+                <Label className="text-base flex items-center text-foreground">
+                  <Smartphone className="mr-2 h-4 w-4 text-primary" />
                   Two-Factor Authentication
                 </Label>
-                <p className="text-sm text-slate-400">Add an extra layer of security to your account</p>
+                <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
               </div>
               <Switch 
                 checked={privacy.twoFactor}
@@ -373,27 +373,27 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notification Settings */}
-        <Card className="relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5" />
+        <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
           <CardHeader className="relative z-10">
-            <CardTitle className="flex items-center gap-3 text-slate-200">
+            <CardTitle className="flex items-center gap-3 text-foreground">
               <div className="p-2 rounded-full bg-gradient-to-r from-primary to-accent">
                 <Bell className="h-4 w-4 text-white" />
               </div>
               Notification Preferences
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-muted-foreground">
               Control how and when you receive notifications.
             </CardDescription>
           </CardHeader>
           <CardContent className="relative z-10 space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base flex items-center text-slate-300">
-                  <Mail className="mr-2 h-4 w-4" />
+                <Label className="text-base flex items-center text-foreground">
+                  <Mail className="mr-2 h-4 w-4 text-primary" />
                   Email Notifications
                 </Label>
-                <p className="text-sm text-slate-400">Receive updates and alerts via email</p>
+                <p className="text-sm text-muted-foreground">Receive updates and alerts via email</p>
               </div>
               <Switch 
                 checked={notifications.email}
@@ -402,11 +402,11 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base flex items-center text-slate-300">
-                  <Smartphone className="mr-2 h-4 w-4" />
+                <Label className="text-base flex items-center text-foreground">
+                  <Smartphone className="mr-2 h-4 w-4 text-primary" />
                   Push Notifications
                 </Label>
-                <p className="text-sm text-slate-400">Get instant updates on your device</p>
+                <p className="text-sm text-muted-foreground">Get instant updates on your device</p>
               </div>
               <Switch 
                 checked={notifications.push}
@@ -415,11 +415,11 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base flex items-center text-slate-300">
-                  <Phone className="mr-2 h-4 w-4" />
+                <Label className="text-base flex items-center text-foreground">
+                  <Phone className="mr-2 h-4 w-4 text-primary" />
                   SMS Notifications
                 </Label>
-                <p className="text-sm text-slate-400">Receive text message alerts</p>
+                <p className="text-sm text-muted-foreground">Receive text message alerts</p>
               </div>
               <Switch 
                 checked={notifications.sms}
@@ -428,11 +428,11 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base flex items-center text-slate-300">
-                  <CreditCard className="mr-2 h-4 w-4" />
+                <Label className="text-base flex items-center text-foreground">
+                  <CreditCard className="mr-2 h-4 w-4 text-primary" />
                   Marketing Communications
                 </Label>
-                <p className="text-sm text-slate-400">Receive promotional offers and updates</p>
+                <p className="text-sm text-muted-foreground">Receive promotional offers and updates</p>
               </div>
               <Switch 
                 checked={notifications.marketing}
@@ -443,25 +443,25 @@ export default function SettingsPage() {
         </Card>
 
         {/* Appearance Settings */}
-        <Card className="relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-slate-800 to-slate-900/50 backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5" />
+        <Card className="relative overflow-hidden border border-border shadow-md bg-card">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
           <CardHeader className="relative z-10">
-            <CardTitle className="flex items-center gap-3 text-slate-200">
+            <CardTitle className="flex items-center gap-3 text-foreground">
               <div className="p-2 rounded-full bg-gradient-to-r from-primary to-accent">
                 <Palette className="h-4 w-4 text-white" />
               </div>
               Appearance & Preferences
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-muted-foreground">
               Customize the look and feel of your experience.
             </CardDescription>
           </CardHeader>
           <CardContent className="relative z-10 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300">Language</Label>
+                <Label className="text-foreground/90">Language</Label>
                 <Select value={preferences.language} onValueChange={(value) => handlePreferenceChange('language', value)}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-slate-200">
+                  <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -473,9 +473,9 @@ export default function SettingsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Timezone</Label>
+                <Label className="text-foreground/90">Timezone</Label>
                 <Select value={preferences.timezone} onValueChange={(value) => handlePreferenceChange('timezone', value)}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-slate-200">
+                  <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -487,9 +487,9 @@ export default function SettingsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Currency</Label>
+                <Label className="text-foreground/90">Currency</Label>
                 <Select value={preferences.currency} onValueChange={(value) => handlePreferenceChange('currency', value)}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-slate-200">
+                  <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -501,9 +501,9 @@ export default function SettingsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Date Format</Label>
+                <Label className="text-foreground/90">Date Format</Label>
                 <Select value={preferences.dateFormat} onValueChange={(value) => handlePreferenceChange('dateFormat', value)}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-slate-200">
+                  <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -515,15 +515,15 @@ export default function SettingsPage() {
               </div>
             </div>
             
-            <Separator className="bg-slate-700" />
+            <Separator className="bg-border" />
             
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base flex items-center text-slate-300">
-                  <Moon className="mr-2 h-4 w-4" />
+                <Label className="text-base flex items-center text-foreground">
+                  <Moon className="mr-2 h-4 w-4 text-primary" />
                   Theme
                 </Label>
-                <p className="text-sm text-slate-400">Choose your preferred color scheme</p>
+                <p className="text-sm text-muted-foreground">Choose your preferred color scheme</p>
               </div>
               <ThemeToggle />
             </div>
@@ -531,35 +531,35 @@ export default function SettingsPage() {
         </Card>
 
         {/* Danger Zone */}
-        <Card className="relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-red-900/20 to-red-800/10 backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-red-500/5" />
+        <Card className="relative overflow-hidden border border-red-500/20 shadow-md bg-red-500/5">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-red-500/5" />
           <CardHeader className="relative z-10">
-            <CardTitle className="flex items-center gap-3 text-red-400">
+            <CardTitle className="flex items-center gap-3 text-red-600 dark:text-red-400">
               <div className="p-2 rounded-full bg-gradient-to-r from-red-500 to-red-600">
                 <Trash2 className="h-4 w-4 text-white" />
               </div>
               Danger Zone
             </CardTitle>
-            <CardDescription className="text-red-300">
+            <CardDescription className="text-red-500 dark:text-red-300">
               Irreversible actions that affect your account.
             </CardDescription>
           </CardHeader>
           <CardContent className="relative z-10 space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-red-500/20 bg-red-500/5 gap-4">
               <div>
-                <h4 className="font-semibold text-red-400">Delete Account</h4>
-                <p className="text-sm text-red-300">Permanently delete your account and all data</p>
+                <h4 className="font-semibold text-red-600 dark:text-red-400">Delete Account</h4>
+                <p className="text-sm text-red-500 dark:text-red-300">Permanently delete your account and all data</p>
               </div>
               <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
                 Delete Account
               </Button>
             </div>
-            <div className="flex items-center justify-between p-4 rounded-lg border border-orange-500/20 bg-orange-500/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-orange-500/20 bg-orange-500/5 gap-4">
               <div>
-                <h4 className="font-semibold text-orange-400">Export Data</h4>
-                <p className="text-sm text-orange-300">Download all your personal data</p>
+                <h4 className="font-semibold text-orange-600 dark:text-orange-400">Export Data</h4>
+                <p className="text-sm text-orange-500 dark:text-orange-300">Download all your personal data</p>
               </div>
-              <Button variant="outline" className="border-orange-500/20 text-orange-400 hover:bg-orange-500/10">
+              <Button variant="outline" className="border-orange-500/20 text-orange-600 dark:text-orange-400 hover:bg-orange-500/10">
                 <Download className="mr-2 h-4 w-4" />
                 Export Data
               </Button>

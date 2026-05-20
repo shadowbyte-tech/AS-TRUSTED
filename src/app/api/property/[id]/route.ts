@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, Property } from '@/lib/models';
 import { requireOwner } from '@/lib/api-auth';
 import { logger } from '@/lib/logger';
+import { redisInvalidatePattern } from '@/lib/redis';
 
 // GET /api/property/[id]
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -40,6 +41,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     logger.info(`✅ Property ${params.id} updated`);
+
+    // Invalidate cached lists
+    await redisInvalidatePattern('properties:*');
+    logger.info('🧹 Invalided Redis properties cache after property PATCH');
+
     return NextResponse.json({ success: true, data: property });
   } catch (err: any) {
     if (err.code === 11000) {
@@ -62,6 +68,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
     logger.info(`✅ Property ${params.id} deleted`);
+
+    // Invalidate cached lists
+    await redisInvalidatePattern('properties:*');
+    logger.info('🧹 Invalided Redis properties cache after property DELETE');
+
     return NextResponse.json({ success: true, message: 'Property deleted successfully' });
   } catch (err) {
     logger.error(`DELETE /api/property/${params.id} failed`, err);

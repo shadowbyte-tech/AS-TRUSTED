@@ -97,42 +97,42 @@ export default function SiteVisitsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {(['Pending', 'Confirmed', 'Completed', 'Cancelled'] as const).map(status => (
-          <Card key={status} className="border-0 shadow-md bg-gradient-to-br from-slate-800 to-slate-900/50">
+          <Card key={status} className="border border-border shadow-md bg-card">
             <CardContent className="p-4">
               <div className={`text-2xl font-bold ${STATUS_COLORS[status].split(' ')[1]}`}>
                 {visits.filter(v => v.status === status).length}
               </div>
-              <p className="text-xs text-slate-400 mt-1">{status}</p>
+              <p className="text-xs text-muted-foreground mt-1">{status}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Card className="border-0 shadow-2xl bg-gradient-to-br from-slate-800 to-slate-900/50">
+      <Card className="border border-border shadow-md bg-card">
         <CardHeader>
-          <CardTitle>All Bookings ({visits.length})</CardTitle>
+          <CardTitle className="text-foreground">All Bookings ({visits.length})</CardTitle>
           <CardDescription>Click status dropdown to update. WhatsApp button to contact client.</CardDescription>
         </CardHeader>
         <CardContent>
           {visits.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-slate-700 rounded-lg">
-              <CalendarCheck className="mx-auto h-12 w-12 text-slate-500 mb-3" />
-              <p className="text-slate-400">No site visit bookings yet.</p>
+            <div className="text-center py-16 border-2 border-dashed border-border rounded-lg">
+              <CalendarCheck className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+              <p className="text-muted-foreground">No site visit bookings yet.</p>
             </div>
           ) : (
             <>
               {/* Mobile cards */}
               <div className="grid gap-4 sm:hidden">
                 {visits.map(visit => (
-                  <Card key={visit._id} className="border border-slate-700 bg-slate-800/50">
+                  <Card key={visit._id} className="border border-border bg-muted/30">
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="font-semibold text-slate-200 flex items-center gap-2">
+                        <div className="font-semibold text-foreground flex items-center gap-2">
                           <User className="h-4 w-4 text-primary" /> {visit.name}
                         </div>
                         <Badge className={`text-xs border ${STATUS_COLORS[visit.status] || ''}`}>{visit.status}</Badge>
                       </div>
-                      <div className="text-sm text-slate-400 space-y-1">
+                      <div className="text-sm text-muted-foreground space-y-1">
                         <div className="flex items-center gap-2"><Phone className="h-3 w-3" /> {visit.phone}</div>
                         <div className="flex items-center gap-2"><MapPin className="h-3 w-3" /> {visit.location}</div>
                         <div className="flex items-center gap-2"><Clock className="h-3 w-3" /> {visit.preferredDate} · {visit.preferredTime}</div>
@@ -175,12 +175,12 @@ export default function SiteVisitsPage() {
                   {visits.map(visit => (
                     <TableRow key={visit._id}>
                       <TableCell>
-                        <div className="font-medium text-slate-200">{visit.name}</div>
-                        {visit.email && <div className="text-xs text-slate-400">{visit.email}</div>}
+                        <div className="font-medium text-foreground">{visit.name}</div>
+                        {visit.email && <div className="text-xs text-muted-foreground">{visit.email}</div>}
                       </TableCell>
-                      <TableCell className="text-slate-300">{visit.phone}</TableCell>
-                      <TableCell className="hidden md:table-cell text-slate-300">{visit.location}</TableCell>
-                      <TableCell className="hidden lg:table-cell text-slate-400 text-sm">
+                      <TableCell className="text-foreground/90">{visit.phone}</TableCell>
+                      <TableCell className="hidden md:table-cell text-foreground/90">{visit.location}</TableCell>
+                      <TableCell className="hidden lg:table-cell text-muted-foreground text-sm">
                         {visit.preferredDate}<br />{visit.preferredTime}
                       </TableCell>
                       <TableCell>
