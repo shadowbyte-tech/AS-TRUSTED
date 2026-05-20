@@ -27,21 +27,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (response.ok) {
         const data = await response.json();
-        
         setUser(data.user || null);
       } else {
-        
         setUser(null);
       }
     } catch {
-      
       setUser(null);
     }
   }, []);
 
   useEffect(() => {
+    // Use startTransition-like pattern: set loading false only after user state is committed
     refreshUser().finally(() => setIsLoading(false));
   }, []);
+
 
   const login = React.useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string; user?: { id: string; email: string; role: string } | null }> => {
     try {
