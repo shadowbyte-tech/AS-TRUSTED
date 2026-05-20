@@ -1,8 +1,12 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireOwner } from '@/lib/api-auth';
 
 export async function DELETE(request: NextRequest) {
+  const authError = await requireOwner(request);
+  if (authError) return authError;
+
   try {
     const { id } = await request.json();
 

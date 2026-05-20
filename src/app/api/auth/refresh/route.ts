@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken, generateAccessToken, setAuthCookies } from '@/lib/auth';
+import { hashToken, setAuthCookies, verifyToken } from '@/lib/auth';
 import { connectDB, User } from '@/lib/models';
 import { AUTH_COOKIES } from '@/lib/constants';
 
@@ -18,8 +18,12 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-    const user = await User.findById(decoded.id).lean();
-    if (!user || !user.isActive || user.isBlocked) {
+    const user = await User.findById(decoded.id).select('+refreshTokenHash').lean();
+    if (!user || user.isActive === false || user.isBlocked === true) {
+      return NextResponse.json({ error: 'User not found or disabled' }, { status: 401 });
+    }
+
+    if (!user.refreshTokenHash || user.refreshTokenHash !== hashToken(refreshToken)) {
       return NextResponse.json({ error: 'User not found or disabled' }, { status: 401 });
     }
 

@@ -5,6 +5,7 @@
  */
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { connectDB, User, Password } from './models';
 import { logger } from './logger';
@@ -12,6 +13,8 @@ import { AUTH_COOKIES, JWT_CONFIG, VALIDATION } from './constants';
 
 const BCRYPT_SALT_ROUNDS = 12;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const MAX_FAILED_LOGINS = 5;
+const LOCKOUT_MS = 15 * 60 * 1000;
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -41,6 +44,16 @@ export interface RegisterData {
   password: string;
   name?: string;
   role?: string;
+}
+
+export class AuthLockoutError extends Error {
+  retryAfterSec: number;
+
+  constructor(retryAfterSec: number) {
+    super('Too many login attempts. Try again later.');
+    this.name = 'AuthLockoutError';
+    this.retryAfterSec = retryAfterSec;
+  }
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -78,6 +91,10 @@ export function verifyToken(token: string): any {
   }
 }
 
+export function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
 // ─── COOKIE OPERATIONS ───────────────────────────────────────────────────────
 export async function setAuthCookies(user: AuthUser): Promise<{ accessToken: string; refreshToken: string }> {
   const accessToken  = generateAccessToken(user);
@@ -101,9 +118,9 @@ export async function setAuthCookies(user: AuthUser): Promise<{ accessToken: str
     maxAge: AUTH_COOKIES.MAX_AGE_REFRESH,
   });
 
-  // Persist refresh token to DB for rotation/invalidation
+  // Persist only a hash of the refresh token for rotation/invalidation.
   await connectDB();
-  await User.findByIdAndUpdate(user.id, { refreshToken });
+  await User.findByIdAndUpdate(user.id, { refreshTokenHash: hashToken(refreshToken) });
 
   return { accessToken, refreshToken };
 }
@@ -149,20 +166,38 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<A
 
   await connectDB();
 
-  const user = await User.findOne({ email: email.toLowerCase() }).lean();
+  const normalizedEmail = email.toLowerCase().trim();
+  const user = await User.findOne({ email: normalizedEmail }).select('+failedLoginCount +lockUntil').lean();
   if (!user || user.isBlocked === true || user.isActive === false) return null;
 
-  const passwordDoc = await Password.findOne({ email: email.toLowerCase() }).select('+hashedPassword').lean();
+  if (user.lockUntil && new Date(user.lockUntil).getTime() > Date.now()) {
+    throw new AuthLockoutError(Math.ceil((new Date(user.lockUntil).getTime() - Date.now()) / 1000));
+  }
+
+  const passwordDoc = await Password.findOne({ email: normalizedEmail }).select('+hashedPassword').lean();
   if (!passwordDoc) {
-    logger.warn(`No password record found for: ${email}`);
+    logger.warn('No password record found during login');
     return null;
   }
 
   const valid = await bcrypt.compare(password, passwordDoc.hashedPassword);
-  if (!valid) return null;
+  if (!valid) {
+    const failedLoginCount = (user.failedLoginCount || 0) + 1;
+    const lockUntil = failedLoginCount >= MAX_FAILED_LOGINS ? new Date(Date.now() + LOCKOUT_MS) : undefined;
+    await User.findByIdAndUpdate(user._id, {
+      failedLoginCount,
+      ...(lockUntil ? { lockUntil } : {}),
+    });
+    if (lockUntil) throw new AuthLockoutError(Math.ceil(LOCKOUT_MS / 1000));
+    return null;
+  }
 
   // Update last login time
-  await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
+  await User.findByIdAndUpdate(user._id, {
+    lastLoginAt: new Date(),
+    failedLoginCount: 0,
+    lockUntil: null,
+  });
 
   return {
     id:       String(user._id),

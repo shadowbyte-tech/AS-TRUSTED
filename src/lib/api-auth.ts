@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from './auth';
 import { AUTH_COOKIES } from './constants';
+import { isEliteRole, isOwnerRole, isPremiumRole } from './roles';
 
 export interface DecodedToken {
   id:    string;
@@ -33,7 +34,7 @@ export async function requireOwner(request: NextRequest): Promise<NextResponse |
   if (!decoded) {
     return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   }
-  if (decoded.role !== 'Owner') {
+  if (!isOwnerRole(decoded.role)) {
     return NextResponse.json({ error: 'Access denied. Owner privileges required.' }, { status: 403 });
   }
   return null;
@@ -44,7 +45,7 @@ export async function requirePremium(request: NextRequest): Promise<NextResponse
   if (!decoded) {
     return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   }
-  if (!['Premium', 'Elite', 'Owner'].includes(decoded.role)) {
+  if (!isPremiumRole(decoded.role)) {
     return NextResponse.json({ error: 'Premium subscription required.' }, { status: 403 });
   }
   return null;
@@ -55,7 +56,7 @@ export async function requireElite(request: NextRequest): Promise<NextResponse |
   if (!decoded) {
     return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   }
-  if (!['Elite', 'Owner'].includes(decoded.role)) {
+  if (!isEliteRole(decoded.role)) {
     return NextResponse.json({ error: 'Elite membership required.' }, { status: 403 });
   }
   return null;

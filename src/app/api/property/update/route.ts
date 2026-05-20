@@ -1,8 +1,12 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireOwner } from '@/lib/api-auth';
 
 export async function PUT(request: NextRequest) {
+  const authError = await requireOwner(request);
+  if (authError) return authError;
+
   try {
     const { id, ...updateData } = await request.json();
 

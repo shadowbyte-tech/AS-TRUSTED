@@ -4,7 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, Property } from '@/lib/models';
-import { requirePremium } from '@/lib/api-auth';
+import { requireOwner } from '@/lib/api-auth';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
 // ─── POST /api/properties ────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
-  const authError = await requirePremium(request);
+  const authError = await requireOwner(request);
   if (authError) return authError;
 
   try {

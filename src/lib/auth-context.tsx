@@ -29,7 +29,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await response.json();
         setUser(data.user || null);
       } else {
-        setUser(null);
+        const refreshResponse = await fetch('/api/auth/refresh', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          setUser(data.user || null);
+        } else {
+          setUser(null);
+        }
       }
     } catch {
       setUser(null);
@@ -96,8 +105,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch {}
     setUser(null);
-    // Hard redirect to clear any protected page state
-    window.location.href = '/owner-login';
+    // Hard redirect to clear any protected page state.
+    window.location.href = '/';
   }, []);
 
   const updateUser = React.useCallback((userData: Partial<AuthUser>) => {

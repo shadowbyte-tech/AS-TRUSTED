@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const sessionUser = await getSessionUser();
     if (sessionUser) {
       await connectDB();
-      await User.findByIdAndUpdate(sessionUser.id, { refreshToken: null });
+      await User.findByIdAndUpdate(sessionUser.id, { refreshTokenHash: null });
     }
     await clearAuthCookies();
     return NextResponse.json({ success: true });

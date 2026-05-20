@@ -160,7 +160,11 @@ const UserSchema = new mongoose.Schema(
     isActive:     { type: Boolean, default: true },
     isBlocked:    { type: Boolean, default: false },
     lastLoginAt:  { type: Date },
-    refreshToken: { type: String, select: false },
+    refreshTokenHash: { type: String, select: false },
+    failedLoginCount: { type: Number, default: 0 },
+    lockUntil: { type: Date },
+    passwordResetTokenHash: { type: String, select: false },
+    passwordResetExpires: { type: Date },
   },
   { timestamps: true }
 );

@@ -10,6 +10,7 @@ import { KeyRound, Mail, Loader2, User } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { getPostLoginPath } from '@/lib/roles';
 
 type FormMode = 'login' | 'register';
 
@@ -38,14 +39,7 @@ export default function UserLoginForm() {
           description: 'Welcome! Taking you to available properties...',
         });
         
-        const role = (result as any).user?.role?.toLowerCase();
-        if (role === 'owner') {
-          router.push('/dashboard');
-        } else if (role === 'premium' || role === 'elite') {
-          router.push('/premium-properties');
-        } else {
-          router.push('/normal-properties');
-        }
+        router.push(getPostLoginPath((result as any).user));
       } else {
         toast({
           variant: 'destructive',

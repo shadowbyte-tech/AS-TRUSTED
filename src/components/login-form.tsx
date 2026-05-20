@@ -13,6 +13,7 @@ import { KeyRound, Mail, ShieldQuestion, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ASLogo } from './as-logo';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getPostLoginPath } from '@/lib/roles';
 
 type View = 'manual' | 'forgot-password' | 'reset-password';
 
@@ -46,16 +47,7 @@ export default function LoginForm() {
           description: 'Redirecting to dashboard...',
         });
         
-        // Use router.push (client-side nav) to preserve AuthProvider state
-        // window.location.href would destroy React state and force a full re-auth
-        const role = result.user?.role?.toLowerCase();
-        if (role === 'owner') {
-          router.push('/dashboard');
-        } else if (role === 'premium' || role === 'elite') {
-          router.push('/premium-dashboard');
-        } else {
-          router.push('/properties');
-        }
+        router.push(getPostLoginPath(result.user));
       } else {
         toast({
           variant: 'destructive',
@@ -346,8 +338,8 @@ export default function LoginForm() {
                         >
                             {isLoading ? 'Authenticating...' : 'Access Executive Portal'}
                         </Button>
-                         <Button variant="link" type="button" onClick={() => setView('forgot-password')} className="p-0 h-auto text-sm text-muted-foreground dark:text-purple-200/80 hover:text-foreground dark:hover:text-purple-200">
-                            Forgot Password?
+                         <Button variant="link" type="button" disabled className="p-0 h-auto text-sm text-muted-foreground dark:text-purple-200/80">
+                            Password reset requires owner support
                         </Button>
                     </CardFooter>
                 </form>

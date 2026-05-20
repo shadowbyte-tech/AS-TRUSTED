@@ -9,7 +9,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { AUTH_COOKIES } from './lib/constants';
-import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from './lib/csrf';
 
 // ─── RATE LIMITER (Edge-compatible in-memory) ────────────────────────────────
 const authAttempts = new Map<string, { count: number; resetAt: number; blockedUntil: number }>();
@@ -64,7 +63,54 @@ const OWNER_PATHS          = ['/dashboard', '/owner-portal', '/upload-property',
 const PREMIUM_PATHS        = ['/premium-dashboard'];
 const IS_PRODUCTION        = process.env.NODE_ENV === 'production';
 
-export function middleware(request: NextRequest) {
+type MiddlewareToken = {
+  id?: string;
+  email?: string;
+  role?: string;
+  exp?: number;
+};
+
+function base64UrlDecode(input: string): Uint8Array {
+  const base64 = input.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(input.length / 4) * 4, '=');
+  const binary = atob(base64);
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+async function verifyJwt(token?: string): Promise<MiddlewareToken | null> {
+  const secret = process.env.JWT_SECRET;
+  if (!token || !secret || secret.length < 32) return null;
+
+  const [headerPart, payloadPart, signaturePart] = token.split('.');
+  if (!headerPart || !payloadPart || !signaturePart) return null;
+
+  try {
+    const header = JSON.parse(new TextDecoder().decode(base64UrlDecode(headerPart)));
+    if (header.alg !== 'HS256') return null;
+
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    const valid = await crypto.subtle.verify(
+      'HMAC',
+      key,
+      base64UrlDecode(signaturePart),
+      new TextEncoder().encode(`${headerPart}.${payloadPart}`)
+    );
+    if (!valid) return null;
+
+    const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadPart))) as MiddlewareToken;
+    if (payload.exp && payload.exp * 1000 < Date.now()) return null;
+    return payload.id ? payload : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = getClientIP(request);
 
@@ -94,7 +140,7 @@ export function middleware(request: NextRequest) {
   // ── 3. SECURITY HEADERS ──────────────────────────────────────────────────
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'",   // unsafe-eval REMOVED
+    `script-src 'self' 'unsafe-inline'${IS_PRODUCTION ? '' : " 'unsafe-eval'"}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://lh3.googleusercontent.com https://www.transparenttextures.com https://placehold.co",
     "font-src 'self' https://fonts.gstatic.com",
@@ -118,9 +164,9 @@ export function middleware(request: NextRequest) {
   // This resolves the 403 Invalid CSRF token issues in production.
 
   // ── 5. PROTECTED ROUTE GUARDS ────────────────────────────────────────────
-  const hasAccessToken  = !!request.cookies.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
-  const hasRefreshToken = !!request.cookies.get(AUTH_COOKIES.REFRESH_TOKEN)?.value;
-  const isAuthenticated = hasAccessToken || hasRefreshToken;
+  const accessToken = request.cookies.get(AUTH_COOKIES.ACCESS_TOKEN)?.value;
+  const session = await verifyJwt(accessToken);
+  const isAuthenticated = !!session;
 
   // Owner-only pages
   const isOwnerPath = OWNER_PATHS.some(p => pathname.startsWith(p));
@@ -129,6 +175,9 @@ export function middleware(request: NextRequest) {
     url.searchParams.set('callbackUrl', encodeURIComponent(pathname));
     return NextResponse.redirect(url);
   }
+  if (isOwnerPath && session?.role !== 'Owner') {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
   // Premium pages
   const isPremiumPath = PREMIUM_PATHS.some(p => pathname.startsWith(p));
@@ -136,6 +185,9 @@ export function middleware(request: NextRequest) {
     const url = new URL('/user-login', request.url);
     url.searchParams.set('callbackUrl', encodeURIComponent(pathname));
     return NextResponse.redirect(url);
+  }
+  if (isPremiumPath && !['Premium', 'Elite', 'Owner'].includes(session?.role || '')) {
+    return NextResponse.redirect(new URL('/normal-properties', request.url));
   }
 
   return response;
