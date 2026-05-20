@@ -114,6 +114,14 @@ export default function RootLayout({
         {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
+        
+        {/* Google AdSense */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5789918917071865"
+          crossOrigin="anonymous"
+        />
         
         {/* Critical CSS inline */}
         <style dangerouslySetInnerHTML={{
