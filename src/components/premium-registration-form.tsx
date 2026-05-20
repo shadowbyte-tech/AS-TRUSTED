@@ -35,7 +35,20 @@ export default function PremiumRegistrationForm() {
     setIsSubmitting(true);
 
     try {
-      // Store registration data
+      // Store registration data in DB
+      await fetch('/api/registrations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
+          notes: `[Premium Registration] ${formData.message}`.trim(),
+        }),
+      });
+
       const registrationData = {
         ...formData,
         timestamp: new Date().toISOString(),
@@ -53,6 +66,7 @@ export default function PremiumRegistrationForm() {
       // Show WhatsApp modal
       setShowWhatsApp(true);
     } catch (error) {
+      console.error('Error saving premium lead:', error);
       toast({
         title: 'Error',
         description: 'Failed to submit registration. Please try again.',

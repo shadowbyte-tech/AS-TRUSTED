@@ -14,8 +14,25 @@ export default function RegistrationForm() {
     const [phone, setPhone] = useState('');
     const [notes, setNotes] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        try {
+            await fetch('/api/registrations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name.trim(),
+                    email: email.trim().toLowerCase(),
+                    phone: phone.trim(),
+                    notes: notes.trim(),
+                }),
+            });
+        } catch (error) {
+            console.error('Error saving registration lead:', error);
+        }
 
         const message = `Hello Sri Swamy Goud,\n\nI'm interested in AS Trusted Consultancy.\n\n*Name:* ${name}\n*Email:* ${email}\n*Phone:* ${phone}\n*Requirements:* ${notes || 'None'}\n\nPlease share the property investment details.`;
         const whatsappUrl = `https://wa.me/919866404090?text=${encodeURIComponent(message)}`;
