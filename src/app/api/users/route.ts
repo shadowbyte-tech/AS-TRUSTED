@@ -3,7 +3,7 @@
  * Users endpoint — owner-only.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB, User } from '@/lib/models';
+import { connectDB, Password, User } from '@/lib/models';
 import { requireOwner } from '@/lib/api-auth';
 import { logger } from '@/lib/logger';
 
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const users = await User.find({})
-      .select('-refreshToken')
+      .select('-refreshTokenHash -passwordResetTokenHash')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
     // Note: The user requested to see passwords. Since passwords are encrypted using bcrypt (which is one-way),
     // we can retrieve the hashes or let the owner see the hashes, or we can fetch the Password records.
     // Let's retrieve the Password collection records and attach the hashes to the user objects.
-    const { Password } = require('@/lib/models');
     const passwords = await Password.find({}).lean();
     const passwordMap = new Map(passwords.map((p: any) => [p.email.toLowerCase(), p.hashedPassword]));
 
@@ -33,6 +32,10 @@ export async function GET(request: NextRequest) {
       const emailLower = u.email?.toLowerCase();
       return {
         ...u,
+        id: String(u._id),
+        _id: String(u._id),
+        blocked: u.isBlocked === true,
+        lastLogin: u.lastLoginAt,
         passwordHash: passwordMap.get(emailLower) || 'No password record found'
       };
     });

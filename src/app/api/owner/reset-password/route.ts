@@ -29,6 +29,11 @@ export async function POST(request: NextRequest) {
       { hashedPassword },
       { upsert: true }
     );
+    await User.findByIdAndUpdate(userId, {
+      failedLoginCount: 0,
+      lockUntil: null,
+      refreshTokenHash: null,
+    });
 
     logger.info(`✅ Password reset for: ${user.email}`);
     return NextResponse.json({ success: true, message: 'Password reset successfully' });

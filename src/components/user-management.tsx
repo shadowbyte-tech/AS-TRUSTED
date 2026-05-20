@@ -25,8 +25,9 @@ import { Shield, CheckCircle, XCircle, RefreshCw, UserPlus, Key, Loader2, Eye, E
 
 interface User {
   id: string;
+  _id?: string;
   email: string;
-  role: 'User' | 'Owner' | 'Premium';
+  role: 'User' | 'Owner' | 'Premium' | 'Elite';
   blocked?: boolean;
   blockedAt?: string;
   createdAt?: string;
@@ -46,14 +47,14 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserRole, setNewUserRole] = useState<'User' | 'Premium' | 'Owner'>('User');
+  const [newUserRole, setNewUserRole] = useState<'User' | 'Premium' | 'Elite' | 'Owner'>('User');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrengthResult | null>(null);
   const [creating, setCreating] = useState(false);
   const [showRoleChangeDialog, setShowRoleChangeDialog] = useState(false);
   const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<string | null>(null);
-  const [newRole, setNewRole] = useState<'User' | 'Premium' | 'Owner'>('User');
+  const [newRole, setNewRole] = useState<'User' | 'Premium' | 'Elite' | 'Owner'>('User');
   // Password reset dialog state
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [selectedUserForPasswordReset, setSelectedUserForPasswordReset] = useState<string | null>(null);
@@ -72,7 +73,11 @@ export default function UserManagement() {
       }
       if (response.ok) {
         const json = await response.json();
-        const usersArray = json.success && Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+        const rawUsers = json.success && Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+        const usersArray = rawUsers.map((user: any) => ({
+          ...user,
+          id: user.id || user._id,
+        }));
         setUsers(usersArray);
       } else {
         const errorData = await response.json();
@@ -141,7 +146,7 @@ export default function UserManagement() {
   // Change Role – now expects user ID
   const handleChangeRole = async (userId: string, currentRole: string) => {
     setSelectedUserForRoleChange(userId);
-    setNewRole(currentRole as 'User' | 'Premium' | 'Owner');
+    setNewRole(currentRole as 'User' | 'Premium' | 'Elite' | 'Owner');
     setShowRoleChangeDialog(true);
   };
 
@@ -358,13 +363,14 @@ export default function UserManagement() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="newUserRole">Role</Label>
-                  <Select value={newUserRole} onValueChange={(value: 'User' | 'Premium' | 'Owner') => setNewUserRole(value)}>
+                  <Select value={newUserRole} onValueChange={(value: 'User' | 'Premium' | 'Elite' | 'Owner') => setNewUserRole(value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="User">User</SelectItem>
                       <SelectItem value="Premium">Premium</SelectItem>
+                      <SelectItem value="Elite">Elite</SelectItem>
                       <SelectItem value="Owner">Owner</SelectItem>
                     </SelectContent>
                   </Select>
@@ -470,13 +476,14 @@ export default function UserManagement() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Select value={newRole} onValueChange={(value: 'User' | 'Premium' | 'Owner') => setNewRole(value)}>
+            <Select value={newRole} onValueChange={(value: 'User' | 'Premium' | 'Elite' | 'Owner') => setNewRole(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="User">User</SelectItem>
                 <SelectItem value="Premium">Premium</SelectItem>
+                <SelectItem value="Elite">Elite</SelectItem>
                 <SelectItem value="Owner">Owner</SelectItem>
               </SelectContent>
             </Select>

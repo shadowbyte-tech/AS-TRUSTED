@@ -21,16 +21,20 @@ export async function POST(request: NextRequest) {
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { role: newRole },
+      { role: newRole, refreshTokenHash: null },
       { new: true }
-    ).select('-refreshToken').lean();
+    ).select('-refreshTokenHash -passwordResetTokenHash').lean();
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     logger.info(`✅ Role updated: ${user.email} → ${newRole}`);
-    return NextResponse.json({ success: true, user, message: `Role updated to ${newRole}` });
+    return NextResponse.json({
+      success: true,
+      user: { ...user, id: String(user._id), _id: String(user._id) },
+      message: `Role updated to ${newRole}`,
+    });
   } catch (err) {
     logger.error('update-user-role failed', err);
     return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
