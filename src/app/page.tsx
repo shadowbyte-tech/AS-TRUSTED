@@ -293,15 +293,15 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                  <div className="p-3 md:p-4 bg-white rounded-lg border border-border">
+                  <div className="p-3 md:p-4 bg-card rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground">1 Year</p>
                     <p className="text-xl md:text-2xl font-bold text-primary">₹{roi1yr.toLocaleString()}</p>
                   </div>
-                  <div className="p-3 md:p-4 bg-white rounded-lg border border-border">
+                  <div className="p-3 md:p-4 bg-card rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground">3 Years</p>
                     <p className="text-xl md:text-2xl font-bold text-emerald-500">₹{roi3yr.toLocaleString()}</p>
                   </div>
-                  <div className="p-3 md:p-4 bg-white rounded-lg border border-border">
+                  <div className="p-3 md:p-4 bg-card rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground">5 Years</p>
                     <p className="text-xl md:text-2xl font-bold text-purple-500">₹{roi5yr.toLocaleString()}</p>
                   </div>

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { FileUp, Pencil, Home, Users, MoreVertical, MapPin, Square, Eye, Activity, Database, Star } from 'lucide-react';
+import { FileUp, Pencil, Home, Users, MoreVertical, MapPin, Square, Eye, Activity, Database, Star, CheckCircle2 } from 'lucide-react';
 import type { Property, PropertyType, PlotFacing } from '@/lib/definitions';
 import DeletePlotButton from '@/components/delete-plot-button';
 import Image from 'next/image';
@@ -25,6 +25,7 @@ import DBStatusIndicator from '@/components/db-status-indicator';
 import { Footer } from '@/components/footer';
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 // Client-side data fetching functions
 const fetchProperties = async () => {
@@ -65,6 +66,51 @@ const chartConfig = {
   },
 } satisfies import('@/components/ui/chart').ChartConfig;
 
+function PropertyStatusDropdown({ plotId, currentStatus }: { plotId: string; currentStatus: string }) {
+  const [status, setStatus] = useState(currentStatus || 'Available');
+  const [updating, setUpdating] = useState(false);
+
+  const statusColors: Record<string, string> = {
+    'Available': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    'Reserved': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    'Sold': 'bg-red-500/20 text-red-400 border-red-500/30',
+    'Under Negotiation': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    'Under Construction': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    setUpdating(true);
+    try {
+      const res = await fetch(`/api/property/${plotId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) setStatus(newStatus);
+    } catch (e) {
+      console.error('Status update failed', e);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button disabled={updating} className={`text-xs px-2 py-1 rounded-full border font-semibold transition-all ${statusColors[status] || 'bg-muted text-muted-foreground border-muted'}`}>
+          {updating ? '...' : status}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        {['Available', 'Reserved', 'Sold', 'Under Negotiation', 'Under Construction'].map((s) => (
+          <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)} className={status === s ? 'font-bold' : ''}>
+            {s}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -76,9 +122,11 @@ export default function DashboardPage() {
     }
   }, [user, router]);
 
+  const { toast } = useToast();
   const [properties, setProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     const loadData = async () => {
@@ -156,7 +204,7 @@ export default function DashboardPage() {
           <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between mb-8 gap-6 text-center lg:text-left">
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight font-headline bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-transparent">
-                Hi Sri Swamy
+                Hi {user?.name || 'Owner'}
               </h1>
               <p className="text-slate-300 text-base sm:text-lg font-medium mt-2">
                 Welcome to your premium investment management center
@@ -286,131 +334,149 @@ export default function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {properties.length > 0 ? (
-                  <>
-                    {/* Mobile View */}
-                    <div className="grid gap-4 sm:hidden">
-                      {properties.map((property: Property) => (
-                        <Card key={property.id} className="border-0 shadow-lg hover:shadow-xl transition-all">
-                          <CardHeader className="flex flex-row items-start gap-4 p-4">
-                            <Image
-                              src={property.imageUrl || '/placeholder-property.jpg'}
-                              alt={`${property.propertyType} ${property.propertyNumber}`}
-                              width={80}
-                              height={60}
-                              className="rounded-lg object-cover aspect-[4/3]"
-                              data-ai-hint={property.imageHint}
-                              loading="lazy"
-                            />
-                            <div className="flex-1">
-                              <CardTitle className="text-lg font-bold text-slate-200">{`${property.propertyType} No. ${property.propertyNumber}`}</CardTitle>
-                              <div className="text-sm text-slate-400 mt-1">
-                                <p className='flex items-center text-slate-300'>
-                                  <MapPin className="mr-2 h-3 w-3" />
-                                  {`${property.areaName}, ${property.villageName}`}
-                                </p>
-                                <p className='flex items-center text-slate-300 mt-1'>
-                                  <Square className="mr-2 h-3 w-3" />
-                                  {property.propertyType === 'Plot' && 'plotSize' in property ? property.plotSize : 
-                                   property.propertyType === 'House' && 'houseSize' in property ? property.houseSize :
-                                   property.propertyType === 'Land' && 'landSize' in property ? property.landSize : 'N/A'}
-                                </p>
-                              </div>
-                            </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-200">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/properties/${property.id}/edit`} className="text-slate-300">Edit</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                  <div className="w-full">
-                                    <DeletePlotButton plotId={property.id} trigger="menuitem" />
-                                  </div>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </CardHeader>
-                        </Card>
-                      ))}
-                    </div>
+                {/* Status Filter Tabs */}
+                <div className="flex gap-2 flex-wrap mb-4">
+                  {['all', 'Available', 'Reserved', 'Sold', 'Under Negotiation'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setStatusFilter(status)}
+                      className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
+                        statusFilter === status
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted/30 text-muted-foreground border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      {status === 'all' ? 'All' : status}
+                    </button>
+                  ))}
+                </div>
 
-                    {/* Desktop View */}
-                    <Table className="hidden sm:table">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="hidden sm:table-cell">Image</TableHead>
-                          <TableHead>Property No.</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Location</TableHead>
-                          <TableHead className="hidden md:table-cell">Facing</TableHead>
-                          <TableHead className="hidden lg:table-cell">Size</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {properties.map((property: Property) => (
-                          <TableRow key={property.id}>
-                            <TableCell className="hidden sm:table-cell">
-                              <Image
-                                src={property.imageUrl || '/placeholder-property.jpg'}
-                                alt={`${property.propertyType} ${property.propertyNumber}`}
-                                width={64}
-                                height={48}
-                                className="rounded-lg object-cover"
-                                data-ai-hint={property.imageHint}
-                                loading="lazy"
-                              />
-                            </TableCell>
-                            <TableCell className="font-medium text-slate-200">{property.propertyNumber}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="border-primary/30 text-primary">{property.propertyType}</Badge>
-                            </TableCell>
-                            <TableCell className="text-slate-300">{`${property.areaName}, ${property.villageName}`}</TableCell>
-                            <TableCell className="hidden md:table-cell">
-                              {property.propertyType === 'Plot' && 'plotFacing' in property ? (
-                                <Badge variant="outline" className="border-primary/30 text-primary">{property.plotFacing}</Badge>
-                              ) : (
-                                <span className="text-slate-400">N/A</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="hidden lg:table-cell text-slate-300">
-                              {property.propertyType === 'Plot' && 'plotSize' in property ? property.plotSize : 
-                               property.propertyType === 'House' && 'houseSize' in property ? property.houseSize :
-                               property.propertyType === 'Land' && 'landSize' in property ? property.landSize : 'N/A'}
-                            </TableCell>
-                            <TableCell className="text-right space-x-2">
-                              <Button asChild variant="outline" size="icon" className="text-slate-400 hover:text-slate-200">
-                                <Link href={`/properties/${property.id}/edit`}>
-                                  <Pencil className="h-4 w-4" />
-                                  <span className="sr-only">Edit</span>
-                                </Link>
-                              </Button>
-                              <DeletePlotButton plotId={property.id} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </>
-                ) : (
+                {properties.length === 0 ? (
                   <div className="text-center py-16 border-2 border-dashed rounded-lg border-slate-700">
                     <Home className="mx-auto h-16 w-16 text-slate-500 mb-4" />
                     <h3 className="text-2xl font-bold text-slate-200 mb-4">No Properties Found</h3>
                     <p className="text-slate-400 mb-6">Get started by uploading your first property.</p>
                     <Button asChild className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-2xl">
-                      <Link href="/upload">
+                      <Link href="/upload-property/select-type">
                         <FileUp className="mr-2 h-4 w-4" />
                         Upload New Property
                       </Link>
                     </Button>
                   </div>
-                )}
+                ) : (() => {
+                  const filtered = properties.filter(p => statusFilter === 'all' || p.status === statusFilter);
+                  return filtered.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <p>No properties match the selected filter.</p>
+                      <button onClick={() => setStatusFilter('all')} className="mt-2 text-primary text-sm underline">Clear filter</button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Mobile Cards */}
+                      <div className="grid gap-4 sm:hidden">
+                        {filtered.map((property: Property) => (
+                          <Card key={property.id} className="border-0 shadow-lg hover:shadow-xl transition-all">
+                            <CardHeader className="flex flex-row items-start gap-4 p-4">
+                              <Image
+                                src={property.imageUrl || '/placeholder-property.jpg'}
+                                alt={`${property.propertyType} ${property.propertyNumber}`}
+                                width={80}
+                                height={60}
+                                className="rounded-lg object-cover aspect-[4/3]"
+                                data-ai-hint={property.imageHint}
+                                loading="lazy"
+                              />
+                              <div className="flex-1">
+                                <CardTitle className="text-lg font-bold text-slate-200">{`${property.propertyType} No. ${property.propertyNumber}`}</CardTitle>
+                                <div className="text-sm text-slate-400 mt-1">
+                                  <p className='flex items-center text-slate-300'>
+                                    <MapPin className="mr-2 h-3 w-3" />
+                                    {`${property.areaName}, ${property.villageName}`}
+                                  </p>
+                                </div>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-200">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/properties/${property.id}/edit`} className="text-slate-300">Edit</Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
+                                    <div className="w-full">
+                                      <DeletePlotButton plotId={property.id} trigger="menuitem" />
+                                    </div>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </CardHeader>
+                          </Card>
+                        ))}
+                      </div>
+
+                      {/* Desktop Table */}
+                      <Table className="hidden sm:table">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="hidden sm:table-cell">Image</TableHead>
+                            <TableHead>Property No.</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead className="hidden md:table-cell">Status</TableHead>
+                            <TableHead className="hidden lg:table-cell">Size</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filtered.map((property: Property) => (
+                            <TableRow key={property.id}>
+                              <TableCell className="hidden sm:table-cell">
+                                <Image
+                                  src={property.imageUrl || '/placeholder-property.jpg'}
+                                  alt={`${property.propertyType} ${property.propertyNumber}`}
+                                  width={64}
+                                  height={48}
+                                  className="rounded-lg object-cover"
+                                  data-ai-hint={property.imageHint}
+                                  loading="lazy"
+                                />
+                              </TableCell>
+                              <TableCell className="font-medium text-slate-200">{property.propertyNumber}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="border-primary/30 text-primary">{property.propertyType}</Badge>
+                              </TableCell>
+                              <TableCell className="text-slate-300">{`${property.areaName}, ${property.villageName}`}</TableCell>
+                              <TableCell className="hidden md:table-cell">
+                                <PropertyStatusDropdown plotId={property.id} currentStatus={property.status} />
+                              </TableCell>
+                              <TableCell className="hidden lg:table-cell text-slate-300">
+                                {property.propertyType === 'Plot' && 'plotSize' in property ? property.plotSize :
+                                 property.propertyType === 'House' && 'houseSize' in property ? property.houseSize :
+                                 property.propertyType === 'Land' && 'landSize' in property ? property.landSize : 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-right space-x-2">
+                                <Button asChild variant="outline" size="icon" className="text-slate-400 hover:text-slate-200">
+                                  <Link href={`/properties/${property.id}/edit`}>
+                                    <Pencil className="h-4 w-4" />
+                                    <span className="sr-only">Edit</span>
+                                  </Link>
+                                </Button>
+                                <DeletePlotButton plotId={property.id} />
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </>
+                  );
+                })()}
+
               </CardContent>
+
+
             </Card>
           </div>
         </div>

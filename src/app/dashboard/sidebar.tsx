@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Brain, Home, FileUp, Users, Settings, MessageSquare, Landmark, UserCheck } from 'lucide-react';
+import { Brain, Home, FileUp, Users, Settings, MessageSquare, Landmark, UserCheck, CalendarCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ASLogo } from '@/components/as-logo';
 
@@ -14,6 +14,7 @@ export default function DashboardSidebar({ newRegistrationCount }: { newRegistra
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/upload-property/select-type', label: 'Upload Property', icon: FileUp },
     { href: '/dashboard/registrations', label: 'Registrations', icon: UserCheck, notificationCount: newRegistrationCount },
+    { href: '/dashboard/site-visits', label: 'Site Visits', icon: CalendarCheck },
     { href: '/dashboard/inquiries', label: 'Inquiries', icon: MessageSquare },
     { href: '/dashboard/contacts', label: 'Contacts', icon: Landmark },
     { href: '/dashboard/users', label: 'Manage Logins', icon: Users },

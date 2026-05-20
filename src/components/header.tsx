@@ -121,13 +121,13 @@ export function Header() {
           <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-amber-500/10 focus:text-amber-200">
             <Link href="/user-login" className="flex items-center gap-3">
               <Crown className="h-4 w-4 text-amber-400" />
-              <span className="font-medium">Premium Access</span>
+              <span className="font-medium">Investor Login</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-blue-500/10 focus:text-blue-200">
             <Link href="/login" className="flex items-center gap-3">
               <UserCog className="h-4 w-4 text-blue-400" />
-              <span className="font-medium">Executive Portal</span>
+              <span className="font-medium">Owner Login</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-emerald-500/10 focus:text-emerald-200">
@@ -254,10 +254,10 @@ export function Header() {
                             </Button>
                             <div className="grid grid-cols-2 gap-2">
                               <Button asChild variant="outline" className="h-12 rounded-xl border-amber-500/20 text-amber-500 hover:bg-amber-500/10 font-black uppercase tracking-tighter text-[10px]">
-                                <Link href="/user-login" onClick={() => setIsMobileMenuOpen(false)}>Premium</Link>
+                                <Link href="/user-login" onClick={() => setIsMobileMenuOpen(false)}>Investor Login</Link>
                               </Button>
                               <Button asChild variant="outline" className="h-12 rounded-xl border-blue-500/20 text-blue-400 hover:bg-blue-500/10 font-black uppercase tracking-tighter text-[10px]">
-                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Executive</Link>
+                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Owner Login</Link>
                               </Button>
                             </div>
                          </div>

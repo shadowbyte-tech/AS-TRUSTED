@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Brain, Home, FileUp, Users, Settings, PanelLeft, MessageSquare, Landmark, UserCheck } from 'lucide-react';
+import { Brain, Home, FileUp, Users, Settings, PanelLeft, MessageSquare, Landmark, UserCheck, CalendarCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ASLogo } from '@/components/as-logo';
 import {
@@ -15,11 +15,12 @@ import { Button } from '@/components/ui/button';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/upload', label: 'Upload Plot', icon: FileUp },
+  { href: '/upload-property/select-type', label: 'Upload Property', icon: FileUp },
   { href: '/dashboard/registrations', label: 'Registrations', icon: UserCheck },
   { href: '/dashboard/inquiries', label: 'Inquiries', icon: MessageSquare },
   { href: '/dashboard/contacts', label: 'Contacts', icon: Landmark },
   { href: '/dashboard/users', label: 'Manage Logins', icon: Users },
+  { href: '/dashboard/site-visits', label: 'Site Visits', icon: CalendarCheck },
   { href: '/ai-management', label: 'AI Control', icon: Brain },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];

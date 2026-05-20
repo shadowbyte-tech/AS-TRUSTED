@@ -5,10 +5,11 @@ import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter } from 'luc
 export function Footer() {
     const currentYear = new Date().getFullYear();
 
+
     return (
         <footer className="bg-background border-t">
             <div className="container px-4 py-12 md:py-24">
-                <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+                <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <div className="flex items-center space-x-2">
@@ -33,12 +34,7 @@ export function Footer() {
                             <Link href="https://www.instagram.com/swamy.goud.37201901?igsh=b2VmZG9zNTZ2YXRt" target="_blank" className="h-10 w-10 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-primary hover:scale-110 transition-all">
                                 <Instagram className="h-5 w-5" />
                             </Link>
-                            <Link href="https://twitter.com" target="_blank" className="h-10 w-10 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-primary hover:scale-110 transition-all">
-                                <Twitter className="h-5 w-5" />
-                            </Link>
-                            <Link href="https://linkedin.com" target="_blank" className="h-10 w-10 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-primary hover:scale-110 transition-all">
-                                <Linkedin className="h-5 w-5" />
-                            </Link>
+
                         </div>
                     </div>
 
@@ -113,14 +109,14 @@ export function Footer() {
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Mail className="h-5 w-5 text-accent shrink-0" />
-                                <span className="text-muted-foreground">contact@swamygoud2775@gmail.com</span>
+                                <a href="mailto:swamygoud2775@gmail.com" className="text-muted-foreground hover:text-primary transition-colors">swamygoud2775@gmail.com</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-24 pt-8 border-t border-primary/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-                    <p> {currentYear} AS Trusted Consultancy. All rights reserved.</p>
+                    <p>© {currentYear} AS Trusted Consultancy. All rights reserved.</p>
                     <div className="flex space-x-8">
                         <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
                         <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>

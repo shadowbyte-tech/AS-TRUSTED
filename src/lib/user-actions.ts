@@ -1,7 +1,7 @@
 'use server';
 
-import { createUser } from './supabase-actions';
-import { getUsers } from './supabase-actions';
+import bcrypt from 'bcryptjs';
+import { connectDB, User, Password } from './models';
 
 export interface State {
   message: string | null;
@@ -10,89 +10,87 @@ export interface State {
 }
 
 export async function createUserAction(prevState: State, formData: FormData): Promise<State> {
-  console.log('🔍 Server action called with formData:', {
-    email: formData.get('email'),
-    password: formData.get('password') ? '***' : null
-  });
+  const email = (formData.get('email') as string)?.trim().toLowerCase();
+  const password = formData.get('password') as string;
+  const name = (formData.get('name') as string)?.trim() || email.split('@')[0];
+  const role = (formData.get('role') as string) || 'User';
+
+  // Input validation
+  if (!email || !password) {
+    return {
+      message: 'Email and password are required',
+      errors: {
+        email: !email ? ['Email is required'] : undefined,
+        password: !password ? ['Password is required'] : undefined,
+      },
+      success: false,
+    };
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return {
+      message: 'Invalid email format',
+      errors: { email: ['Please enter a valid email address'] },
+      success: false,
+    };
+  }
+
+  if (password.length < 8) {
+    return {
+      message: 'Password must be at least 8 characters',
+      errors: { password: ['Password must be at least 8 characters long'] },
+      success: false,
+    };
+  }
 
   try {
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    await connectDB();
 
-    // Validate input
-    if (!email || !password) {
-      return {
-        message: 'Email and password are required',
-        errors: {
-          email: !email ? ['Email is required'] : undefined,
-          password: !password ? ['Password is required'] : undefined,
-        },
-        success: false,
-      };
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return {
-        message: 'Invalid email format',
-        errors: {
-          email: ['Please enter a valid email address'],
-        },
-        success: false,
-      };
-    }
-
-    // Validate password length
-    if (password.length < 8) {
-      return {
-        message: 'Password must be at least 8 characters long',
-        errors: {
-          password: ['Password must be at least 8 characters long'],
-        },
-        success: false,
-      };
-    }
-
-    // Check if user already exists
-    const existingUsers = await getUsers();
-    const existingUser = existingUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
+    // Check for existing user
+    const existingUser = await User.findOne({ email }).lean();
     if (existingUser) {
       return {
         message: 'A user with this email already exists',
-        errors: {
-          email: ['A user with this email already exists'],
-        },
+        errors: { email: ['Email is already registered'] },
         success: false,
       };
     }
 
-    // Create the user
-    const newUser = await createUser({
-      email: email.toLowerCase(),
-      name: email.split('@')[0], // Use email prefix as name
-      role: 'User',
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create User document
+    const newUser = await User.create({
+      email,
+      name,
+      role,
+      isBlocked: false,
     });
 
-    if (!newUser) {
-      return {
-        message: 'Failed to create user',
-        errors: {},
-        success: false,
-      };
-    }
+    // Store hashed password in Password collection
+    await Password.create({
+      userId: newUser._id,
+      email,
+      hashedPassword,
+    });
 
     return {
-      message: 'User created successfully',
+      message: `User ${email} created successfully`,
       errors: {},
       success: true,
     };
-
-  } catch (error) {
-    console.error('Error creating user:', error);
+  } catch (error: any) {
+    console.error('❌ createUserAction error:', error);
+    if (error.code === 11000) {
+      return {
+        message: 'A user with this email already exists',
+        errors: { email: ['Email is already registered'] },
+        success: false,
+      };
+    }
     return {
-      message: 'An error occurred while creating the user',
+      message: 'An error occurred while creating the user. Please try again.',
       errors: {},
       success: false,
     };

@@ -43,27 +43,24 @@ export default function BookSiteVisitPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Create WhatsApp message
-    const message = `🏗️ *Site Visit Request*
+    try {
+      // 1. Save to MongoDB so no booking is ever lost
+      await fetch('/api/site-visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+    } catch (err) {
+      console.error('Failed to save site visit to DB:', err);
+      // Continue even if DB save fails — WhatsApp is the backup
+    }
 
-*Name:* ${formData.name}
-*Phone:* ${formData.phone}
-*Email:* ${formData.email}
-*Preferred Date:* ${formData.preferredDate}
-*Preferred Time:* ${formData.preferredTime}
-*Location:* ${formData.location}
-*Message:* ${formData.message}
-
-Please confirm the site visit details. Thank you!`;
-
-    // Send to WhatsApp
+    // 2. Also send WhatsApp notification
+    const message = `🏗️ *Site Visit Request*\n\n*Name:* ${formData.name}\n*Phone:* ${formData.phone}\n*Email:* ${formData.email}\n*Preferred Date:* ${formData.preferredDate}\n*Preferred Time:* ${formData.preferredTime}\n*Location:* ${formData.location}\n*Message:* ${formData.message}\n\nPlease confirm the site visit details. Thank you!`;
     window.open(`https://wa.me/919866404090?text=${encodeURIComponent(message)}`, '_blank');
 
-    // Simulate submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1000);
+    setIsSubmitting(false);
+    setIsSubmitted(true);
   };
 
   if (isSubmitted) {

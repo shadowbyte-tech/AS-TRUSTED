@@ -35,7 +35,7 @@ import PropertySearchFilters from '@/components/property-search-filters';
 import UnifiedPropertyList from '@/components/unified-property-list';
 import { useAuth } from '@/lib/auth-context';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { motion } from 'framer-motion';
+
 import Link from 'next/link';
 import type { Property, PropertyType } from '@/lib/definitions';
 
@@ -339,7 +339,7 @@ export default function NormalPropertiesPage() {
 
                <div className="flex items-center gap-4 w-full md:w-auto">
                  <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                   <SelectTrigger className="w-full md:w-56 h-12 rounded-full border-zinc-200 bg-white shadow-sm font-bold">
+                   <SelectTrigger className="w-full md:w-56 h-12 rounded-full border-border bg-card shadow-sm font-bold">
                      <SelectValue placeholder="Ordering Strategy" />
                    </SelectTrigger>
                    <SelectContent className="rounded-2xl">
@@ -441,7 +441,7 @@ export default function NormalPropertiesPage() {
                       >
                         Elevate My Status <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
                       </Button>
-                      <div className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Only 4 slots available <br /> this month</div>
+                      <div className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Limited premium slots <br /> available</div>
                     </div>
                   </div>
                   
@@ -449,13 +449,12 @@ export default function NormalPropertiesPage() {
                     <div className="absolute inset-[-40px] bg-amber-500/10 blur-[100px] rounded-full opacity-40 animate-pulse" />
                     <div className="relative h-80 w-80 rounded-[4rem] bg-gradient-to-br from-zinc-800 to-black border-2 border-amber-500/30 flex items-center justify-center overflow-hidden group-hover:border-amber-500 transition-colors duration-700">
                       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
-                      <motion.div
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ repeat: Infinity, duration: 4 }}
-                        className="relative z-10"
+                      <div
+                        className="relative z-10 animate-bounce"
+                        style={{ animationDuration: '4s' }}
                       >
                         <Brain className="h-40 w-40 text-amber-500/70" />
-                      </motion.div>
+                      </div>
                     </div>
                   </div>
                 </div>
