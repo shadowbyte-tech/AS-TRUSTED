@@ -34,7 +34,8 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({ email }).lean();
     console.log('👤 User Found:', !!user, '| Active:', user?.isActive, '| Blocked:', user?.isBlocked);
 
-    if (!user || !user.isActive || user.isBlocked) {
+    // isActive===undefined means old doc created before the field existed — treat as active
+    if (!user || user.isActive === false || user.isBlocked === true) {
       return NextResponse.json(
         { success: false, error: 'Invalid email or password' },
         { status: 401 }

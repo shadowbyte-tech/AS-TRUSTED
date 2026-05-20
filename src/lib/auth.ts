@@ -126,7 +126,7 @@ export async function getSessionUser(): Promise<AuthUser | null> {
   try {
     await connectDB();
     const user = await User.findById(decoded.id).lean();
-    if (!user || !user.isActive || user.isBlocked) return null;
+    if (!user || user.isActive === false || user.isBlocked === true) return null;
 
     return {
       id:       String(user._id),
@@ -150,7 +150,7 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<A
   await connectDB();
 
   const user = await User.findOne({ email: email.toLowerCase() }).lean();
-  if (!user || user.isBlocked || !user.isActive) return null;
+  if (!user || user.isBlocked === true || user.isActive === false) return null;
 
   const passwordDoc = await Password.findOne({ email: email.toLowerCase() }).select('+hashedPassword').lean();
   if (!passwordDoc) {
