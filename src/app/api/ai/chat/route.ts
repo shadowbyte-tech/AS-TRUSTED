@@ -44,7 +44,7 @@ ${Object.keys(preferences).length > 0
         ...messages,
       ],
       async onFinish({ text, toolCalls, toolResults, finishReason, usage }) {
-        logger.info(\`AI Chat completed. Tokens: \${usage.totalTokens}. Reason: \${finishReason}\`);
+        logger.info(`AI Chat completed. Tokens: ${usage.totalTokens}. Reason: ${finishReason}`);
         
         // Save the updated history in the background
         const newHistory = [

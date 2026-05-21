@@ -20,6 +20,7 @@
     "@ai-sdk/anthropic": "^3.0.78",
     "@ai-sdk/google": "^3.0.78",
     "@ai-sdk/openai": "^3.0.64",
+    "@ai-sdk/react": "^3.0.190",
     "@genkit-ai/googleai": "^1.14.1",
     "@genkit-ai/next": "^1.14.1",
     "@hookform/resolvers": "^4.1.3",
