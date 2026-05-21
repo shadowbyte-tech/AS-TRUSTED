@@ -10,9 +10,9 @@ export async function PUT(request: NextRequest) {
   try {
     const { id, ...updateData } = await request.json();
 
-    // Property update functionality would need to be implemented in Supabase
+    // Property update functionality would need to be implemented
     return NextResponse.json({
-      message: 'Property update functionality not yet implemented in Supabase',
+      message: 'Property update functionality not yet implemented',
       status: 'placeholder'
     });
 

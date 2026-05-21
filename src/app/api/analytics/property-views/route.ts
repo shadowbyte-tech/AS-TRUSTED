@@ -6,7 +6,7 @@ export async function GET() {
   try {
     // Property views analytics placeholder
     return NextResponse.json({
-      message: 'Property views analytics not yet implemented in Supabase',
+      message: 'Property views analytics not yet implemented',
       status: 'placeholder',
       views: 0
     });
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     
     // Property view tracking placeholder
     return NextResponse.json({
-      message: 'Property view tracking not yet implemented in Supabase',
+      message: 'Property view tracking not yet implemented',
       status: 'placeholder'
     });
 

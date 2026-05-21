@@ -6,7 +6,7 @@ export async function GET() {
   try {
     // AI management functionality placeholder
     return NextResponse.json({
-      message: 'AI management functionality not yet implemented in Supabase',
+      message: 'AI management functionality not yet implemented.',
       status: 'placeholder'
     });
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   try {
     // AI management functionality placeholder
     return NextResponse.json({
-      message: 'AI management functionality not yet implemented in Supabase',
+      message: 'AI management functionality not yet implemented.',
       status: 'placeholder'
     });
 

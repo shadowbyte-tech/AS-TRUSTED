@@ -10,9 +10,9 @@ export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();
 
-    // Property deletion functionality would need to be implemented in Supabase
+    // Property deletion functionality would need to be implemented
     return NextResponse.json({
-      message: 'Property deletion functionality not yet implemented in Supabase',
+      message: 'Property deletion functionality not yet implemented',
       status: 'placeholder'
     });
 

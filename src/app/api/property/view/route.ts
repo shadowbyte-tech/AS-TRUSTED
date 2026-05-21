@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
   try {
     const { propertyId } = await request.json();
 
-    // Property view tracking functionality would need to be implemented in Supabase
+    // Property view tracking functionality would need to be implemented
     return NextResponse.json({
-      message: 'Property view tracking not yet implemented in Supabase',
+      message: 'Property view tracking not yet implemented',
       status: 'placeholder'
     });
 

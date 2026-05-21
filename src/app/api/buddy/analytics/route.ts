@@ -6,7 +6,7 @@ export async function GET() {
   try {
     // Buddy analytics placeholder
     return NextResponse.json({
-      message: 'Buddy analytics not yet implemented in Supabase',
+      message: 'Buddy analytics not yet implemented',
       status: 'placeholder',
       data: []
     });

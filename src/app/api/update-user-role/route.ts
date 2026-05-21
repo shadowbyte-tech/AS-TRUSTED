@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
   try {
     const { email, newRole } = await request.json();
 
-    // User role update functionality would need to be implemented in Supabase
+    // User role update functionality would need to be implemented
     return NextResponse.json({
-      message: 'User role update functionality not yet implemented in Supabase',
+      message: 'User role update functionality not yet implemented',
       status: 'placeholder'
     });
 
