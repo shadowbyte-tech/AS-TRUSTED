@@ -140,7 +140,8 @@ function Buddy() {
     return () => window.removeEventListener('as-open-ai-assistant', openAI);
   }, []);
 
-  const hideStandaloneToggle = ['/', '/about', '/services'].includes(pathname);
+  // Only show the standalone Buddy toggle on these specific pages
+  const showStandaloneToggle = ['/', '/about', '/services', '/properties', '/book-site-visit', '/premium-properties'].includes(pathname);
 
   const calculateVastu = () => {
     let facingScore = 50;
@@ -248,7 +249,7 @@ function Buddy() {
       `}</style>
 
       {/* Toggle */}
-      {!hideStandaloneToggle && (
+      {showStandaloneToggle && (
         <div style={{position:'fixed',bottom:20,right:20,zIndex:9999}}>
           <button onClick={()=>setPhase(p=>p==='closed'?'welcome':'closed')} style={{width:64,height:64,borderRadius:'50%',background:'linear-gradient(135deg,#c9a84c,#8b6914)',border:'2px solid #fff',boxShadow:'0 10px 40px rgba(0,0,0,0.5)',cursor:'pointer',fontSize:18,fontWeight:900,display:'flex',justifyContent:'center',alignItems:'center',color:'#000'}}>{phase!=='closed'?'✕':'AI'}</button>
         </div>

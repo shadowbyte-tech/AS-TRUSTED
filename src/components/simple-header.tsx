@@ -119,7 +119,7 @@ export function SimpleHeader() {
             <div className="relative">
               {/* Premium glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-orange-500/30 blur-2xl rounded-full group-hover:from-amber-400/50 group-hover:to-orange-500/50 transition-all duration-700" aria-hidden="true"></div>
-              <div className="relative">
+              <div className="relative overflow-hidden rounded-full bg-[#0B0B0B]">
                 <ASLogo className="h-9 w-9" />
               </div>
             </div>

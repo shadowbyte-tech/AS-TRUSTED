@@ -97,7 +97,8 @@ export default function PropertyDetailsPage() {
       
       if (response.ok) {
         const data = await response.json();
-        const propertyData = data.property || data;
+        // API returns { success: true, data: property }
+        const propertyData = data.data || data.property || data;
         setProperty(propertyData);
       } else if (response.status === 404) {
         toast({
@@ -366,7 +367,7 @@ export default function PropertyDetailsPage() {
                       >
                         <Image
                           src={property.images[currentImageIndex]}
-                          alt={property.title}
+                          alt={property.title || (property as any).propertyNumber || `Property image ${currentImageIndex + 1}`}
                           fill
                           priority
                           className="object-cover transition-transform duration-700 hover:scale-105"

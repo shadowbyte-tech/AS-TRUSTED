@@ -281,13 +281,14 @@ export default function NormalPropertiesPage() {
       
       <main className="flex-1 container mx-auto px-4 py-12">
         {/* Top Header */}
-        <div className="mb-12">
-          <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest">
+        <div className="mb-12 pt-4">
+          <div className="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 mb-4 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
             Standard Portfolio
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter uppercase">
+          </div>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter uppercase text-foreground">
             Discover Your <br />
-            <span className="text-primary">Next Project</span>
+            <span className="text-amber-500">Next Project</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl font-medium leading-relaxed">
             Verified property listings for residential and agricultural development across the region's fastest-growing sectors.

@@ -12,11 +12,12 @@ import { logger } from '@/lib/logger';
 // ─── GET /api/properties/[id] ─────────────────────────────────────────────────
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const property = await Property.findById(params.id).lean();
+    const { id } = await params;
+    const property = await Property.findById(id).lean();
 
     if (!property) {
       return NextResponse.json({ success: false, error: 'Property not found' }, { status: 404 });
@@ -32,17 +33,18 @@ export async function GET(
 // ─── PUT /api/properties/[id] ─────────────────────────────────────────────────
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = await requireOwner(request);
   if (authError) return authError;
 
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
 
     const property = await Property.findByIdAndUpdate(
-      params.id,
+      id,
       { ...body },
       { new: true, runValidators: true }
     ).lean();
@@ -51,7 +53,7 @@ export async function PUT(
       return NextResponse.json({ success: false, error: 'Property not found' }, { status: 404 });
     }
 
-    logger.info(`✅ Property updated: ${params.id}`);
+    logger.info(`✅ Property updated: ${id}`);
     return NextResponse.json({ success: true, data: property });
   } catch (error) {
     logger.error('PUT /api/properties/[id] failed', error);
@@ -62,20 +64,21 @@ export async function PUT(
 // ─── DELETE /api/properties/[id] ──────────────────────────────────────────────
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authError = await requireOwner(request);
   if (authError) return authError;
 
   try {
     await connectDB();
-    const property = await Property.findByIdAndDelete(params.id).lean();
+    const { id } = await params;
+    const property = await Property.findByIdAndDelete(id).lean();
 
     if (!property) {
       return NextResponse.json({ success: false, error: 'Property not found' }, { status: 404 });
     }
 
-    logger.info(`✅ Property deleted: ${params.id}`);
+    logger.info(`✅ Property deleted: ${id}`);
     return NextResponse.json({ success: true, message: 'Property deleted successfully' });
   } catch (error) {
     logger.error('DELETE /api/properties/[id] failed', error);

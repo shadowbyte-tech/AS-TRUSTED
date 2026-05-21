@@ -65,7 +65,7 @@ export function Header() {
     <Link href="/" className="flex items-center space-x-3 group">
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-gold/40 to-gold-light/40 blur-2xl rounded-full group-hover:from-gold/60 group-hover:to-gold-light/60 transition-all duration-700" />
-        <div className="relative h-12 w-12 rounded-full flex items-center justify-center transition-all duration-700 group-hover:scale-105">
+        <div className="relative h-12 w-12 rounded-full overflow-hidden bg-[#0B0B0B] flex items-center justify-center transition-all duration-700 group-hover:scale-105">
           <ASLogo className="h-10 w-10" />
         </div>
       </div>

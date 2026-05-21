@@ -50,9 +50,15 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .lean();
 
+    // Map _id → id so the frontend can use property.id consistently
+    const mappedProperties = properties.map((p: any) => ({
+      ...p,
+      id: p._id?.toString(),
+    }));
+
     const result = {
       success: true,
-      data:  properties,
+      data:  mappedProperties,
       total,
       page,
       limit,
