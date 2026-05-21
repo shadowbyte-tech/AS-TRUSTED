@@ -17,7 +17,7 @@ export default function DashboardSidebar({ newRegistrationCount }: { newRegistra
     { href: '/dashboard/site-visits', label: 'Site Visits', icon: CalendarCheck },
     { href: '/dashboard/inquiries', label: 'Inquiries', icon: MessageSquare },
     { href: '/dashboard/contacts', label: 'Contacts', icon: Landmark },
-    { href: '/dashboard/users', label: 'Manage Logins', icon: Users },
+    { href: '/dashboard/users', label: 'New Users & Logins', icon: Users },
     { href: '/ai-management', label: 'AI Control', icon: Brain },
     { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   ];

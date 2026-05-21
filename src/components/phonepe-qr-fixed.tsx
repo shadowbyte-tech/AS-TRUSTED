@@ -57,10 +57,22 @@ export default function PhonePeQR({ className }: PhonePeQRProps) {
           
           {/* Small QR Code */}
           <div 
-            className="w-24 h-24 mx-auto bg-white rounded border-2 border-gray-300 cursor-pointer hover:border-primary transition-colors overflow-hidden"
+            className="w-24 h-24 mx-auto bg-white rounded border-2 border-gray-300 cursor-pointer hover:border-primary transition-colors overflow-hidden flex items-center justify-center relative group"
             onClick={() => setShowFullQR(true)}
           >
-            <QRCodePlaceholder size={96} />
+            <img 
+              src="/phonepe-qr.jpg" 
+              alt="PhonePe QR Code" 
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                // Fallback to placeholder if image not uploaded yet
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className="hidden absolute inset-0">
+              <QRCodePlaceholder size={96} />
+            </div>
           </div>
           
           <div className="space-y-1">
@@ -90,8 +102,19 @@ export default function PhonePeQR({ className }: PhonePeQRProps) {
               <div className="space-y-4">
                 {/* Large QR Code */}
                 <div className="bg-gray-100 p-4 rounded-lg border-2 border-gray-300">
-                  <div className="w-48 h-48 mx-auto bg-white rounded-lg overflow-hidden flex items-center justify-center">
-                    <QRCodePlaceholder size={192} />
+                  <div className="w-48 h-48 mx-auto bg-white rounded-lg overflow-hidden flex items-center justify-center relative">
+                    <img 
+                      src="/phonepe-qr.jpg" 
+                      alt="PhonePe QR Code" 
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                    <div className="hidden absolute inset-0">
+                      <QRCodePlaceholder size={192} />
+                    </div>
                   </div>
                 </div>
 

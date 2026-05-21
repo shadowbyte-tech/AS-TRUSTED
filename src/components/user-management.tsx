@@ -60,6 +60,8 @@ export default function UserManagement() {
   const [selectedUserForPasswordReset, setSelectedUserForPasswordReset] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [resetting, setResetting] = useState(false);
+  const [isBlocking, setIsBlocking] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Load users
@@ -233,6 +235,55 @@ export default function UserManagement() {
       toast({ title: "Error", description: 'Failed to reset password', variant: 'destructive' });
     } finally {
       setResetting(false);
+    }
+  };
+
+  // Block/Unblock User
+  const handleBlockUser = async (userId: string, isCurrentlyBlocked: boolean) => {
+    setIsBlocking(userId);
+    try {
+      const response = await fetch('/api/owner/block-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId, blocked: !isCurrentlyBlocked }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast({ title: "Success", description: result.message || 'User status updated' });
+        loadUsers();
+      } else {
+        toast({ title: "Error", description: result.error || 'Failed to update user', variant: 'destructive' });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: 'Failed to update user status', variant: 'destructive' });
+    } finally {
+      setIsBlocking(null);
+    }
+  };
+
+  // Delete User
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this user?')) return;
+    setIsDeleting(userId);
+    try {
+      const response = await fetch('/api/owner/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast({ title: "Success", description: 'User deleted successfully' });
+        loadUsers();
+      } else {
+        toast({ title: "Error", description: result.error || 'Failed to delete user', variant: 'destructive' });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: 'Failed to delete user', variant: 'destructive' });
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -435,6 +486,11 @@ export default function UserManagement() {
                         Hash: {user.passwordHash}
                       </p>
                     )}
+                    {user.blocked && (
+                      <span className="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
+                        Blocked
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -449,15 +505,39 @@ export default function UserManagement() {
                   </Button>
                   
                   {user.role !== 'Owner' && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1 sm:flex-none"
-                      onClick={() => handleChangeRole(user.id, user.role)}
-                    >
-                      <Shield className="h-4 w-4 mr-1" />
-                      Role
-                    </Button>
+                    <>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex-1 sm:flex-none"
+                        onClick={() => handleChangeRole(user.id, user.role)}
+                      >
+                        <Shield className="h-4 w-4 mr-1" />
+                        Role
+                      </Button>
+
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex-1 sm:flex-none"
+                        disabled={isBlocking === user.id}
+                        onClick={() => handleBlockUser(user.id, !!user.blocked)}
+                      >
+                        {isBlocking === user.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <AlertCircle className="h-4 w-4 mr-1 text-amber-500" />}
+                        {user.blocked ? 'Unblock' : 'Block'}
+                      </Button>
+
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        className="flex-1 sm:flex-none"
+                        disabled={isDeleting === user.id}
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        {isDeleting === user.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-1" />}
+                        Delete
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
