@@ -36,7 +36,7 @@ export default function GlobalLeadModal() {
     
     setIsSubmitting(true);
     try {
-      await fetch('/api/leads', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -47,13 +47,22 @@ export default function GlobalLeadModal() {
         })
       });
       
+      const data = await res.json();
+      
       localStorage.setItem('as_trusted_lead_captured', 'true');
       setIsOpen(false);
       
-      toast({
-        title: "Welcome to AS Trusted!",
-        description: "Our experts will get in touch with you shortly.",
-      });
+      if (data.isDuplicate) {
+        toast({
+          title: "Welcome Back!",
+          description: "These details have already been registered.",
+        });
+      } else {
+        toast({
+          title: "Welcome to AS Trusted!",
+          description: "Our experts will get in touch with you shortly.",
+        });
+      }
     } catch (error) {
       console.error(error);
     } finally {

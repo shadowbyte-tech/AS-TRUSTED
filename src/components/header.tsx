@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { ASLogo } from './as-logo';
-import { ThemeToggle } from './theme-toggle';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent } from './ui/sheet';
 import {
@@ -318,7 +317,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <AuthButtons />
             <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block" />
-            <ThemeToggle />
+            {/* ThemeToggle removed to lock into premium dark mode */}
           </div>
         </div>
       </div>

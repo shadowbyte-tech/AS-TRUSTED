@@ -18,6 +18,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and Phone are required' }, { status: 400 });
     }
 
+    const existingLead = await Lead.findOne({ phone });
+    if (existingLead) {
+      return NextResponse.json({ success: true, isDuplicate: true }, { status: 200 });
+    }
+
     const lead = await Lead.create({ 
       name, 
       phone, 
