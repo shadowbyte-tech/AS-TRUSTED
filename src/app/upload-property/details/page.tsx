@@ -347,8 +347,8 @@ function PropertyDetailsContent() {
           images: []
         });
       } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create property');
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || 'Failed to create property');
       }
     } catch (error) {
       console.error('Property creation error:', error);

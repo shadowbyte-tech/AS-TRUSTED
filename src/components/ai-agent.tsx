@@ -108,7 +108,10 @@ class AIClient {
   }
 }
 
-function Buddy() {
+export function Buddy() {
+  // Completely disabled per user request
+  return null;
+
   const pathname = usePathname();
   const [phase, setPhase] = useState<'closed'|'welcome'|'chat'>('closed');
   const [activeTab, setActiveTab] = useState<'chat' | 'vastu'>('chat');

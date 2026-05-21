@@ -26,6 +26,6 @@ export async function POST(request: NextRequest) {
     if (err.code === 11000) {
       return NextResponse.json({ error: 'Duplicate property number in that village' }, { status: 409 });
     }
-    return NextResponse.json({ error: 'Failed to create property' }, { status: 500 });
+    return NextResponse.json({ error: err.message || 'Failed to create property', details: err }, { status: 500 });
   }
 }

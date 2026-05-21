@@ -55,6 +55,7 @@ export function Header() {
   }, []);
 
   const isAuthPage = pathname.startsWith('/user-login') || pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/ai-access');
+  const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/upload-property') || pathname.startsWith('/owner-portal') || pathname.startsWith('/ai-management');
 
   const handleLogout = async () => {
     await logout();
@@ -128,12 +129,6 @@ export function Header() {
                 <span className="font-medium">Executive Login</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer rounded-lg px-3 py-2.5 focus:bg-emerald-500/10 focus:text-emerald-300">
-              <Link href="/book-site-visit" className="flex items-center gap-3">
-                <CalendarCheck className="h-4 w-4 text-emerald-400" />
-                <span className="font-medium">Book Site Visit</span>
-              </Link>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -152,16 +147,16 @@ export function Header() {
   return (
     <header 
       className={cn(
-        'fixed top-0 left-0 right-0 z-[100] transition-all duration-500',
-        scrolled 
+        isDashboardPage ? 'relative z-[90] bg-navy/90 border-b border-gold/10' : 'fixed top-0 left-0 right-0 z-[100] transition-all duration-500',
+        !isDashboardPage && scrolled 
           ? 'bg-navy/90 backdrop-blur-xl border-b border-gold/10 shadow-lg shadow-black/20' 
-          : 'bg-transparent'
+          : !isDashboardPage ? 'bg-transparent' : ''
       )}
     >
       {/* Premium Gold Accent Line */}
       <div className={cn(
         'h-[1.5px] w-full transition-all duration-700',
-        scrolled 
+        (!isDashboardPage && scrolled) || isDashboardPage
           ? 'bg-gradient-to-r from-transparent via-gold/40 to-transparent' 
           : 'bg-gradient-to-r from-transparent via-gold/20 to-transparent'
       )} />

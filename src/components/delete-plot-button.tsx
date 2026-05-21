@@ -21,28 +21,24 @@ export default function DeletePlotButton({ plotId, trigger }: { plotId: string; 
 
   const handleDelete = async () => {
     try {
-      const response = await fetch('/api/property/delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: plotId }),
+      const response = await fetch(`/api/property/${plotId}`, {
+        method: 'DELETE',
+        credentials: 'include',
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (response.ok && result.success) {
         toast({
           title: 'Success!',
-          description: result.message,
+          description: result.message || 'Property deleted successfully.',
         });
-        // Optional: redirect or refresh the page
         window.location.reload();
       } else {
         toast({
           variant: 'destructive',
           title: 'Error!',
-          description: result.error || result.message,
+          description: result.error || 'Failed to delete property.',
         });
       }
     } catch (error) {
@@ -50,7 +46,7 @@ export default function DeletePlotButton({ plotId, trigger }: { plotId: string; 
       toast({
         variant: 'destructive',
         title: 'Error!',
-        description: 'Failed to delete property',
+        description: 'Failed to delete property.',
       });
     }
   };

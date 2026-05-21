@@ -107,7 +107,7 @@ const PropertySchema = new mongoose.Schema(
     bedrooms:   { type: Number },
     bathrooms:  { type: Number },
     floors:     { type: Number },
-    houseType:  { type: String, enum: ['Independent', 'Villa', 'Apartment', 'Duplex', 'Penthouse', null] },
+    houseType:  { type: String, enum: ['Independent', 'Villa', 'Apartment', 'Duplex', 'Penthouse', 'Farmhouse', 'Studio', null] },
     furnished:  { type: Boolean, default: false },
     parking:    { type: Boolean, default: false },
     amenities:  [{ type: String }],

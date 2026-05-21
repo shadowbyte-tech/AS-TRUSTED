@@ -7,10 +7,11 @@ import { logger } from '@/lib/logger';
 import { redisInvalidatePattern } from '@/lib/redis';
 
 // GET /api/property/[id]
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     await connectDB();
-    const property = await Property.findById(params.id).lean();
+    const property = await Property.findById(id).lean();
     if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
@@ -22,16 +23,17 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PATCH /api/property/[id]
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authError = await requireOwner(request);
   if (authError) return authError;
 
   try {
+    const { id } = await params;
     await connectDB();
     const body = await request.json();
 
     const property = await Property.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: body },
       { new: true, runValidators: true }
     ).lean();
@@ -51,23 +53,24 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     if (err.code === 11000) {
       return NextResponse.json({ error: 'Duplicate property number in that village' }, { status: 409 });
     }
-    logger.error(`PATCH /api/property/${params.id} failed`, err);
+    logger.error(`PATCH /api/property/${id} failed`, err);
     return NextResponse.json({ error: 'Failed to update property' }, { status: 500 });
   }
 }
 
 // DELETE /api/property/[id]
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authError = await requireOwner(request);
   if (authError) return authError;
 
   try {
+    const { id } = await params;
     await connectDB();
-    const property = await Property.findByIdAndDelete(params.id);
+    const property = await Property.findByIdAndDelete(id);
     if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
-    logger.info(`✅ Property ${params.id} deleted`);
+    logger.info(`✅ Property ${id} deleted`);
 
     // Invalidate cached lists
     await redisInvalidatePattern('properties:*');
@@ -75,7 +78,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     return NextResponse.json({ success: true, message: 'Property deleted successfully' });
   } catch (err) {
-    logger.error(`DELETE /api/property/${params.id} failed`, err);
+    // We can't safely log id here since it might have failed during await params, but if it did, id is undefined
+    logger.error(`DELETE /api/property/[id] failed`, err);
     return NextResponse.json({ error: 'Failed to delete property' }, { status: 500 });
   }
 }
