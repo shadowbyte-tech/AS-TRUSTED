@@ -62,16 +62,17 @@ export default function GlobalLeadModal() {
   };
 
   const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      // If they close it without submitting, NEVER ask again
-      localStorage.setItem('as_trusted_lead_dismissed', 'true');
-    }
+    // We intentionally do nothing here to prevent the user from dismissing the modal via 'ESC' or clicking outside
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-[95vw] sm:max-w-md rounded-2xl glass border-primary/20 p-0 overflow-hidden mx-auto">
+      <DialogContent 
+        hideCloseButton 
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className="w-[95vw] sm:max-w-md rounded-2xl glass border-primary/20 p-0 overflow-hidden mx-auto"
+      >
         <div className="bg-gradient-to-r from-primary/20 to-amber-500/20 p-6 flex flex-col items-center justify-center border-b border-primary/10">
           <ASLogo className="h-12 w-12 text-primary mb-2" />
           <DialogTitle className="text-2xl font-headline text-center">Welcome to AS Trusted</DialogTitle>
