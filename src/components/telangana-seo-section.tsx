@@ -31,10 +31,10 @@ export default function TelanganaSeoSection() {
     <section className="py-20 bg-muted/30">
       <div className="container px-4 md:px-6 max-w-7xl mx-auto">
         <div className="flex flex-col items-center text-center space-y-4 mb-12">
-          <h2 className="text-3xl md:text-5xl font-bold font-headline text-foreground">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold font-headline text-foreground px-2">
             Why Invest in <span className="text-primary">Telangana Real Estate?</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl text-lg">
+          <p className="text-muted-foreground max-w-2xl text-base md:text-lg px-2">
             Discover why smart investors are securing plots in Kamareddy, Hyderabad Highway, and Nizamabad routes.
           </p>
         </div>
@@ -63,8 +63,8 @@ export default function TelanganaSeoSection() {
           ))}
         </div>
 
-        <div className="mt-16 prose prose-lg dark:prose-invert max-w-4xl mx-auto">
-          <h3 className="text-2xl font-bold font-headline">The Kamareddy Investment Advantage</h3>
+        <div className="mt-16 prose prose-base md:prose-lg dark:prose-invert max-w-4xl mx-auto px-2">
+          <h3 className="text-xl md:text-2xl font-bold font-headline">The Kamareddy Investment Advantage</h3>
           <p>
             Kamareddy is rapidly emerging as the premier destination for strategic land investments in Telangana. With the expansion of <strong>NH-44 (Hyderabad-Nagpur Highway)</strong> and the impending execution of the <strong>Regional Ring Road (RRR)</strong>, connectivity to Hyderabad has never been better.
           </p>

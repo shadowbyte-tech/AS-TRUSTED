@@ -70,12 +70,13 @@ export default function GlobalLeadModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md glass border-primary/20 p-0 overflow-hidden">
+      <DialogContent className="w-[95vw] sm:max-w-md rounded-2xl glass border-primary/20 p-0 overflow-hidden mx-auto">
         <div className="bg-gradient-to-r from-primary/20 to-amber-500/20 p-6 flex flex-col items-center justify-center border-b border-primary/10">
           <ASLogo className="h-12 w-12 text-primary mb-2" />
           <DialogTitle className="text-2xl font-headline text-center">Welcome to AS Trusted</DialogTitle>
           <DialogDescription className="text-center text-foreground/80 mt-1">
-            Unlock exclusive property deals and early-bird access to premium plots in Telangana.
+            Unlock exclusive property deals and early-bird access to premium plots. <br/>
+            <span className="font-bold text-rose-500 mt-2 inline-block">Only for the first 2000 users!</span>
           </DialogDescription>
         </div>
         
@@ -104,10 +105,10 @@ export default function GlobalLeadModal() {
           
           <Button 
             type="submit" 
-            className="w-full bg-primary hover:bg-primary/90 mt-2" 
+            className="w-full bg-primary hover:bg-primary/90 mt-2 font-bold" 
             disabled={isSubmitting || !name || !phone}
           >
-            {isSubmitting ? 'Saving...' : 'Get VIP Access'}
+            {isSubmitting ? 'Saving...' : 'Unlock VIP Access for Free'}
           </Button>
           
           <p className="text-[10px] text-center text-muted-foreground mt-4">
