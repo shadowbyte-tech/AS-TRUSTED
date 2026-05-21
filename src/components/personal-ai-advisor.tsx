@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useChat } from 'ai/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,459 +9,216 @@ import { Input } from '@/components/ui/input';
 import { 
   Bot, 
   Send, 
-  Mic, 
   Sparkles,
   TrendingUp,
   Target,
-  Clock,
-  MapPin,
-  DollarSign,
-  Shield,
-  Lightbulb,
-  Home,
-  Search,
-  Filter,
   BarChart3,
-  AlertTriangle,
-  CheckCircle,
-  MessageSquare,
-  User,
-  Zap
+  Shield,
+  Search,
+  Lightbulb
 } from 'lucide-react';
-
-interface AIMessage {
-  id: string;
-  type: 'user' | 'ai';
-  content: string;
-  timestamp: Date;
-  suggestions?: string[];
-  propertyRecommendations?: any[];
-}
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PersonalAIAdvisorProps {
   userId: string;
-  userPreferences?: {
-    investmentRange: [number, number];
-    preferredLocations: string[];
-    propertyTypes: string[];
-    riskTolerance: 'low' | 'medium' | 'high';
-  };
 }
 
-export function PersonalAIAdvisor({ userId, userPreferences }: PersonalAIAdvisorProps) {
-  const [messages, setMessages] = useState<AIMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+export function PersonalAIAdvisor({ userId }: PersonalAIAdvisorProps) {
+  // Integrate Vercel AI SDK useChat
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, setMessages } = useChat({
+    api: '/api/ai/chat',
+    body: { userId },
+    initialMessages: [
+      {
+        id: 'welcome-1',
+        role: 'assistant',
+        content: `Welcome to the AS Trusted Elite Portal. I am your advanced AI Investment Advisor.\n\nI analyze market trends, predict ROI, and locate high-growth assets tailored to your portfolio goals.\n\nHow can I optimize your real estate strategy today?`,
+      }
+    ]
+  });
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Initialize with welcome message
-    const welcomeMessage: AIMessage = {
-      id: '1',
-      type: 'ai',
-      content: `Hello! I'm your personal AI Property Advisor. I can help you:
-
-🔍 Find the perfect property based on your preferences
-📈 Analyze investment opportunities
-🧮 Calculate ROI projections
-🏆 Compare properties side-by-side
-📊 Track market trends in your areas of interest
-
-Try asking me: "Show me plots under ₹20L near highway" or "Which is safer - Plot A or B?"`,
-      timestamp: new Date(),
-      suggestions: [
-        "Find properties under ₹20L",
-        "Show high-growth areas",
-        "Compare investment options",
-        "Analyze market trends"
-      ]
-    };
-    setMessages([welcomeMessage]);
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const generateAIResponse = async (userMessage: string): Promise<AIMessage> => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    let response = '';
-    let propertyRecommendations: any[] = [];
-    let suggestions: string[] = [];
-
-    // Pattern matching for different query types
-    if (lowerMessage.includes('under') || lowerMessage.includes('below') || lowerMessage.includes('less than')) {
-      const priceMatch = userMessage.match(/₹?(\d+)l/i);
-      if (priceMatch) {
-        const budget = parseInt(priceMatch[1]) * 100000;
-        response = `I found several excellent properties under ₹${priceMatch[1]}L. Based on market analysis, these areas offer the best value in your budget range:
-
-🏆 **Top Recommendations:**
-1. **Kamareddy** - ₹${(budget * 0.8).toLocaleString()} avg, 18% growth potential
-2. **Sircilla** - ₹${(budget * 0.7).toLocaleString()} avg, 22% growth potential  
-3. **Nizamabad** - ₹${(budget * 0.9).toLocaleString()} avg, 15% growth potential
-
-Would you like me to show specific plots in any of these areas?`;
-        suggestions = ["Show Kamareddy plots", "Analyze Sircilla growth", "Compare these areas"];
-      }
-    } else if (lowerMessage.includes('compare') || lowerMessage.includes('better') || lowerMessage.includes('safer')) {
-      response = `I'd be happy to help you compare properties! To give you the most accurate analysis, I'll need:
-
-📋 **Property Details:**
-- Property IDs or locations
-- Your investment budget
-- Investment timeline (1yr, 3yr, 5yr+)
-- Risk preference (conservative/moderate/aggressive)
-
-🔍 **I can compare:**
-- Investment scores & ROI projections
-- Infrastructure development potential
-- Risk factors & legal safety
-- Market appreciation trends
-- Location advantages
-
-Could you share the specific properties you'd like me to analyze?`;
-      suggestions = ["Compare Plot A vs Plot B", "Analyze investment safety", "Show ROI comparison"];
-    } else if (lowerMessage.includes('growth') || lowerMessage.includes('trend') || lowerMessage.includes('hot')) {
-      response = `🔥 **Current Hot Zones for Investment:**
-
-**🥇 #1 Kamareddy Corridor**
-- Growth: 18-22% annually
-- Catalysts: Metro extension, IT park development
-- Entry price: ₹8-15L for plots
-
-**🥈 #2 Sircilla Industrial Belt**  
-- Growth: 20-25% annually
-- Catalysts: New highway, industrial expansion
-- Entry price: ₹6-12L for plots
-
-**🥉 #3 Nizamabad Periphery**
-- Growth: 15-18% annually
-- Catalysts: Infrastructure upgrades, connectivity
-- Entry price: ₹10-20L for plots
-
-📊 **My Recommendation:** Kamareddy offers the best balance of growth potential and infrastructure development for 2024-2025.
-
-Would you like detailed analysis of any specific area?`;
-      suggestions = ["Analyze Kamareddy", "Compare all 3 areas", "Show entry-level options"];
-    } else if (lowerMessage.includes('show') || lowerMessage.includes('find') || lowerMessage.includes('search')) {
-      response = `🔍 I'll help you find the perfect property! Let me know:
-
-💰 **Budget:** What's your investment range?
-📍 **Location:** Any preferred areas?
-🏗️ **Property Type:** Plot, House, or Land?
-⏰ **Timeline:** When are you planning to invest?
-
-**Quick Options I can show:**
-- Best properties under ₹20L
-- Highway-adjacent plots
-- High-growth potential areas
-- Ready-to-build plots
-
-What would you like to explore?`;
-      suggestions = ["Show under ₹20L", "Highway plots", "High growth areas", "Ready to build"];
-    } else {
-      response = `I understand you're interested in property investment. Let me help you make the best decision!
-
-🤖 **What I can do for you:**
-- Find properties matching your exact criteria
-- Analyze investment potential & risks
-- Compare multiple properties side-by-side  
-- Calculate ROI projections with different scenarios
-- Track market trends and infrastructure development
-- Provide personalized recommendations based on your goals
-
-💡 **Try asking me:**
-- "Find plots under ₹15L near highway"
-- "Which area has better growth - Kamareddy or Sircilla?"
-- "Show me properties with 20%+ growth potential"
-- "What's the best investment for ₹25L?"
-
-What specific aspect of property investment would you like to explore?`;
-      suggestions = ["Find investment properties", "Analyze growth areas", "Calculate ROI", "Compare locations"];
-    }
-
-    return {
-      id: Date.now().toString(),
-      type: 'ai',
-      content: response,
-      timestamp: new Date(),
-      suggestions,
-      propertyRecommendations
-    };
-  };
-
-  const handleSendMessage = async () => {
-    if (!input.trim()) return;
-
-    const userMessage: AIMessage = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: input,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsTyping(true);
-
-    try {
-      const aiResponse = await generateAIResponse(input);
-      setMessages(prev => [...prev, aiResponse]);
-      setSuggestions(aiResponse.suggestions || []);
-    } catch (error) {
-      console.error('AI Error:', error);
-      const errorMessage: AIMessage = {
-        id: Date.now().toString(),
-        type: 'ai',
-        content: 'I apologize, but I encountered an error. Please try again or rephrase your question.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const handleVoiceInput = () => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const recognition = new (window as any).webkitSpeechRecognition() || new (window as any).SpeechRecognition();
-      
-      recognition.onstart = () => setIsListening(true);
-      recognition.onend = () => setIsListening(false);
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-      };
-      
-      recognition.start();
-    } else {
-      alert('Voice input is not supported in your browser');
-    }
-  };
+  }, [messages, isLoading]);
 
   const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion);
-  };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    // Vercel useChat doesn't have a direct setInput method exposed that triggers submit automatically.
+    // We simulate a synthetic event for handleInputChange, then submit.
+    const fakeEvent = { target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>;
+    handleInputChange(fakeEvent);
+    
+    // Slight delay to allow state update before submitting
+    setTimeout(() => {
+      const formEvent = new Event('submit', { cancelable: true }) as any;
+      handleSubmit(formEvent);
+    }, 50);
   };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* AI Advisor Header */}
-      <Card className="border-2 border-primary/20 mb-4">
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
+    <div className="h-full flex flex-col bg-background/50 backdrop-blur-xl">
+      {/* Luxury AI Advisor Header */}
+      <Card className="border-b border-white/10 bg-black/40 shadow-2xl backdrop-blur-2xl rounded-none md:rounded-t-xl mb-4">
+        <CardHeader className="py-4">
           <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bot className="h-6 w-6 text-primary animate-pulse" />
-              <span>Personal AI Property Advisor</span>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary blur-md opacity-50 rounded-full animate-pulse"></div>
+                <div className="relative bg-black border border-white/20 p-2 rounded-full">
+                  <Bot className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold tracking-tight text-white">Elite AI Advisor</h3>
+                <p className="text-xs text-zinc-400 font-medium">Bloomberg-Grade Market Intelligence</p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge className="bg-emerald-100 text-emerald-800">
+              <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 backdrop-blur-md">
                 <Sparkles className="h-3 w-3 mr-1" />
-                Online
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                GPT-4 Powered
+                Live Feed
               </Badge>
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-            <div className="p-3 bg-primary/5 rounded-lg">
-              <Target className="h-5 w-5 text-primary mx-auto mb-1" />
-              <div className="text-xs font-medium">Smart Search</div>
+        <CardContent className="pb-4 pt-0">
+          <div className="grid grid-cols-4 gap-2 text-center mt-2">
+            <div className="p-2 bg-white/5 border border-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10 cursor-default">
+              <Target className="h-4 w-4 text-zinc-300 mx-auto mb-1" />
+              <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Predictive</div>
             </div>
-            <div className="p-3 bg-emerald-5 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-emerald-600 mx-auto mb-1" />
-              <div className="text-xs font-medium">ROI Analysis</div>
+            <div className="p-2 bg-white/5 border border-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10 cursor-default">
+              <BarChart3 className="h-4 w-4 text-emerald-400 mx-auto mb-1" />
+              <div className="text-[10px] font-semibold text-emerald-400/80 uppercase tracking-wider">ROI Analysis</div>
             </div>
-            <div className="p-3 bg-blue-5 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-              <div className="text-xs font-medium">Market Trends</div>
+            <div className="p-2 bg-white/5 border border-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10 cursor-default">
+              <TrendingUp className="h-4 w-4 text-blue-400 mx-auto mb-1" />
+              <div className="text-[10px] font-semibold text-blue-400/80 uppercase tracking-wider">Market Data</div>
             </div>
-            <div className="p-3 bg-amber-5 rounded-lg">
-              <Shield className="h-5 w-5 text-amber-600 mx-auto mb-1" />
-              <div className="text-xs font-medium">Risk Assessment</div>
+            <div className="p-2 bg-white/5 border border-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10 cursor-default">
+              <Shield className="h-4 w-4 text-amber-400 mx-auto mb-1" />
+              <div className="text-[10px] font-semibold text-amber-400/80 uppercase tracking-wider">Risk Assessed</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Chat Messages */}
-      <Card className="flex-1 flex flex-col">
-        <CardContent className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-4">
-            {messages.map((message) => (
+      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
+        <AnimatePresence initial={false}>
+          {messages.map((message) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={\`flex \${message.role === 'user' ? 'justify-end' : 'justify-start'}\`}
+            >
               <div
-                key={message.id}
-                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={\`max-w-[85%] rounded-2xl p-4 shadow-sm backdrop-blur-md \${
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                    : 'bg-zinc-900/80 border border-white/10 text-zinc-100 rounded-tl-sm'
+                }\`}
               >
-                <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.type === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
-                >
-                  {message.type === 'ai' && (
-                    <div className="flex items-center gap-2 mb-2">
-                      <Bot className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-medium text-primary">AI Advisor</span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatTime(message.timestamp)}
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className="whitespace-pre-wrap text-sm">
-                    {message.content}
+                {message.role !== 'user' && (
+                  <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
+                    <Sparkles className="h-3 w-3 text-primary" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary">System Response</span>
                   </div>
-                  
-                  {message.suggestions && message.suggestions.length > 0 && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs text-muted-foreground mb-2">Quick suggestions:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {message.suggestions.map((suggestion, index) => (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSuggestionClick(suggestion)}
-                            className="text-xs h-6"
-                          >
-                            {suggestion}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                )}
+                
+                <div className="whitespace-pre-wrap text-sm leading-relaxed font-medium">
+                  {message.content}
                 </div>
               </div>
-            ))}
-            
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg p-3">
-                  <div className="flex items-center gap-2">
-                    <Bot className="h-4 w-4 text-primary animate-pulse" />
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
-                    </div>
-                  </div>
+            </motion.div>
+          ))}
+          
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-start"
+            >
+              <div className="bg-zinc-900/80 border border-white/10 rounded-2xl rounded-tl-sm p-4 shadow-sm backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Analyzing Datasets...</span>
                 </div>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </CardContent>
-      </Card>
+            </motion.div>
+          )}
+
+          {error && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs px-4 py-2 rounded-full backdrop-blur-md">
+                Connection lost. Please try again.
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
+      </div>
 
       {/* Input Area */}
-      <Card className="mt-4">
-        <CardContent className="p-4">
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Ask me anything about property investment..."
-                className="pr-12"
-              />
-              {input.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setInput('')}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                >
-                  ×
-                </Button>
-              )}
-            </div>
-            
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleVoiceInput}
-              className={`relative ${isListening ? 'bg-red-50 text-red-600' : ''}`}
-            >
-              <Mic className="h-4 w-4" />
-              {isListening && (
-                <div className="absolute inset-0 border-2 border-red-400 rounded animate-pulse" />
-              )}
-            </Button>
-            
-            <Button 
-              onClick={handleSendMessage}
-              disabled={!input.trim() || isTyping}
-              className="flex items-center gap-2"
-            >
-              <Send className="h-4 w-4" />
-              Send
-            </Button>
+      <div className="p-4 bg-black/60 border-t border-white/10 backdrop-blur-xl">
+        <form onSubmit={handleSubmit} className="flex gap-3">
+          <div className="flex-1 relative group">
+            <Input
+              value={input}
+              onChange={handleInputChange}
+              disabled={isLoading}
+              placeholder="Ask for high-growth areas, ROI analysis, or budget optimization..."
+              className="pr-12 bg-zinc-900/50 border-white/10 text-white placeholder:text-zinc-500 focus-visible:ring-primary focus-visible:border-primary transition-all rounded-xl h-12"
+            />
           </div>
           
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-2 mt-3">
+          <Button 
+            type="submit"
+            disabled={!input.trim() || isLoading}
+            className="h-12 w-12 rounded-xl shrink-0 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Send className="h-5 w-5 ml-1" />
+          </Button>
+        </form>
+        
+        {/* Elite Quick Prompts */}
+        {messages.length <= 1 && (
+          <div className="flex flex-wrap gap-2 mt-4 justify-center">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setInput("Find properties under ₹20L")}
-              className="text-xs"
+              type="button"
+              onClick={() => handleSuggestionClick("Identify top 3 locations poised for 20%+ capital appreciation next year.")}
+              className="text-[10px] uppercase tracking-wider h-7 bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white rounded-full"
             >
-              <Search className="h-3 w-3 mr-1" />
-              Under ₹20L
+              <TrendingUp className="h-3 w-3 mr-2" />
+              High Appreciation Zones
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setInput("Show high-growth areas")}
-              className="text-xs"
+              type="button"
+              onClick={() => handleSuggestionClick("Generate a risk-adjusted ROI comparison for Kamareddy vs Sircilla.")}
+              className="text-[10px] uppercase tracking-wider h-7 bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white rounded-full"
             >
-              <TrendingUp className="h-3 w-3 mr-1" />
-              Hot Zones
+              <BarChart3 className="h-3 w-3 mr-2" />
+              Compare ROI Risk
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setInput("Compare investment options")}
-              className="text-xs"
+              type="button"
+              onClick={() => handleSuggestionClick("Find off-market distress deals or undervalued plots under ₹15 Lakhs.")}
+              className="text-[10px] uppercase tracking-wider h-7 bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white rounded-full"
             >
-              <BarChart3 className="h-3 w-3 mr-1" />
-              Compare
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setInput("Analyze market trends")}
-              className="text-xs"
-            >
-              <Lightbulb className="h-3 w-3 mr-1" />
-              Analysis
+              <Search className="h-3 w-3 mr-2" />
+              Find Undervalued Deals
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 }

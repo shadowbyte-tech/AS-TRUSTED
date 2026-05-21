@@ -87,103 +87,62 @@ export function AIDecisionEngine({ property, userInvestmentCapacity = 1000000 }:
 
   const analyzeProperty = async () => {
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1200));
     
-    // Deterministic premium analysis logic
-    const infrastructureScore = Math.min(100, Math.max(50, 95 - highwayDist * 3));
-    const locationScore = Math.min(100, Math.max(45, 90 - rrrDist * 1.5));
-    const priceScore = property.price ? Math.max(35, Math.min(95, 100 - (property.price / 150000))) : 70;
-    const developmentScore = Math.round((infrastructureScore + locationScore) / 2);
-    const demandScore = historicalGrowth >= 12 ? 88 : historicalGrowth >= 10 ? 74 : 58;
+    try {
+      const response = await fetch('/api/ai/investment-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          property,
+          highwayDist,
+          rrrDist,
+          historicalGrowth
+        })
+      });
 
-    const overall = Math.round(
-      (infrastructureScore * 0.25 + 
-       locationScore * 0.25 + 
-       priceScore * 0.2 + 
-       developmentScore * 0.15 + 
-       demandScore * 0.15)
-    );
-    
-    // Risk assessment
-    let risk: 'Low' | 'Medium' | 'High' = 'Low';
-    if (overall < 60 || priceScore < 45) risk = 'High';
-    else if (overall < 78 || highwayDist > 10) risk = 'Medium';
-    
-    // Recommendation logic
-    let recommendation: 'BUY_NOW' | 'BUY_SOON' | 'WAIT' | 'AVOID' = 'BUY_SOON';
-    if (overall >= 85 && risk === 'Low') recommendation = 'BUY_NOW';
-    else if (overall >= 70 && risk !== 'High') recommendation = 'BUY_SOON';
-    else if (overall >= 55 && risk === 'Low') recommendation = 'WAIT';
-    else recommendation = 'AVOID';
-    
-    // Growth projections
-    const growthRate = historicalGrowth / 100;
-    const oneYear = Math.floor(propertyPrice * (1 + growthRate));
-    const fiveYears = Math.floor(propertyPrice * Math.pow(1 + growthRate, 5));
-    const tenYears = Math.floor(propertyPrice * Math.pow(1 + growthRate, 10));
-    
-    const insights = [
-      infrastructureScore > 75 ? "🚧 Strong infrastructure development with quick highway access." : "🏗️ Infrastructure development in pipeline.",
-      locationScore > 80 ? "📍 Prime strategic corridor with high connectivity." : "🗺️ Growing suburban location.",
-      priceScore > 70 ? "💰 Competitively priced relative to market average." : "💸 Premium pricing, negotiating margin recommended.",
-      demandScore > 75 ? "🔥 Hot spot with rapid transaction turnaround." : "📊 Steady, stable demand trends."
-    ];
-    
-    const risks = [
-      risk === 'High' ? "⚠️ Sub-average location scores; verify legal titles thoroughly." : "",
-      highwayDist > 10 ? "🛣️ Remote location: distance to National Highway is higher." : "",
-      priceScore < 50 ? "💸 Above market standard. Evaluate plot value details." : ""
-    ].filter(Boolean);
-    
-    const opportunities = [
-      "🎯 Multi-fold appreciation potential in regional expansion plans.",
-      "🛣️ Upcoming Regional Ring Road (RRR) to stimulate connectivity.",
-      "💼 Increasing commercial warehouses in adjacent sectors."
-    ];
-    
-    const analysisText = `
+      if (!response.ok) {
+        throw new Error('Failed to fetch AI score');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.score) {
+        const generatedScore = data.score;
+        
+        // Growth projections
+        const growthRate = generatedScore.growth / 100;
+        const oneYear = Math.floor(propertyPrice * (1 + growthRate));
+        const fiveYears = Math.floor(propertyPrice * Math.pow(1 + growthRate, 5));
+        const tenYears = Math.floor(propertyPrice * Math.pow(1 + growthRate, 10));
+        
+        // Add timeline to score object
+        generatedScore.timeline = { oneYear, fiveYears, tenYears };
+        
+        const analysisText = `
 AI Evaluation Summary for Plot ${property.propertyNumber || 'L-1'}:
 ==============================================
-Overall Investment Score: ${overall}/100
-Recommended Action: ${recommendation.replace('_', ' ')}
-Underlying Risk Profile: ${risk}
+Overall Investment Score: ${generatedScore.overall}/100
+Recommended Action: ${generatedScore.recommendation.replace('_', ' ')}
+Underlying Risk Profile: ${generatedScore.risk}
 
-Appreciation Outlook (CAGR): ${historicalGrowth}%
+Appreciation Outlook (CAGR): ${generatedScore.growth}%
 Projected Returns (Historical Baseline):
 - Current Price: ₹${propertyPrice.toLocaleString()}
-- 1-Year Value:  ₹${oneYear.toLocaleString()} (+${historicalGrowth}%)
+- 1-Year Value:  ₹${oneYear.toLocaleString()} (+${generatedScore.growth}%)
 - 5-Year Value:  ₹${fiveYears.toLocaleString()} (+${Math.round((fiveYears-propertyPrice)/propertyPrice*100)}%)
 - 10-Year Value: ₹${tenYears.toLocaleString()} (+${Math.round((tenYears-propertyPrice)/propertyPrice*100)}%)
-
-Infrastructure rating stands at ${infrastructureScore}/100.
-Location connectivity value rates ${locationScore}/100.
-    `;
-    
-    setAnalysis(analysisText);
-    setScore({
-      overall,
-      growth: historicalGrowth,
-      risk,
-      recommendation,
-      confidence: Math.round(85 - (highwayDist * 0.5) - (rrrDist * 0.3)),
-      factors: {
-        infrastructure: infrastructureScore,
-        location: locationScore,
-        price: Math.round(priceScore),
-        development: developmentScore,
-        demand: demandScore
-      },
-      timeline: {
-        oneYear,
-        fiveYears,
-        tenYears
-      },
-      insights,
-      risks,
-      opportunities
-    });
-    
-    setLoading(false);
+        `;
+        
+        setAnalysis(analysisText);
+        setScore(generatedScore);
+      }
+    } catch (error) {
+      console.error('AI Decision Engine Error:', error);
+      // Fallback if API fails
+      setAnalysis("⚠️ AI Service Unavailable. Please check your API keys in the dashboard.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Interactive Predictor Calculations

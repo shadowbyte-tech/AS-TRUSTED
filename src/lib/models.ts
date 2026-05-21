@@ -271,14 +271,48 @@ const SiteVisitSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ─── SYSTEM SETTINGS SCHEMA ──────────────────────────────────────────────────
+const SystemSettingsSchema = new mongoose.Schema(
+  {
+    key: { type: String, required: true, unique: true, index: true },
+    value: { type: mongoose.Schema.Types.Mixed, required: true },
+    description: { type: String },
+    isSecret: { type: Boolean, default: false }, // For API keys
+  },
+  { timestamps: true }
+);
+
 // ─── EXPORT MODELS ───────────────────────────────────────────────────────────
-export const Property   = model<any>('Property',   PropertySchema);
-export const User       = model<any>('User',        UserSchema);
-export const Password   = model<any>('Password',    PasswordSchema);
-export const Lead       = model<any>('Lead',        LeadSchema);
-export const Inquiry    = model<any>('Inquiry',     InquirySchema);
-export const Contact    = model<any>('Contact',     ContactSchema);
-export const Favorite   = model<any>('Favorite',    FavoriteSchema);
-export const Comparison = model<any>('Comparison',  ComparisonSchema);
-export const AuditLog   = model<any>('AuditLog',    AuditLogSchema);
-export const SiteVisit  = model<any>('SiteVisit',   SiteVisitSchema);
+export const Property       = model<any>('Property',       PropertySchema);
+export const User           = model<any>('User',            UserSchema);
+export const Password       = model<any>('Password',        PasswordSchema);
+export const Lead           = model<any>('Lead',            LeadSchema);
+export const Inquiry        = model<any>('Inquiry',         InquirySchema);
+export const Contact        = model<any>('Contact',         ContactSchema);
+export const Favorite       = model<any>('Favorite',        FavoriteSchema);
+export const Comparison     = model<any>('Comparison',      ComparisonSchema);
+export const AuditLog       = model<any>('AuditLog',        AuditLogSchema);
+export const SiteVisit      = model<any>('SiteVisit',       SiteVisitSchema);
+export const SystemSettings = model<any>('SystemSettings',  SystemSettingsSchema);
+
+// ─── AI MEMORY SCHEMA ────────────────────────────────────────────────────────
+const AIMemorySchema = new mongoose.Schema(
+  {
+    userId: { type: String, required: true, index: true },
+    type: { type: String, enum: ['preference', 'chat_history', 'insight'], required: true },
+    key: { type: String },
+    value: { type: mongoose.Schema.Types.Mixed },
+    messages: [{
+      role: { type: String, enum: ['user', 'assistant', 'system', 'data'] },
+      content: { type: String },
+      timestamp: { type: Date, default: Date.now }
+    }],
+    metadata: { type: mongoose.Schema.Types.Mixed },
+    expiresAt: { type: Date }
+  },
+  { timestamps: true }
+);
+
+AIMemorySchema.index({ userId: 1, type: 1, key: 1 });
+export const AIMemory = model<any>('AIMemory', AIMemorySchema);
+
