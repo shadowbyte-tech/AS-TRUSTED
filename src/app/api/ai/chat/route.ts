@@ -24,7 +24,7 @@ ${CORE_SYSTEM_PROMPT}
 
 USER CONTEXT:
 ${Object.keys(preferences).length > 0 
-  ? \`Known Preferences: \${JSON.stringify(preferences)}\` 
+  ? `Known Preferences: ${JSON.stringify(preferences)}` 
   : 'New user. No saved preferences yet. Ask clarifying questions to learn their budget and goals.'}
 `;
 

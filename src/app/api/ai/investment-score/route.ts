@@ -35,16 +35,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: e.message || 'AI not configured' }, { status: 503 });
     }
 
-    const prompt = \`
+    const prompt = `
 Analyze the following property and its parameters to generate a sophisticated investment score matrix.
-Property Data: \${JSON.stringify(property)}
+Property Data: ${JSON.stringify(property)}
 Manual Parameters:
-- Distance to NH-44: \${highwayDist} km
-- Distance to Regional Ring Road: \${rrrDist} km
-- Base Historical Growth: \${historicalGrowth}%
+- Distance to NH-44: ${highwayDist} km
+- Distance to Regional Ring Road: ${rrrDist} km
+- Base Historical Growth: ${historicalGrowth}%
 
 Based on proptech valuation logic, calculate the scores and provide a comprehensive Bloomberg-style analysis.
-\`;
+`;
 
     const { object } = await generateObject({
       model: model,

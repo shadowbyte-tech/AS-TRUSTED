@@ -112,14 +112,14 @@ export function PersonalAIAdvisor({ userId }: PersonalAIAdvisorProps) {
               key={message.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={\`flex \${message.role === 'user' ? 'justify-end' : 'justify-start'}\`}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={\`max-w-[85%] rounded-2xl p-4 shadow-sm backdrop-blur-md \${
+                className={`max-w-[85%] rounded-2xl p-4 shadow-sm backdrop-blur-md ${
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground rounded-tr-sm'
                     : 'bg-zinc-900/80 border border-white/10 text-zinc-100 rounded-tl-sm'
-                }\`}
+                }`}
               >
                 {message.role !== 'user' && (
                   <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
