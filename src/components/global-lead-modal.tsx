@@ -17,10 +17,11 @@ export default function GlobalLeadModal() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if we've already captured this lead or if they dismissed it recently
+    // Check if we've already captured this lead or if they dismissed it
     const hasCaptured = localStorage.getItem('as_trusted_lead_captured');
+    const hasDismissed = localStorage.getItem('as_trusted_lead_dismissed');
     
-    if (!hasCaptured) {
+    if (!hasCaptured && !hasDismissed) {
       // Show the popup 3 seconds after they visit the website
       const timer = setTimeout(() => {
         setIsOpen(true);
@@ -63,8 +64,8 @@ export default function GlobalLeadModal() {
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      // If they close it without submitting, don't ask again for this session
-      sessionStorage.setItem('as_trusted_lead_dismissed', 'true');
+      // If they close it without submitting, NEVER ask again
+      localStorage.setItem('as_trusted_lead_dismissed', 'true');
     }
   };
 
