@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 
 // Import the ClientWidgets wrapper (standard import is fine because the component itself handles dynamic loading)
 import ClientWidgets from '@/components/client-widgets';
+import AICoPilot from '@/components/ai-copilot';
 
 // Optimized font configuration with display: swap
 const inter = Inter({ 
@@ -200,6 +201,7 @@ export default function RootLayout({
             </div>
             <Toaster />
             <ClientWidgets />
+            <AICoPilot />
           </AuthProvider>
         </ThemeProvider>
         

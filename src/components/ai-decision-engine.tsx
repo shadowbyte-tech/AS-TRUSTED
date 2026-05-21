@@ -19,7 +19,7 @@ import {
   Clock,
   MapPin,
   Building,
-  Road,
+  Route,
   Navigation
 } from 'lucide-react';
 import type { Property } from '@/lib/definitions';
@@ -288,7 +288,7 @@ Projected Returns (Historical Baseline):
             {/* Input Slider 1 */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground font-medium flex items-center gap-1"><Road className="h-4 w-4" /> NH-44 Highway Distance</span>
+                <span className="text-muted-foreground font-medium flex items-center gap-1"><Route className="h-4 w-4" /> NH-44 Highway Distance</span>
                 <span className="text-foreground font-bold">{highwayDist} km</span>
               </div>
               <input 

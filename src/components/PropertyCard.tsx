@@ -22,7 +22,8 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Property } from '@/lib/definitions';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import InquiryModal from './inquiry-modal';
 
 interface PropertyCardProps {
   property: Property;
@@ -48,9 +49,22 @@ function PropertyCard({
   variant = 'default'
 }: PropertyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
   
   const isSelected = wishlist.includes(property.id) || isFavorite;
   const onToggle = onWishlistToggle || onFavorite;
+
+  // Generate stable scarcity tags based on property ID
+  const scarcityTag = React.useMemo(() => {
+    const sum = property.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    const options = [
+      { text: "High Demand", color: "bg-red-500/90 text-white" },
+      { text: `${(sum % 4) + 2} people viewing this`, color: "bg-orange-500/90 text-white" },
+      { text: `Only ${(sum % 3) + 1} plots remaining`, color: "bg-rose-600/90 text-white" }
+    ];
+    // Return null 20% of the time so it's not on EVERY property
+    return sum % 5 === 0 ? null : options[sum % options.length];
+  }, [property.id]);
 
   const getPropertyIcon = () => {
     switch (property.propertyType) {
@@ -158,6 +172,11 @@ function PropertyCard({
                 Premium
               </Badge>
             )}
+            {scarcityTag && (
+              <Badge className={`${scarcityTag.color} border-none shadow-lg animate-pulse backdrop-blur-md`}>
+                {scarcityTag.text}
+              </Badge>
+            )}
           </div>
 
           <div className="absolute top-3 right-3 flex flex-col gap-2">
@@ -210,16 +229,14 @@ function PropertyCard({
               Details <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
-          {onContact && (
-            <Button 
-              size="icon" 
-              variant="outline" 
-              className="rounded-xl border-primary/20 hover:bg-primary/5"
-              onClick={() => onContact(property)}
-            >
-              <Phone className="h-4 w-4 text-primary" />
-            </Button>
-          )}
+          <Button 
+            size="icon" 
+            variant="outline" 
+            className="rounded-xl border-primary/20 hover:bg-primary/5"
+            onClick={() => setIsInquiryModalOpen(true)}
+          >
+            <Phone className="h-4 w-4 text-primary" />
+          </Button>
           {onShare && (
             <Button 
               size="icon" 
@@ -232,6 +249,11 @@ function PropertyCard({
           )}
         </CardFooter>
       </Card>
+      <InquiryModal 
+        isOpen={isInquiryModalOpen} 
+        onClose={() => setIsInquiryModalOpen(false)} 
+        property={property} 
+      />
     </motion.div>
   );
 }

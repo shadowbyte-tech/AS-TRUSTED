@@ -74,7 +74,7 @@ export default function UserLoginForm() {
           // Auto-login
           const loginResult = await login(email, password);
           if (loginResult.success) {
-            router.push('/normal-properties');
+            router.push('/onboarding');
           } else {
             setMode('login');
           }

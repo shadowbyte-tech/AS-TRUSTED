@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
-    const { plotNumber, name, email, message } = body;
+    const { plotNumber, name, email, phone, message } = body;
 
-    if (!plotNumber || !name || !email || !message) {
+    if (!plotNumber || !name || !email || !phone || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const inquiry = await Inquiry.create({ plotNumber, name, email: email.toLowerCase(), message });
-    logger.info(`✅ Inquiry created from ${email}`);
+    const inquiry = await Inquiry.create({ plotNumber, name, email: email.toLowerCase(), phone, message });
+    logger.info(`✅ Inquiry created from ${email} (${phone})`);
 
     return NextResponse.json({ success: true, data: inquiry }, { status: 201 });
   } catch (err) {
