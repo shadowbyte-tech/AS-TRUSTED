@@ -203,8 +203,8 @@ export default function ComparisonTable() {
             </CardHeader>
             <CardContent className="space-y-6 relative z-10">
               <div className="text-center">
-                <div className="text-4xl font-black bg-gradient-to-r from-purple-400 to-amber-400 bg-clip-text text-transparent">₹2000</div>
-                <p className="text-sm text-purple-200/60">One-time payment</p>
+                <div className="text-4xl font-black bg-gradient-to-r from-purple-400 to-amber-400 bg-clip-text text-transparent">₹500</div>
+                <div className="text-sm text-zinc-400 mt-2 font-medium">One-time payment</div>
                 <p className="text-xs text-amber-400 font-medium">15% average ROI achieved</p>
               </div>
               

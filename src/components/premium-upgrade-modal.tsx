@@ -89,9 +89,9 @@ export default function PremiumUpgradeModal({ isOpen, onClose, featureName, feat
               </div>
               <div>
                 <h4 className="font-bold text-purple-200">One-Time Payment</h4>
-                <p className="text-sm text-purple-200/60">
-                  ₹2000 for lifetime access
-                </p>
+                <span className="text-sm text-zinc-400 block mt-1">
+                  ₹500 for lifetime access
+                </span>
               </div>
             </div>
           </div>
