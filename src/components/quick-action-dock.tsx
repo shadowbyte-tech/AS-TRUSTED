@@ -22,7 +22,7 @@ export default function QuickActionDock() {
   };
 
   return (
-    <div className="fixed bottom-6 right-5 z-[9990] md:bottom-8 md:right-8">
+    <div className="fixed bottom-6 left-5 z-[9990] md:bottom-8 md:left-8">
       <AnimatePresence>
         {isOpen && (
           <motion.div

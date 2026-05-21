@@ -184,7 +184,11 @@ const LeadSchema = new mongoose.Schema(
   {
     name:     { type: String, required: true, trim: true },
     phone:    { type: String, required: true, trim: true },
-    email:    { type: String, required: true, lowercase: true, trim: true, index: true },
+    email:    { type: String, lowercase: true, trim: true, index: true },
+    goal:     { type: String },
+    budget:   { type: String },
+    location: { type: String },
+    source:   { type: String, default: 'Website' },
     notes:    { type: String },
     isUnread: { type: Boolean, default: true, index: true },
   },

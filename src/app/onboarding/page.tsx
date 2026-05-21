@@ -7,11 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/components/ui/use-toast';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ASLogo } from '@/components/as-logo';
 
 export default function OnboardingWizard() {
   const [step, setStep] = useState(1);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [budget, setBudget] = useState('');
   const [goal, setGoal] = useState('');
   const [location, setLocation] = useState('');
@@ -19,21 +22,36 @@ export default function OnboardingWizard() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleNext = () => setStep((s) => Math.min(s + 1, 3));
+  const handleNext = () => setStep((s) => Math.min(s + 1, 4));
   const handlePrev = () => setStep((s) => Math.max(s - 1, 1));
 
-  const handleComplete = async () => {
+  const saveLead = async (source: string) => {
     setIsSubmitting(true);
-    // In a real application, you would save these preferences to the user's profile via an API.
-    // For now, we simulate saving preferences.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, goal, budget, location, source: `Onboarding (${source})` })
+      });
+    } catch (e) {
+      console.error(e);
+    }
     setIsSubmitting(false);
-    
+  };
+
+  const handleCompleteWhatsApp = async () => {
+    await saveLead('WhatsApp');
+    const msg = encodeURIComponent(`Hi AS Trusted, I am ${name}. I am looking for a property in ${location} with a budget of ${budget} for ${goal}. Please share options.`);
+    window.open(`https://wa.me/919866404090?text=${msg}`, '_blank');
+    router.push('/normal-properties');
+  };
+
+  const handleCompleteProperties = async () => {
+    await saveLead('Properties Check');
     toast({
       title: "Preferences Saved!",
       description: "We have customized your property feed.",
     });
-    
     router.push('/normal-properties');
   };
 
@@ -49,7 +67,7 @@ export default function OnboardingWizard() {
             <motion.div 
               className="h-full bg-primary" 
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 3) * 100}%` }}
+              animate={{ width: `${(step / 4) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
@@ -62,6 +80,28 @@ export default function OnboardingWizard() {
           <CardContent className="p-8">
             <AnimatePresence mode="wait">
               {step === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6"
+                >
+                  <h3 className="text-lg font-medium text-foreground">A few details so our team can assist you better</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. John Doe" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. 9876543210" className="mt-1" />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {step === 2 && (
                 <motion.div
                   key="step1"
                   initial={{ opacity: 0, x: 20 }}
@@ -91,7 +131,7 @@ export default function OnboardingWizard() {
                 </motion.div>
               )}
 
-              {step === 2 && (
+              {step === 3 && (
                 <motion.div
                   key="step2"
                   initial={{ opacity: 0, x: 20 }}
@@ -121,7 +161,7 @@ export default function OnboardingWizard() {
                 </motion.div>
               )}
 
-              {step === 3 && (
+              {step === 4 && (
                 <motion.div
                   key="step3"
                   initial={{ opacity: 0, x: 20 }}
@@ -153,22 +193,50 @@ export default function OnboardingWizard() {
             </AnimatePresence>
 
             <div className="flex justify-between mt-10">
-              <Button 
-                variant="outline" 
-                onClick={step === 1 ? () => router.push('/normal-properties') : handlePrev}
-                disabled={isSubmitting}
-              >
-                {step === 1 ? 'Skip' : 'Back'}
-              </Button>
+              {step < 4 && (
+                <>
+                  <Button 
+                    variant="outline" 
+                    onClick={step === 1 ? () => router.push('/normal-properties') : handlePrev}
+                    disabled={isSubmitting}
+                  >
+                    {step === 1 ? 'Skip' : 'Back'}
+                  </Button>
+                  <Button 
+                    onClick={handleNext} 
+                    disabled={(step === 1 && (!name || !phone)) || (step === 2 && !goal) || (step === 3 && !budget)}
+                  >
+                    Continue
+                  </Button>
+                </>
+              )}
               
-              {step < 3 ? (
-                <Button onClick={handleNext} disabled={(step === 1 && !goal) || (step === 2 && !budget)}>
-                  Continue
-                </Button>
-              ) : (
-                <Button onClick={handleComplete} disabled={!location || isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Finish Setup'}
-                </Button>
+              {step === 4 && (
+                <div className="w-full space-y-3">
+                  <Button 
+                    onClick={handleCompleteProperties} 
+                    disabled={!location || isSubmitting}
+                    className="w-full bg-primary"
+                  >
+                    {isSubmitting ? 'Saving...' : 'Check Suggested Properties'}
+                  </Button>
+                  <Button 
+                    onClick={handleCompleteWhatsApp} 
+                    disabled={!location || isSubmitting}
+                    variant="outline"
+                    className="w-full border-primary/20 text-primary hover:bg-primary/5"
+                  >
+                    {isSubmitting ? 'Saving...' : 'Continue to WhatsApp for VIP Assistance'}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    onClick={handlePrev}
+                    disabled={isSubmitting}
+                    className="w-full text-sm text-muted-foreground"
+                  >
+                    Back to previous step
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>

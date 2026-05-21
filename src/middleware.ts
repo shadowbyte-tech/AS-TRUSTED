@@ -140,7 +140,7 @@ export async function middleware(request: NextRequest) {
   // ── 3. SECURITY HEADERS ──────────────────────────────────────────────────
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline'${IS_PRODUCTION ? '' : " 'unsafe-eval'"}`,
+    `script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com${IS_PRODUCTION ? '' : " 'unsafe-eval'"}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://lh3.googleusercontent.com https://www.transparenttextures.com https://placehold.co",
     "font-src 'self' https://fonts.gstatic.com",

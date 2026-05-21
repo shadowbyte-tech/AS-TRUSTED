@@ -116,7 +116,7 @@ export default function AICoPilot() {
                     value={input}
                     onChange={handleInputChange}
                   />
-                  <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="rounded-full shadow-md">
+                  <Button type="submit" size="icon" disabled={isLoading || !input?.trim()} className="rounded-full shadow-md">
                     <MessageSquare className="h-4 w-4" />
                   </Button>
                 </form>

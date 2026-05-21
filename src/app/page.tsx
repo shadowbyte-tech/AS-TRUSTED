@@ -17,6 +17,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Plot } from '@/lib/definitions';
+import dynamic from 'next/dynamic';
+
+const TelanganaSeoSection = dynamic(() => import('@/components/telangana-seo-section'), { ssr: true });
+const Testimonials = dynamic(() => import('@/components/testimonials-fixed'), { ssr: true });
+const WhyKamareddy = dynamic(() => import('@/components/why-kamareddy'), { ssr: true });
 
 /* ─── Reusable Animation Components ─────────────────────────────────────── */
 
@@ -1016,9 +1021,11 @@ export default function HomePage() {
             </FadeInUp>
           </div>
         </section>
+        <WhyKamareddy />
+        <Testimonials />
+        <TelanganaSeoSection />
+        <Footer />
       </main>
-
-      <Footer />
     </div>
   );
 }
