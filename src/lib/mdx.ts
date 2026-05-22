@@ -37,7 +37,7 @@ export function getPostBySlug(slug: string): BlogPost {
     date: data.date || new Date().toISOString(),
     author: data.author || 'AS Trusted Experts',
     category: data.category || 'Real Estate',
-    coverImage: data.coverImage || '/images/og-image.jpg',
+    coverImage: data.coverImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop',
     readTime: data.readTime || '5 min read',
     content,
   };
