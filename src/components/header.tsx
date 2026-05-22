@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   CalendarCheck, ChevronDown, LogOut, PanelLeft, MapPin, X,
   LayoutDashboard, UserCheck, MessageSquare, Landmark, Users as UsersIcon, 
-  Settings, FileUp, UserPlus, Crown, UserCog, Menu, ArrowRight
+  Settings, FileUp, UserPlus, Crown, UserCog, Menu, ArrowRight, BookOpen
 } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { ASLogo } from './as-logo';
@@ -25,6 +25,7 @@ const publicNavItems = [
   { href: '/properties', label: 'Properties', icon: MapPin },
   { href: '/about', label: 'About', icon: PanelLeft },
   { href: '/services', label: 'Services', icon: LayoutDashboard },
+  { href: '/blog', label: 'Blog', icon: BookOpen },
   { href: '/book-site-visit', label: 'Site Visit', icon: CalendarCheck },
 ];
 
