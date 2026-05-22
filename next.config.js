@@ -7,6 +7,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
   disable: false,
   workboxOptions: {
     disableDevLogs: true,
+    exclude: [/api\/.*/, /middleware-manifest\.json$/],
   },
 });
 
@@ -59,9 +60,10 @@ const nextConfig = {
               "default-src 'self'",
               `script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com${isDev ? " 'unsafe-eval'" : ''}`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://lh3.googleusercontent.com https://www.transparenttextures.com",
+              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://lh3.googleusercontent.com https://www.transparenttextures.com https://placehold.co https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://api.cloudinary.com https://generativelanguage.googleapis.com",
+              "connect-src 'self' https://api.cloudinary.com https://generativelanguage.googleapis.com https://ep1.adtrafficquality.google https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
+              "frame-src 'self' https://googleads.g.doubleclick.net https://www.youtube.com",
               "frame-ancestors 'none'",
             ].join('; '),
           },
