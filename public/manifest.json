@@ -1,0 +1,21 @@
+{
+  "name": "AS Trusted",
+  "short_name": "AS Trusted",
+  "description": "Premium DTCP approved plots and real estate in Telangana",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A1628",
+  "theme_color": "#0A1628",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

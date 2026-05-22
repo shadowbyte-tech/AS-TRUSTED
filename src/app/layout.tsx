@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import ClientWidgets from '@/components/client-widgets';
 import AICoPilot from '@/components/ai-copilot';
 import GlobalLeadModal from '@/components/global-lead-modal';
+import AppInstallPopup from '@/components/app-install-popup';
 
 // Optimized font configuration with display: swap
 const inter = Inter({ 
@@ -205,6 +206,7 @@ export default function RootLayout({
             <ClientWidgets />
             <AICoPilot />
             <GlobalLeadModal />
+            <AppInstallPopup />
           </AuthProvider>
         </ThemeProvider>
         
