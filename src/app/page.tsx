@@ -22,6 +22,7 @@ import dynamic from 'next/dynamic';
 const TelanganaSeoSection = dynamic(() => import('@/components/telangana-seo-section'), { ssr: true });
 const Testimonials = dynamic(() => import('@/components/testimonials-fixed'), { ssr: true });
 const WhyKamareddy = dynamic(() => import('@/components/why-kamareddy'), { ssr: true });
+const FinancialAssistance = dynamic(() => import('@/components/financial-assistance'), { ssr: true });
 
 /* ─── Reusable Animation Components ─────────────────────────────────────── */
 
@@ -1021,6 +1022,7 @@ export default function HomePage() {
             </FadeInUp>
           </div>
         </section>
+        <FinancialAssistance />
         <WhyKamareddy />
         <Testimonials />
         <TelanganaSeoSection />
