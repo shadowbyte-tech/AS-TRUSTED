@@ -232,9 +232,11 @@ export default function FinancialAssistance() {
                     ))}
                   </ul>
 
-                  <Button className="w-full bg-white/5 hover:bg-gold text-white hover:text-black border border-white/10 hover:border-gold transition-all duration-300">
-                    {service.cta}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                  <Button asChild className="w-full bg-white/5 hover:bg-gold text-white hover:text-black border border-white/10 hover:border-gold transition-all duration-300">
+                    <a href="tel:+919866404090">
+                      {service.cta}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </a>
                   </Button>
                 </CardContent>
               </Card>
@@ -278,9 +280,11 @@ export default function FinancialAssistance() {
 
       {/* Floating Action Button */}
       <div className="fixed bottom-6 right-6 z-50">
-        <Button className="bg-gold hover:bg-gold-light text-black shadow-xl shadow-gold/30 rounded-full px-6 py-6 font-bold flex items-center gap-2 group transition-all duration-300 hover:scale-105">
-          <MessageSquare className="w-5 h-5 group-hover:animate-bounce" />
-          <span className="hidden md:inline">Request Financial Consultation</span>
+        <Button asChild className="bg-gold hover:bg-gold-light text-black shadow-xl shadow-gold/30 rounded-full px-6 py-6 font-bold flex items-center gap-2 group transition-all duration-300 hover:scale-105">
+          <a href="tel:+919866404090">
+            <MessageSquare className="w-5 h-5 group-hover:animate-bounce" />
+            <span className="hidden md:inline">Request Financial Consultation</span>
+          </a>
         </Button>
       </div>
     </section>
