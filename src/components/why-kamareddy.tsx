@@ -145,24 +145,24 @@ export default function WhyKamareddy() {
           
           <div className="grid md:grid-cols-3 gap-6">
             {infrastructure.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg border border-emerald-200 p-6">
+              <div key={item.id} className="bg-white/5 rounded-lg border border-white/10 p-6 hover:border-emerald-500/30 transition-all">
                 <div className="flex items-center gap-4 mb-4">
-                  <item.icon className="w-8 h-8 text-emerald-600" />
+                  <item.icon className="w-8 h-8 text-emerald-400" />
                   <div>
-                    <h4 className="font-medium text-emerald-600">{item.title}</h4>
-                    <p className="text-sm text-gray-600">{item.description}</p>
+                    <h4 className="font-medium text-emerald-400">{item.title}</h4>
+                    <p className="text-sm text-white/70">{item.description}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    item.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 
-                    item.status === 'in-progress' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'
+                    item.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 
+                    item.status === 'in-progress' ? 'bg-amber-500/20 text-amber-400' : 'bg-white/10 text-white/70'
                   }`}>
                     {item.status}
                   </span>
-                  <span className="text-xs text-gray-500">{item.details}</span>
+                  <span className="text-xs text-white/50">{item.details}</span>
                 </div>
-                <div className="mt-2 text-xs text-emerald-600 font-medium">
+                <div className="mt-2 text-xs text-emerald-400 font-medium">
                   {item.impact}
                 </div>
               </div>
@@ -188,18 +188,18 @@ export default function WhyKamareddy() {
 
             <div className="space-y-4">
               {investmentOutlook.map((year, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+                <div key={index} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-all">
                   <div className="flex items-center gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-primary">{year.year}</div>
                     </div>
                     <div>
-                      <p className="font-medium">{year.event}</p>
+                      <p className="font-medium text-white">{year.event}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-emerald-600">{year.impact}</p>
-                    <p className="text-sm text-gray-500">{year.appreciation}</p>
+                    <p className="font-bold text-emerald-400">{year.impact}</p>
+                    <p className="text-sm text-white/50">{year.appreciation}</p>
                   </div>
                 </div>
               ))}
