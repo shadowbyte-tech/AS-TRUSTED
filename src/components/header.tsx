@@ -26,6 +26,7 @@ const publicNavItems = [
   { href: '/about', label: 'About', icon: PanelLeft },
   { href: '/services', label: 'Services', icon: LayoutDashboard },
   { href: '/blog', label: 'Blog', icon: BookOpen },
+  { href: '/financial-services', label: 'Financial Services', icon: Landmark },
   { href: '/book-site-visit', label: 'Site Visit', icon: CalendarCheck },
 ];
 

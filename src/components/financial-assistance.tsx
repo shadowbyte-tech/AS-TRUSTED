@@ -19,6 +19,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
 /* ─── Reusable Animation Components ─────────────────────────────────────── */
 
@@ -119,6 +120,7 @@ export default function FinancialAssistance() {
         'Balance Transfer Support'
       ],
       cta: 'Get Home Loan Assistance',
+      link: '/financial-services#home-loan',
     },
     {
       title: 'Personal Loan Assistance',
@@ -133,6 +135,7 @@ export default function FinancialAssistance() {
         'Trusted Banking Partners'
       ],
       cta: 'Talk to an Advisor',
+      link: '/financial-services#personal-loan',
     },
     {
       title: 'Education Loan Assistance',
@@ -147,6 +150,7 @@ export default function FinancialAssistance() {
         'Simplified Loan Consultation'
       ],
       cta: 'Get Education Loan Support',
+      link: '/financial-services#education-loan',
     }
   ];
 
@@ -233,10 +237,10 @@ export default function FinancialAssistance() {
                   </ul>
 
                   <Button asChild className="w-full bg-white/5 hover:bg-gold text-white hover:text-black border border-white/10 hover:border-gold transition-all duration-300">
-                    <a href="tel:+919866404090">
+                    <Link href={service.link}>
                       {service.cta}
                       <ArrowRight className="w-4 h-4 ml-2" />
-                    </a>
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
