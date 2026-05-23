@@ -270,22 +270,22 @@ export default function FinancialAssistance() {
           </StaggerChildren>
         </div>
 
+        {/* Action Button */}
+        <FadeInUp delay={0.3} className="mt-16 mb-8 flex justify-center">
+          <Button asChild className="bg-gold hover:bg-gold-light text-black shadow-xl shadow-gold/30 rounded-full px-8 py-6 text-lg font-bold flex items-center gap-2 group transition-all duration-300 hover:scale-105">
+            <a href="tel:+919866404090">
+              <MessageSquare className="w-5 h-5 group-hover:animate-bounce" />
+              <span>Request Financial Consultation</span>
+            </a>
+          </Button>
+        </FadeInUp>
+
         {/* Disclaimer */}
-        <FadeInUp delay={0.4} className="mt-16 text-center">
+        <FadeInUp delay={0.4} className="mt-8 text-center">
           <p className="text-xs text-white/40 max-w-2xl mx-auto bg-white/5 py-3 px-6 rounded-full border border-white/10">
             Disclaimer: Loan approvals are subject to eligibility and partner financial institution policies. We provide consultancy and assistance, not direct lending.
           </p>
         </FadeInUp>
-      </div>
-
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button asChild className="bg-gold hover:bg-gold-light text-black shadow-xl shadow-gold/30 rounded-full px-6 py-6 font-bold flex items-center gap-2 group transition-all duration-300 hover:scale-105">
-          <a href="tel:+919866404090">
-            <MessageSquare className="w-5 h-5 group-hover:animate-bounce" />
-            <span className="hidden md:inline">Request Financial Consultation</span>
-          </a>
-        </Button>
       </div>
     </section>
   );
