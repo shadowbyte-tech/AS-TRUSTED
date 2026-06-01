@@ -37,6 +37,9 @@ export function Footer() {
                             </div>
                         </div>
                         <div className="flex space-x-3">
+                            <Link href="https://wa.me/919866404090" target="_blank" className="h-9 w-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-white hover:scale-110 transition-all duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                            </Link>
                             <Link href="https://www.facebook.com/as.trusted.customers?sfnsn=wa" target="_blank" className="h-9 w-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:bg-gold/20 hover:text-gold hover:scale-110 transition-all duration-300">
                                 <Facebook className="h-4 w-4" />
                             </Link>
@@ -55,6 +58,7 @@ export function Footer() {
                                 { href: '/properties', label: 'Properties' },
                                 { href: '/about', label: 'About Us' },
                                 { href: '/services', label: 'Services' },
+                                { href: '/faq', label: 'FAQ' },
                                 { href: '/book-site-visit', label: 'Site Visit' },
                             ].map((link) => (
                                 <li key={link.href}>

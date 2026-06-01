@@ -16,38 +16,30 @@ export interface BlogPost {
 
 const contentDirectory = path.join(process.cwd(), 'src/content/blog');
 
-export function getPostSlugs() {
-  if (!fs.existsSync(contentDirectory)) {
-    fs.mkdirSync(contentDirectory, { recursive: true });
-    return [];
-  }
-  return fs.readdirSync(contentDirectory).filter(file => file.endsWith('.mdx'));
-}
-
 export function getPostBySlug(slug: string): BlogPost {
   const realSlug = slug.replace(/\.mdx$/, '');
   const fullPath = path.join(contentDirectory, `${realSlug}.mdx`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
-
   return {
     slug: realSlug,
-    title: data.title || '',
-    description: data.description || '',
-    date: data.date || new Date().toISOString(),
-    author: data.author || 'AS Trusted Experts',
-    category: data.category || 'Real Estate',
-    coverImage: data.coverImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop',
-    readTime: data.readTime || '5 min read',
+    title: data.title,
+    description: data.description,
+    date: data.date,
+    author: data.author,
+    category: data.category,
+    coverImage: data.coverImage,
+    readTime: data.readTime,
     content,
   };
 }
 
 export function getAllPosts(): BlogPost[] {
-  const slugs = getPostSlugs();
+  if (!fs.existsSync(contentDirectory)) return [];
+  const slugs = fs.readdirSync(contentDirectory);
   const posts = slugs
+    .filter((s) => s.endsWith('.mdx'))
     .map((slug) => getPostBySlug(slug))
-    // sort posts by date in descending order
-    .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
+    .sort((a, b) => (a.date > b.date ? -1 : 1));
   return posts;
 }

@@ -12,6 +12,7 @@ import ClientWidgets from '@/components/client-widgets';
 import AICoPilot from '@/components/ai-copilot';
 import GlobalLeadModal from '@/components/global-lead-modal';
 import AppInstallPopup from '@/components/app-install-popup';
+import Script from 'next/script';
 
 // Optimized font configuration with display: swap
 const inter = Inter({ 
@@ -142,10 +143,11 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
         
         {/* Google AdSense */}
-        <script
+        <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5789918917071865"
           crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
         
         {/* Critical CSS inline */}
