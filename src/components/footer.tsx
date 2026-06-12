@@ -58,6 +58,7 @@ export function Footer() {
                                 { href: '/properties', label: 'Properties' },
                                 { href: '/about', label: 'About Us' },
                                 { href: '/services', label: 'Services' },
+                                { href: '/trust-center', label: 'Trust Center' },
                                 { href: '/faq', label: 'FAQ' },
                                 { href: '/book-site-visit', label: 'Site Visit' },
                             ].map((link) => (

@@ -29,7 +29,7 @@ export default function SecureFuturePage() {
                 Lock Your <span className="text-amber-600">Financial Future</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                In uncertain times, land provides the security that paper assets cannot. Premium members get legally verified plots with guaranteed titles.
+                This page explains the legal checks and ownership review steps we use before a property is presented as a lower-risk option.
               </p>
             </div>
 
@@ -45,22 +45,26 @@ export default function SecureFuturePage() {
               </CardHeader>
               <CardContent className="relative text-center space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                  Every premium plot undergoes 30-point legal verification, title insurance, and escrow protection. Your investment is fortress-secured.
+                  We review documents, site access, and available approvals so buyers can make a more informed decision. No property should be treated as risk-free.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-600 mb-2">30</div>
-                    <div className="text-sm text-muted-foreground">Point Verification</div>
+                    <div className="text-3xl font-bold text-amber-600 mb-2">Docs</div>
+                    <div className="text-sm text-muted-foreground">Title review</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-orange-600 mb-2">100%</div>
-                    <div className="text-sm text-muted-foreground">Title Insurance</div>
+                    <div className="text-3xl font-bold text-orange-600 mb-2">Site</div>
+                    <div className="text-sm text-muted-foreground">Physical inspection</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-emerald-600 mb-2">₹1Cr</div>
-                    <div className="text-sm text-muted-foreground">Protection Cover</div>
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">Risk</div>
+                    <div className="text-sm text-muted-foreground">Buyer evaluation</div>
                   </div>
+                </div>
+
+                <div className="rounded-2xl border border-amber-500/15 bg-amber-500/5 p-4 text-sm leading-6 text-muted-foreground text-left max-w-2xl mx-auto">
+                  Security in real estate comes from careful review, not guarantees. Please verify legal documents and consult qualified professionals before purchase.
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

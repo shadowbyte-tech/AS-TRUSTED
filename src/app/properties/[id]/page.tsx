@@ -621,10 +621,10 @@ export default function PropertyDetailsPage() {
                       <Separator className="bg-white/5" />
                       <div className="flex items-center gap-4 text-emerald-400">
                          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                         <span className="text-sm font-bold uppercase tracking-widest">High Growth Zone</span>
+                         <span className="text-sm font-bold uppercase tracking-widest">Active Development Corridor</span>
                       </div>
                       <p className="text-slate-500 text-xs leading-relaxed">
-                        Strategically located in one of Kamareddy's fastest-appreciating development corridors.
+                        Review the local access roads, title documents, and nearby development before making a purchase decision.
                       </p>
                     </CardContent>
                   </Card>

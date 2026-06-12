@@ -229,7 +229,7 @@ export default function PlotDetailPage() {
                 
                 <div className="prose prose-invert max-w-none">
                   <p className="text-lg text-slate-400 leading-relaxed font-medium">
-                    {plot.description || "This prime residential asset is strategically positioned within the burgeoning Kamareddy investment corridor. Featuring superior connectivity to infrastructure nodes and an impeccable title chain, the property serves as a high-alpha vehicle for wealth preservation and strategic appreciation."}
+                    {plot.description || "This property listing is presented for review purposes. Buyers should verify title documents, access roads, approvals, and surrounding development before making any purchase decision."}
                   </p>
                 </div>
 
@@ -238,13 +238,13 @@ export default function PlotDetailPage() {
                       <div className="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500">
                         <CheckCircle className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-bold text-emerald-400">Title investigation completed by 10/10 legal audit.</span>
+                      <span className="text-sm font-bold text-emerald-400">Review title, approvals, and site access before proceeding.</span>
                    </div>
                    <div className="flex items-center gap-4 p-5 rounded-3xl bg-primary/5 border border-primary/10">
                       <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                         <TrendingUp className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-bold text-primary-foreground/70">Projected yield outperforming neighborhood benchmarks.</span>
+                      <span className="text-sm font-bold text-primary-foreground/70">Compare pricing and holding horizon with nearby listings.</span>
                    </div>
                 </div>
               </div>

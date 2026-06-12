@@ -29,7 +29,7 @@ export default function ExponentialGrowthPage() {
                 Multiply Your <span className="text-purple-600">Wealth</span> Exponentially
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Land appreciation compounds like nothing else. Our strategic locations deliver 3x returns in just 5 years, turning lakhs into crores.
+                This page explains how we think about long holding periods, corridor selection, and the risks that come with any growth-oriented land purchase.
               </p>
             </div>
 
@@ -45,22 +45,26 @@ export default function ExponentialGrowthPage() {
               </CardHeader>
               <CardContent className="relative text-center space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                  Premium members access high-growth corridors where infrastructure, IT parks, and urban expansion create exponential appreciation opportunities.
+                  Growth can happen in some corridors, but the outcome depends on infrastructure, demand, pricing, approvals, and timing. None of those variables are guaranteed.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 mb-2">3x</div>
-                    <div className="text-sm text-muted-foreground">5-Year Returns</div>
+                    <div className="text-3xl font-bold text-purple-600 mb-2">Long</div>
+                    <div className="text-sm text-muted-foreground">Investment horizon</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-pink-600 mb-2">25%</div>
-                    <div className="text-sm text-muted-foreground">Annual Growth</div>
+                    <div className="text-3xl font-bold text-pink-600 mb-2">Corridor</div>
+                    <div className="text-sm text-muted-foreground">Location strength</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-emerald-600 mb-2">∞</div>
-                    <div className="text-sm text-muted-foreground">Compounding Potential</div>
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">Check</div>
+                    <div className="text-sm text-muted-foreground">Risk and budget fit</div>
                   </div>
+                </div>
+
+                <div className="rounded-2xl border border-purple-500/15 bg-purple-500/5 p-4 text-sm leading-6 text-muted-foreground text-left max-w-2xl mx-auto">
+                  Treat growth scenarios as examples, not promises. Always review title, access, and local development plans before making a long-term investment.
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

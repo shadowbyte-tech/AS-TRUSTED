@@ -30,11 +30,11 @@ export default function CapitalTodayTomorrowPage() {
                 Build Your <span className="text-primary">Future</span> Today
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Every smart decision today compounds into tomorrow's fortune. Don't wait for the future—create it now with strategic land investments that appreciate exponentially.
+                This page explains how we think about timing, corridor selection, and due diligence before a buyer decides to move forward.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
               <div className="space-y-8">
                 <Card className="relative overflow-hidden border-primary/20">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10" />
@@ -48,37 +48,67 @@ export default function CapitalTodayTomorrowPage() {
                   </CardHeader>
                   <CardContent className="relative space-y-4">
                     <p className="text-muted-foreground leading-relaxed">
-                      The best time to invest in Telangana's growth corridor is now. Infrastructure projects, IT expansions, and urban development are creating unprecedented appreciation opportunities.
+                      Growth corridors can change quickly. We look at access roads, public infrastructure, and surrounding land use before listing a property as a possible fit.
                     </p>
                     <div className="flex items-center gap-2 text-sm text-primary font-medium">
                       <Shield className="h-4 w-4" />
-                      DTCP Approved Plots
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="relative overflow-hidden border-accent/20">
-                  <div className="absolute inset-0 bg-gradient-to-r from-accent/10 to-primary/10" />
-                  <CardHeader className="relative">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-accent rounded-full flex items-center justify-center">
-                        <Award className="h-5 w-5 text-white" />
-                      </div>
-                      <CardTitle className="text-accent">Proven Returns</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="relative space-y-4">
-                    <p className="text-muted-foreground leading-relaxed">
-                      Historical data shows 15-20% annual returns in strategic locations. Our clients who invested 3 years ago are now sitting on 80% appreciation.
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-accent font-medium">
-                      <Star className="h-4 w-4" />
-                      80% Average ROI
+                      Review approval and title status
                     </div>
                   </CardContent>
                 </Card>
               </div>
+
+              <Card className="relative overflow-hidden border-accent/20">
+                <div className="absolute inset-0 bg-gradient-to-r from-accent/10 to-primary/10" />
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-accent rounded-full flex items-center justify-center">
+                      <Award className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle className="text-accent">Due Diligence</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <p className="text-muted-foreground leading-relaxed">
+                    We review title records, access, nearby development, and practical usability so buyers can compare options with more context.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-accent font-medium">
+                    <Star className="h-4 w-4" />
+                    Compare locations, not slogans
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="relative overflow-hidden border-emerald-500/20">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-primary/10" />
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-emerald-500 rounded-full flex items-center justify-center">
+                      <Target className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle className="text-emerald-600">Decision Checklist</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <p className="text-muted-foreground leading-relaxed">
+                    Use this page as a starting point, then verify documents, visit the site, and review the neighborhood before making any purchase decision.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-emerald-600 font-medium">
+                    <Shield className="h-4 w-4" />
+                    Site visit, documents, and budget fit
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            <Card className="mb-16 border-border/60">
+              <CardContent className="p-6 md:p-8 space-y-4">
+                <h2 className="text-2xl font-bold">Important note</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  This page is informational only. Land values can rise or fall depending on demand, approvals, infrastructure, and local market conditions. No return is guaranteed.
+                </p>
+              </CardContent>
+            </Card>
 
             <PremiumRegistrationForm />
           </div>

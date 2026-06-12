@@ -61,6 +61,24 @@ const AUTH_API_PATHS       = ['/api/auth/login', '/api/auth/register', '/api/aut
 const PUBLIC_API_PREFIXES  = ['/api/properties', '/api/plots', '/api/inquiries', '/api/registrations', '/api/site-visits', '/api/db-status'];
 const OWNER_PATHS          = ['/dashboard', '/owner-portal', '/upload-property', '/upload'];
 const PREMIUM_PATHS        = ['/premium-dashboard'];
+const NOINDEX_PATHS        = [
+  '/login',
+  '/user-login',
+  '/register',
+  '/ai-access',
+  '/ai-dashboard',
+  '/ai-management',
+  '/dashboard',
+  '/owner-portal',
+  '/upload-property',
+  '/upload',
+  '/premium-dashboard',
+  '/premium',
+  '/profile-settings',
+  '/onboarding',
+  '/offline',
+  '/create-user',
+];
 const IS_PRODUCTION        = process.env.NODE_ENV === 'production';
 
 type MiddlewareToken = {
@@ -97,7 +115,7 @@ async function verifyJwt(token?: string): Promise<MiddlewareToken | null> {
     const valid = await crypto.subtle.verify(
       'HMAC',
       key,
-      base64UrlDecode(signaturePart),
+      base64UrlDecode(signaturePart) as BufferSource,
       new TextEncoder().encode(`${headerPart}.${payloadPart}`)
     );
     if (!valid) return null;
@@ -188,6 +206,11 @@ export async function middleware(request: NextRequest) {
   }
   if (isPremiumPath && !['Premium', 'Elite', 'Owner'].includes(session?.role || '')) {
     return NextResponse.redirect(new URL('/normal-properties', request.url));
+  }
+
+  const shouldNoIndex = NOINDEX_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  if (shouldNoIndex) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   }
 
   return response;

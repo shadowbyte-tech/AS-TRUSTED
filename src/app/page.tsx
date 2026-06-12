@@ -713,7 +713,7 @@ export default function HomePage() {
                           />
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">
-                          Based on 15% average annual appreciation
+                          Illustrative example only. Actual appreciation depends on market and property conditions.
                         </p>
                       </div>
 
@@ -723,7 +723,7 @@ export default function HomePage() {
                           Verified Performance
                         </div>
                         <p className="text-xs text-muted-foreground/80">
-                          Average returns based on 500+ verified property investments over the past 12 years.
+                          Example scenarios based on selected property history. Results are not guaranteed.
                         </p>
                       </div>
                     </div>
@@ -800,7 +800,7 @@ export default function HomePage() {
                 { href: '/legacy-wealth', icon: Crown, title: 'Legacy Building', desc: 'Land investments that last generations and create family heritage', color: 'from-emerald-500/20 to-emerald-500/5', border: 'border-emerald-500/20', textColor: 'text-emerald-400' },
                 { href: '/smart-investment', icon: BarChart3, title: 'AI Intelligence', desc: 'Data-driven decisions with AI-powered market insights', color: 'from-blue-500/20 to-blue-500/5', border: 'border-blue-500/20', textColor: 'text-blue-400' },
                 { href: '/secure-future', icon: Shield, title: 'Bank Security', desc: '30-point legal verification with title insurance protection', color: 'from-amber-500/20 to-amber-500/5', border: 'border-amber-500/20', textColor: 'text-amber-400' },
-                { href: '/exponential-growth', icon: TrendingUp, title: '3X Returns', desc: 'Compounding wealth with 25% annual growth potential', color: 'from-purple-500/20 to-purple-500/5', border: 'border-purple-500/20', textColor: 'text-purple-400' },
+                { href: '/exponential-growth', icon: TrendingUp, title: 'Growth Scenario', desc: 'Long-term planning for market-dependent appreciation outcomes', color: 'from-purple-500/20 to-purple-500/5', border: 'border-purple-500/20', textColor: 'text-purple-400' },
                 { href: '/premium-club', icon: Crown, title: 'Elite Club', desc: 'VIP access to exclusive deals and personalized advisory', color: 'from-rose-500/20 to-rose-500/5', border: 'border-rose-500/20', textColor: 'text-rose-400' },
               ].map((box, i) => (
                 <StaggerItem key={i}>
@@ -916,6 +916,10 @@ export default function HomePage() {
                     </Card>
                   </motion.div>
                 </AnimatePresence>
+
+                <p className="mt-6 text-center text-xs text-muted-foreground/70 leading-relaxed">
+                  Testimonials, ROI figures, and example values on this page are shown for context only and should not be treated as a promise of future returns.
+                </p>
 
                 {/* Testimonial Navigation Dots */}
                 <div className="flex justify-center gap-3 mt-8">

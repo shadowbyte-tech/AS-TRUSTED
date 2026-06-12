@@ -29,7 +29,7 @@ export default function SmartInvestmentPage() {
                 Invest with <span className="text-blue-600">Intelligence</span>, Not Emotion
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Data-driven investment decisions beat emotional buying every time. Our AI-powered insights help you identify tomorrow's hotspots today.
+                This page explains the type of market information we review before suggesting a property, including location, access, approvals, and practical demand.
               </p>
             </div>
 
@@ -45,22 +45,26 @@ export default function SmartInvestmentPage() {
               </CardHeader>
               <CardContent className="relative text-center space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                  Premium members access exclusive AI analytics, market predictions, and automated property scoring. Make decisions with surgical precision.
+                  We use data as a decision aid, not as a promise. Final choices still depend on site visits, document checks, and your own investment goals.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600 mb-2">95%</div>
-                    <div className="text-sm text-muted-foreground">Accuracy Rate</div>
+                    <div className="text-3xl font-bold text-blue-600 mb-2">Map</div>
+                    <div className="text-sm text-muted-foreground">Location context</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 mb-2">50+</div>
-                    <div className="text-sm text-muted-foreground">Data Points</div>
+                    <div className="text-3xl font-bold text-purple-600 mb-2">Docs</div>
+                    <div className="text-sm text-muted-foreground">Approval checks</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-emerald-600 mb-2">24/7</div>
-                    <div className="text-sm text-muted-foreground">Market Monitoring</div>
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">Trend</div>
+                    <div className="text-sm text-muted-foreground">Market direction</div>
                   </div>
+                </div>
+
+                <div className="rounded-2xl border border-blue-500/15 bg-blue-500/5 p-4 text-sm leading-6 text-muted-foreground text-left max-w-2xl mx-auto">
+                  AI and analytics can highlight patterns, but they do not guarantee future returns. Treat the output as a research aid, not a substitute for due diligence.
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

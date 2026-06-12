@@ -12,7 +12,7 @@ import ClientWidgets from '@/components/client-widgets';
 import AICoPilot from '@/components/ai-copilot';
 import GlobalLeadModal from '@/components/global-lead-modal';
 import AppInstallPopup from '@/components/app-install-popup';
-import Script from 'next/script';
+import AdSenseLoader from '@/components/adsense-loader';
 
 // Optimized font configuration with display: swap
 const inter = Inter({ 
@@ -142,13 +142,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
         
-        {/* Google AdSense */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5789918917071865"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        <AdSenseLoader />
         
         {/* Critical CSS inline */}
         <style dangerouslySetInnerHTML={{

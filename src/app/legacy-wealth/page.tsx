@@ -29,7 +29,7 @@ export default function LegacyWealthPage() {
                 Build Your <span className="text-emerald-600">Legacy</span> Today
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Land is the only investment that truly lasts generations. Every plot you buy today becomes your family's heritage tomorrow.
+                This page explains how we think about land as a long-term asset, and what buyers should review before treating any plot as a family holding.
               </p>
             </div>
 
@@ -45,22 +45,26 @@ export default function LegacyWealthPage() {
               </CardHeader>
               <CardContent className="relative text-center space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                  Premium members get access to heritage plots with clear titles, strategic locations, and exponential growth potential. Don't just buy land—invest in generations.
+                  Long-term holding only makes sense when the title is clear, the location is practical, and the purchase fits your budget and time horizon.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-emerald-600 mb-2">100%</div>
-                    <div className="text-sm text-muted-foreground">Clear Titles</div>
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">Docs</div>
+                    <div className="text-sm text-muted-foreground">Title and approval review</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">3x</div>
-                    <div className="text-sm text-muted-foreground">Faster Appreciation</div>
+                    <div className="text-3xl font-bold text-primary mb-2">Area</div>
+                    <div className="text-sm text-muted-foreground">Location and access check</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-accent mb-2">∞</div>
-                    <div className="text-sm text-muted-foreground">Generational Value</div>
+                    <div className="text-3xl font-bold text-accent mb-2">Horizon</div>
+                    <div className="text-sm text-muted-foreground">Long-term holding fit</div>
                   </div>
+                </div>
+
+                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/5 p-4 text-sm leading-6 text-muted-foreground text-left max-w-2xl mx-auto">
+                  Important: land is not a guaranteed wealth product. Buyers should review legal documents, tax implications, and the intended holding period before making a decision.
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
