@@ -78,11 +78,11 @@ export default function FeedbackButton() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 left-4 right-4 z-50 sm:bottom-6 sm:left-auto sm:right-6 sm:w-auto">
         <Button
           onClick={() => setIsOpen(true)}
           size="lg"
-          className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg rounded-full px-6 gap-2"
+          className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg rounded-full px-6 gap-2"
         >
           <MessageSquare className="h-5 w-5" />
           <span className="hidden sm:inline">Send Feedback</span>
@@ -92,7 +92,7 @@ export default function FeedbackButton() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)]">
+    <div className="fixed bottom-4 left-4 right-4 z-50 w-auto sm:bottom-6 sm:left-auto sm:right-6 sm:w-96 sm:max-w-[calc(100vw-2rem)]">
       <Card className="shadow-2xl border-primary/20">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -120,13 +120,13 @@ export default function FeedbackButton() {
               </div>
               
               {/* Quick Actions */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {quickActions.map((action, index) => (
                   <Button
                     key={index}
                     variant="outline"
                     size="sm"
-                    className="justify-start gap-2"
+                    className="w-full justify-start gap-2"
                     onClick={() => setFeedback(prev => prev + `[${action.text}] `)}
                   >
                     <Badge className={`${action.color} text-white text-xs`}>
@@ -149,11 +149,11 @@ Example: 'Fix the upload button color' or 'Change the header layout'"
               </div>
               
               {/* Action Buttons */}
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   onClick={handleSubmit}
                   disabled={!feedback.trim() || isSubmitting}
-                  className="flex-1"
+                  className="flex-1 w-full"
                 >
                   {isSubmitting ? (
                     <>
@@ -174,6 +174,7 @@ Example: 'Fix the upload button color' or 'Change the header layout'"
                     // In a real app, this would open file picker
                     alert('Screenshot feature would open file picker here');
                   }}
+                  className="w-full sm:w-auto"
                 >
                   <Camera className="h-4 w-4" />
                 </Button>

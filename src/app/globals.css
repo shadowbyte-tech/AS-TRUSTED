@@ -11,6 +11,15 @@ html, body {
   max-width: 100vw;
 }
 
+img,
+video,
+svg,
+iframe,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
 @layer base {
   :root {
     --background: 0 0% 98%;
@@ -82,6 +91,7 @@ html, body {
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-x: none;
   }
 }
 
@@ -322,5 +332,54 @@ html, body {
       radial-gradient(ellipse at 20% 50%, rgba(212,175,55,0.08) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, rgba(212,175,55,0.05) 0%, transparent 50%),
       radial-gradient(ellipse at 50% 80%, rgba(212,175,55,0.03) 0%, transparent 50%);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
+  main,
+  section,
+  article,
+  aside,
+  nav,
+  header,
+  footer {
+    min-width: 0;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: 1.375rem;
+    line-height: 1.25;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    line-height: 1.35;
+  }
+
+  .section-spacing {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  button,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

@@ -22,7 +22,7 @@ export default function QuickActionDock() {
   };
 
   return (
-    <div className="fixed bottom-6 left-5 z-[9990] md:bottom-8 md:left-8">
+    <div className="fixed bottom-4 right-4 z-[9990] md:bottom-8 md:right-auto md:left-8">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -30,7 +30,7 @@ export default function QuickActionDock() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.96 }}
             transition={{ duration: 0.18 }}
-            className="mb-3 w-[calc(100vw-2.5rem)] max-w-[340px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/95 text-white shadow-2xl shadow-black/50 backdrop-blur-xl"
+            className="mb-3 w-[calc(100vw-2rem)] max-w-[340px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/95 text-white shadow-2xl shadow-black/50 backdrop-blur-xl"
           >
             <div className="border-b border-white/10 bg-white/[0.03] px-4 py-3">
               <div className="flex items-center gap-3">

@@ -549,7 +549,7 @@ What aspect of your property listing would you like help with first?`;
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full w-full min-w-0 flex flex-col">
       {/* AI Assistant Header */}
       <Card className="border-2 border-primary/20 mb-4">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
@@ -570,7 +570,7 @@ What aspect of your property listing would you like help with first?`;
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-center">
             <div className="p-3 bg-primary/5 rounded-lg">
               <Target className="h-5 w-5 text-primary mx-auto mb-1" />
               <div className="text-xs font-medium">Titles</div>
@@ -605,7 +605,7 @@ What aspect of your property listing would you like help with first?`;
               {suggestions.map((suggestion, index) => (
                 <div 
                   key={index}
-                  className="border rounded-lg p-3 cursor-pointer hover:border-primary/50 transition-colors"
+                  className="border rounded-lg p-3 cursor-pointer hover:border-primary/50 transition-colors min-w-0"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -636,12 +636,12 @@ What aspect of your property listing would you like help with first?`;
         <CardContent className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-4">
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
+                  key={message.id}
+                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                <div
+                  className={`max-w-full sm:max-w-[80%] rounded-lg p-3 break-words ${
                     message.type === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
@@ -686,7 +686,7 @@ What aspect of your property listing would you like help with first?`;
       {/* Input Area */}
       <Card className="mt-4">
         <CardContent className="p-4">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1 relative">
               <Input
                 value={input}
@@ -711,7 +711,7 @@ What aspect of your property listing would you like help with first?`;
               variant="outline"
               size="icon"
               onClick={handleVoiceInput}
-              className={`relative ${isListening ? 'bg-red-50 text-red-600' : ''}`}
+              className={`relative w-full sm:w-auto ${isListening ? 'bg-red-50 text-red-600' : ''}`}
             >
               <Mic className="h-4 w-4" />
               {isListening && (
@@ -722,7 +722,7 @@ What aspect of your property listing would you like help with first?`;
             <Button 
               onClick={handleSendMessage}
               disabled={!input.trim() || isTyping}
-              className="flex items-center gap-2"
+              className="flex w-full sm:w-auto items-center justify-center gap-2"
             >
               <Send className="h-4 w-4" />
               Send
@@ -735,7 +735,7 @@ What aspect of your property listing would you like help with first?`;
               variant="outline"
               size="sm"
               onClick={() => setInput("Help me create an attractive title")}
-              className="text-xs"
+              className="text-xs w-full sm:w-auto"
             >
               <Target className="h-3 w-3 mr-1" />
               Title Help
@@ -744,7 +744,7 @@ What aspect of your property listing would you like help with first?`;
               variant="outline"
               size="sm"
               onClick={() => setInput("Write a compelling description")}
-              className="text-xs"
+              className="text-xs w-full sm:w-auto"
             >
               <FileText className="h-3 w-3 mr-1" />
               Description
@@ -753,7 +753,7 @@ What aspect of your property listing would you like help with first?`;
               variant="outline"
               size="sm"
               onClick={() => setInput("What's the best pricing strategy?")}
-              className="text-xs"
+              className="text-xs w-full sm:w-auto"
             >
               <DollarSign className="h-3 w-3 mr-1" />
               Pricing
@@ -762,7 +762,7 @@ What aspect of your property listing would you like help with first?`;
               variant="outline"
               size="sm"
               onClick={() => setInput("What photos should I take?")}
-              className="text-xs"
+              className="text-xs w-full sm:w-auto"
             >
               <Camera className="h-3 w-3 mr-1" />
               Photos

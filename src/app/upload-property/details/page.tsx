@@ -375,14 +375,14 @@ function PropertyDetailsContent() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto p-4">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8 pt-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-8 pt-4 sm:pt-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
             <Button
               variant="ghost"
               onClick={() => router.push('/upload-property/select-type')}
-              className="text-gray-300 hover:text-white hover:bg-white/10 backdrop-blur-sm"
+              className="w-full sm:w-auto text-gray-300 hover:text-white hover:bg-white/10 backdrop-blur-sm"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Type Selection
@@ -391,7 +391,7 @@ function PropertyDetailsContent() {
             <Button
               variant="outline"
               onClick={() => setShowAIAssistant(!showAIAssistant)}
-              className="text-gray-300 border-gray-600 hover:text-white hover:bg-gray-700"
+              className="w-full sm:w-auto text-gray-300 border-gray-600 hover:text-white hover:bg-gray-700"
             >
               {showAIAssistant ? (
                 <>
@@ -426,9 +426,9 @@ function PropertyDetailsContent() {
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Main Form */}
-          <div className={`flex-1 ${showAIAssistant ? 'max-w-4xl' : 'max-w-full'}`}>
+          <div className="flex-1 min-w-0 w-full">
             <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-gray-700 shadow-2xl">
@@ -1029,7 +1029,7 @@ function PropertyDetailsContent() {
 
           {/* AI Assistant Sidebar */}
           {showAIAssistant && (
-            <div className="w-96 flex-shrink-0">
+            <div className="w-full lg:w-96 lg:flex-shrink-0 min-w-0">
               <PropertyListingAIAssistant
                 propertyType={propertyType || 'normal'}
                 onFieldUpdate={handleAIFieldUpdate}
