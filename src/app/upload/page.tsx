@@ -61,6 +61,11 @@ export default function UploadPropertyPage() {
     
     for (const file of files) {
       try {
+        const fileName = file.name.toLowerCase();
+        const isImageType = file.type.startsWith('image/');
+        const isHeicOrHeif = file.type === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif'));
+        if (!isImageType && !isHeicOrHeif) continue;
+
         const formData = new FormData();
         formData.append('file', file);
         
@@ -632,13 +637,13 @@ export default function UploadPropertyPage() {
                     Click to upload or drag and drop
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    PNG, JPG, GIF up to 10MB each
+                    PNG, JPG, WebP, HEIC, HEIF up to 10MB each
                   </p>
                 </div>
                 <input
                   type="file"
                   multiple
-                  accept="image/*"
+                  accept="image/*,.heic,.heif,image/heic,image/heif"
                   onChange={handleImageUpload}
                   className="hidden"
                   id="image-upload"

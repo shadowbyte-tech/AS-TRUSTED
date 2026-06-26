@@ -16,8 +16,20 @@ cloudinary.config({
   secure: true,
 });
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+];
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+
+const getBrowserFriendlyUrl = (secureUrl: string) => {
+  return secureUrl.replace('/upload/', '/upload/f_auto,q_auto/');
+};
 
 export async function POST(request: NextRequest) {
   const authError = await requireOwner(request);
@@ -30,8 +42,11 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, WebP' }, { status: 400 });
+    const lowerName = file.name.toLowerCase();
+    const hasAllowedExtension = ALLOWED_EXTENSIONS.some((extension) => lowerName.endsWith(extension));
+
+    if (!ALLOWED_TYPES.includes(file.type) && !hasAllowedExtension) {
+      return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, WebP, HEIC, HEIF' }, { status: 400 });
     }
     if (file.size > MAX_SIZE_BYTES) {
       return NextResponse.json({ error: 'File too large. Maximum size is 10MB' }, { status: 400 });
@@ -79,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url:       result.secure_url,
+      url:       getBrowserFriendlyUrl(result.secure_url),
       publicId:  result.public_id,
       width:     result.width,
       height:    result.height,

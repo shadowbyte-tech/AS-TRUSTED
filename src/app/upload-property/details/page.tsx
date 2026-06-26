@@ -116,7 +116,10 @@ function PropertyDetailsContent() {
     try {
       for (const file of Array.from(files)) {
         if (formData.images.length + newImages.length >= 5) break;
-        if (!file.type.startsWith('image/')) continue;
+        const fileName = file.name.toLowerCase();
+        const isImageType = file.type.startsWith('image/');
+        const isHeicOrHeif = file.type === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif'));
+        if (!isImageType && !isHeicOrHeif) continue;
 
         const uploadFormData = new FormData();
         uploadFormData.append('file', file);
@@ -815,7 +818,7 @@ function PropertyDetailsContent() {
                   type="file"
                   id="propertyImages"
                   multiple
-                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  accept="image/png, image/jpeg, image/jpg, image/webp, image/heic, image/heif, .heic, .heif"
                   onChange={handleImageUpload}
                   disabled={isUploading}
                   className="hidden"
@@ -834,7 +837,7 @@ function PropertyDetailsContent() {
                   <div>
                     <p className="text-white font-medium">{isUploading ? 'Uploading images...' : 'Click to upload images'}</p>
                     <p className="text-gray-400 text-sm">or drag and drop</p>
-                    <p className="text-gray-500 text-xs mt-1">PNG, JPG, WebP up to 5MB each</p>
+                    <p className="text-gray-500 text-xs mt-1">PNG, JPG, WebP, HEIC, HEIF up to 5MB each</p>
                   </div>
                 </label>
               </div>
