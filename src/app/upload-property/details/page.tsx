@@ -82,23 +82,22 @@ function PropertyDetailsContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showAIAssistant, setShowAIAssistant] = useState(true);
+  const [showAIAssistant, setShowAIAssistant] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth >= 1024;
+  });
 
   useEffect(() => {
     const updateViewport = () => {
-      setIsMobile(window.innerWidth < 1024);
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setShowAIAssistant(!mobile);
     };
 
     updateViewport();
     window.addEventListener('resize', updateViewport);
     return () => window.removeEventListener('resize', updateViewport);
   }, []);
-
-  useEffect(() => {
-    if (isMobile) {
-      setShowAIAssistant(false);
-    }
-  }, [isMobile]);
 
   useEffect(() => {
     if (!propertyType) {
