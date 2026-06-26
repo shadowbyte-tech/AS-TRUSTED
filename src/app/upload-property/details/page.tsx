@@ -37,6 +37,10 @@ function PropertyDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const propertyType = searchParams.get('type') as 'premium' | 'normal' | null;
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.innerWidth < 1024;
+  });
   
   const [formData, setFormData] = useState({
     propertyNumber: '',
@@ -79,6 +83,22 @@ function PropertyDetailsContent() {
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showAIAssistant, setShowAIAssistant] = useState(true);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setShowAIAssistant(false);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     if (!propertyType) {
@@ -391,7 +411,7 @@ function PropertyDetailsContent() {
             <Button
               variant="outline"
               onClick={() => setShowAIAssistant(!showAIAssistant)}
-              className="w-full sm:w-auto text-gray-300 border-gray-600 hover:text-white hover:bg-gray-700"
+              className="hidden lg:inline-flex w-full sm:w-auto text-gray-300 border-gray-600 hover:text-white hover:bg-gray-700"
             >
               {showAIAssistant ? (
                 <>
@@ -1028,7 +1048,7 @@ function PropertyDetailsContent() {
           </div>
 
           {/* AI Assistant Sidebar */}
-          {showAIAssistant && (
+          {!isMobile && showAIAssistant && (
             <div className="w-full lg:w-96 lg:flex-shrink-0 min-w-0">
               <PropertyListingAIAssistant
                 propertyType={propertyType || 'normal'}

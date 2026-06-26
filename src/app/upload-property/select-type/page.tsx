@@ -105,40 +105,40 @@ export default function SelectPropertyTypePage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 sm:py-12">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-amber-400/20 to-orange-500/20 rounded-full mb-6">
-            <Building className="h-8 w-8 text-amber-400" />
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-amber-400/20 to-orange-500/20 rounded-full mb-4 sm:mb-6">
+            <Building className="h-7 w-7 sm:h-8 sm:w-8 text-amber-400" />
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-white via-amber-200 to-white bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6 bg-gradient-to-r from-white via-amber-200 to-white bg-clip-text text-transparent">
             Upload Your Property
           </h1>
           
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
             Choose the perfect property type that best describes your listing and reach the right buyers
           </p>
 
           {/* Stats Bar */}
-          <div className="flex flex-wrap justify-center gap-8 mt-8">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mt-6 sm:mt-8">
             <div className="flex items-center gap-2 text-gray-300">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm">500+ Properties Listed</span>
+              <span className="text-xs sm:text-sm">500+ Properties Listed</span>
             </div>
             <div className="flex items-center gap-2 text-gray-300">
               <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse delay-300"></div>
-              <span className="text-sm">98% Success Rate</span>
+              <span className="text-xs sm:text-sm">98% Success Rate</span>
             </div>
             <div className="flex items-center gap-2 text-gray-300">
               <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse delay-600"></div>
-              <span className="text-sm">24hr Approval</span>
+              <span className="text-xs sm:text-sm">24hr Approval</span>
             </div>
           </div>
         </div>
 
         {/* Property Type Selection */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8 mb-10 sm:mb-12">
           {propertyTypes.map((type, index) => (
             <div
               key={type.id}
@@ -167,9 +167,9 @@ export default function SelectPropertyTypePage() {
                   </div>
                 )}
 
-                <CardHeader className="pb-6">
+                <CardHeader className="pb-5 sm:pb-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`p-4 bg-gradient-to-r ${type.bgGradient} rounded-2xl shadow-lg ${selectedType === type.id ? 'animate-pulse' : ''}`}>
+                    <div className={`p-3 sm:p-4 bg-gradient-to-r ${type.bgGradient} rounded-2xl shadow-lg ${selectedType === type.id ? 'animate-pulse' : ''}`}>
                       <div className="text-white">
                         {type.icon}
                       </div>
@@ -181,24 +181,24 @@ export default function SelectPropertyTypePage() {
                     )}
                   </div>
                   
-                  <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+                  <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                     {type.name}
                   </CardTitle>
                   
-                  <CardDescription className="text-gray-700 text-base leading-relaxed">
+                  <CardDescription className="text-sm sm:text-base text-gray-700 leading-relaxed">
                     {type.description}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="pt-0">
                   {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5 sm:mb-6">
                     {type.stats.map((stat, statIndex) => (
                       <div key={statIndex} className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
-                        <div className={`text-lg font-bold bg-gradient-to-r ${type.bgGradient} bg-clip-text text-transparent`}>
+                        <div className={`text-base sm:text-lg font-bold bg-gradient-to-r ${type.bgGradient} bg-clip-text text-transparent`}>
                           {stat.value}
                         </div>
-                        <div className="text-xs text-gray-600 mt-1">
+                        <div className="text-[11px] sm:text-xs text-gray-600 mt-1">
                           {stat.label}
                         </div>
                       </div>
@@ -207,14 +207,14 @@ export default function SelectPropertyTypePage() {
 
                   {/* Features */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-gray-900 mb-3">Key Features</h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <h4 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Key Features</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {type.features.map((feature, featureIndex) => (
                         <div key={featureIndex} className="flex items-center gap-2 p-2 bg-white/30 rounded-lg backdrop-blur-sm">
                           <div className={`p-1 bg-gradient-to-r ${type.bgGradient} rounded text-white`}>
                             {feature.icon}
                           </div>
-                          <span className="text-sm text-gray-700 font-medium">{feature.text}</span>
+                          <span className="text-xs sm:text-sm text-gray-700 font-medium">{feature.text}</span>
                         </div>
                       ))}
                     </div>
@@ -231,7 +231,7 @@ export default function SelectPropertyTypePage() {
             onClick={handleContinue}
             disabled={!selectedType}
             size="lg"
-            className={`px-12 py-4 text-lg font-bold transition-all duration-300 ${
+            className={`w-full sm:w-auto px-8 sm:px-12 py-4 text-base sm:text-lg font-bold transition-all duration-300 ${
               selectedType === 'premium'
                 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/40'
                 : selectedType === 'normal'
@@ -253,73 +253,73 @@ export default function SelectPropertyTypePage() {
           </Button>
           
           {selectedType && (
-            <p className="mt-4 text-gray-400 text-sm">
+            <p className="mt-4 text-gray-400 text-xs sm:text-sm px-2">
               You'll be redirected to fill in the details for your {selectedType} property
             </p>
           )}
         </div>
 
         {/* Help Section */}
-        <div className="mt-16">
+        <div className="mt-12 sm:mt-16">
           <Card className="max-w-4xl mx-auto bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-gray-700">
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
+            <CardContent className="p-5 sm:p-8">
+              <div className="text-center mb-6 sm:mb-8">
                 <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full mb-4">
-                  <Users className="h-6 w-6 text-blue-400" />
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Not Sure Which Type to Choose?</h3>
-                <p className="text-gray-400">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Not Sure Which Type to Choose?</h3>
+                <p className="text-sm sm:text-base text-gray-400">
                   Here's a quick guide to help you make the right decision
                 </p>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="p-6 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl border border-amber-500/20">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
+                <div className="p-5 sm:p-6 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl border border-amber-500/20">
                   <div className="flex items-center gap-3 mb-4">
-                    <Crown className="h-6 w-6 text-amber-400" />
-                    <h4 className="font-bold text-amber-400 text-lg">Choose Premium if:</h4>
+                    <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-amber-400" />
+                    <h4 className="font-bold text-amber-400 text-base sm:text-lg">Choose Premium if:</h4>
                   </div>
                   <ul className="space-y-3 text-gray-300">
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Property value greater than 50 Lakhs</span>
+                      <span className="text-sm">Property value greater than 50 Lakhs</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Located in prime, high-demand areas</span>
+                      <span className="text-sm">Located in prime, high-demand areas</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Has premium amenities and facilities</span>
+                      <span className="text-sm">Has premium amenities and facilities</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Target high-end buyers and investors</span>
+                      <span className="text-sm">Target high-end buyers and investors</span>
                     </li>
                   </ul>
                 </div>
                 
-                <div className="p-6 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-500/20">
+                <div className="p-5 sm:p-6 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-500/20">
                   <div className="flex items-center gap-3 mb-4">
-                    <Building2 className="h-6 w-6 text-blue-400" />
-                    <h4 className="font-bold text-blue-400 text-lg">Choose Standard if:</h4>
+                    <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
+                    <h4 className="font-bold text-blue-400 text-base sm:text-lg">Choose Standard if:</h4>
                   </div>
                   <ul className="space-y-3 text-gray-300">
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Property value between 10-50 Lakhs</span>
+                      <span className="text-sm">Property value between 10-50 Lakhs</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Standard but essential amenities</span>
+                      <span className="text-sm">Standard but essential amenities</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Target budget-conscious buyers</span>
+                      <span className="text-sm">Target budget-conscious buyers</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Quick listing and processing needed</span>
+                      <span className="text-sm">Quick listing and processing needed</span>
                     </li>
                   </ul>
                 </div>
