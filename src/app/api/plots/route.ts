@@ -32,7 +32,12 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .lean();
 
-    return NextResponse.json({ success: true, data: plots, total, page, pages: Math.ceil(total / limit) });
+    const mappedPlots = plots.map((plot: any) => ({
+      ...plot,
+      id: plot._id?.toString(),
+    }));
+
+    return NextResponse.json({ success: true, data: mappedPlots, total, page, pages: Math.ceil(total / limit) });
   } catch (err) {
     logger.error('GET /api/plots failed', err);
     return NextResponse.json({ error: 'Failed to fetch plots' }, { status: 500 });
