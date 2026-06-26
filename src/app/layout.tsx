@@ -9,7 +9,6 @@ import dynamic from 'next/dynamic';
 
 // Import the ClientWidgets wrapper (standard import is fine because the component itself handles dynamic loading)
 import ClientWidgets from '@/components/client-widgets';
-import AICoPilot from '@/components/ai-copilot';
 import GlobalLeadModal from '@/components/global-lead-modal';
 import AppInstallPopup from '@/components/app-install-popup';
 import AdSenseLoader from '@/components/adsense-loader';
@@ -200,7 +199,6 @@ export default function RootLayout({
             </div>
             <Toaster />
             <ClientWidgets />
-            <AICoPilot />
             <GlobalLeadModal />
             <AppInstallPopup />
           </AuthProvider>

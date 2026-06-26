@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Image as ImageIcon, Home, Trees, Building, Plus, X, Brain } from 'lucide-react';
+import { Upload, Image as ImageIcon, Home, Trees, Building, Plus, X } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import type { PropertyType } from '@/lib/definitions';
@@ -25,9 +25,6 @@ export default function UploadPropertyPage() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [newAmenity, setNewAmenity] = useState('');
-  const [aiDescription, setAiDescription] = useState('');
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  
   const [formData, setFormData] = useState({
     propertyType: 'Plot' as PropertyType,
     title: '',
@@ -100,50 +97,6 @@ export default function UploadPropertyPage() {
 
   const removeAmenity = (index: number) => {
     setAmenities(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const generateAIDescription = async () => {
-    if (!formData.propertyType || !formData.location || !formData.price || !formData.size) {
-      alert('Please fill in property type, location, price, and size first.');
-      return;
-    }
-
-    // Check if user has AI access
-    if (user?.role !== 'Owner' && user?.role !== 'Premium') {
-      alert('AI features require Premium access. Upgrade to Premium to use AI generation.');
-      router.push('/ai-access');
-      return;
-    }
-
-    setIsGeneratingAI(true);
-    try {
-      const response = await fetch('/api/ai-generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'property-description',
-          propertyDescription: `${formData.propertyType} in ${formData.location}, ${formData.size}, priced at ₹${formData.price}`,
-          location: formData.location,
-          price: parseFloat(formData.price) || 0,
-          userEmail: user?.email || ''
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setAiDescription(result.result);
-        setFormData(prev => ({ ...prev, description: result.result }));
-        alert('AI description generated successfully!');
-      } else {
-        const errorData = await response.json();
-        alert(`AI generation failed: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error('AI generation error:', error);
-      alert('Error generating AI description. Please try again.');
-    } finally {
-      setIsGeneratingAI(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -382,26 +335,6 @@ export default function UploadPropertyPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <Label htmlFor="description">Description *</Label>
-                  {(user?.role === 'Owner' || user?.role === 'Premium') && (
-                    <Button
-                      type="button"
-                      onClick={generateAIDescription}
-                      disabled={isGeneratingAI}
-                      className="ml-2 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg border-0"
-                    >
-                      {isGeneratingAI ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
-                          Generating...
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <Brain className="h-4 w-4" />
-                          AI Generate
-                        </div>
-                      )}
-                    </Button>
-                  )}
                 </div>
                 <Textarea
                   id="description"
@@ -411,12 +344,6 @@ export default function UploadPropertyPage() {
                   rows={4}
                   required
                 />
-                {aiDescription && (
-                  <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                    <p className="text-sm text-green-800 font-medium">AI Generated:</p>
-                    <p className="text-sm text-green-700">{aiDescription}</p>
-                  </div>
-                )}
               </div>
 
               <div>
