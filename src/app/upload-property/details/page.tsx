@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { PropertyListingAIAssistant } from '@/components/property-listing-ai-assistant';
 import { 
   ArrowLeft, 
   Upload, 
@@ -19,9 +18,6 @@ import {
   IndianRupee,
   CheckCircle,
   AlertCircle,
-  Zap,
-  Bot,
-  Sparkles
 } from 'lucide-react';
 
 const getBasePropertyType = (type: string): 'Plot' | 'House' | 'Land' => {
@@ -37,10 +33,6 @@ function PropertyDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const propertyType = searchParams.get('type') as 'premium' | 'normal' | null;
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return window.innerWidth < 1024;
-  });
   
   const [formData, setFormData] = useState({
     propertyNumber: '',
@@ -80,24 +72,7 @@ function PropertyDetailsContent() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showAIAssistant, setShowAIAssistant] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth >= 1024;
-  });
-
-  useEffect(() => {
-    const updateViewport = () => {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
-      setShowAIAssistant(!mobile);
-    };
-
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-    return () => window.removeEventListener('resize', updateViewport);
-  }, []);
 
   useEffect(() => {
     if (!propertyType) {
@@ -180,73 +155,6 @@ function PropertyDetailsContent() {
     }));
   };
 
-
-  const handleAIFieldUpdate = (field: string, value: string) => {
-    handleInputChange(field, value);
-  };
-
-  const generateAIDescription = async () => {
-    if (!formData.propertyType || !formData.villageName || !formData.areaName || !formData.price) {
-      setErrors({ 
-        generate: 'Please fill in property type, location, and price first' 
-      });
-      return;
-    }
-
-    setIsGeneratingDescription(true);
-    setErrors(prev => ({ ...prev, generate: '' }));
-
-    try {
-      // Extract features from form data
-      const features = [];
-      
-      if (formData.propertyType === 'Plot') {
-        if (formData.plotSize) features.push(`Plot size: ${formData.plotSize}`);
-        if (formData.plotFacing) features.push(`Facing: ${formData.plotFacing}`);
-        if (formData.pricePerSqft) features.push(`Price per sqft: ${formData.pricePerSqft}`);
-      } else if (formData.propertyType === 'House') {
-        if (formData.houseSize) features.push(`House size: ${formData.houseSize}`);
-        if (formData.bedrooms) features.push(`${formData.bedrooms} bedrooms`);
-        if (formData.bathrooms) features.push(`${formData.bathrooms} bathrooms`);
-        if (formData.furnished) features.push('Fully furnished');
-        if (formData.parking) features.push('Parking available');
-      } else if (formData.propertyType === 'Land') {
-        if (formData.landSize) features.push(`Land size: ${formData.landSize}`);
-        if (formData.landType) features.push(`Land type: ${formData.landType}`);
-        if (formData.roadAccess) features.push('Road access available');
-        if (formData.waterConnection) features.push('Water connection');
-        if (formData.electricityConnection) features.push('Electricity connection');
-      }
-
-      const response = await fetch('/api/ai/generate-description', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          propertyType: formData.propertyType,
-          villageName: formData.villageName,
-          areaName: formData.areaName,
-          price: parseFloat(formData.price),
-          features
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setFormData(prev => ({ ...prev, description: result.description }));
-      } else {
-        throw new Error('Failed to generate description');
-      }
-    } catch (error) {
-      console.error('AI generation error:', error);
-      setErrors({ 
-        generate: error instanceof Error ? error.message : 'Failed to generate AI description' 
-      });
-    } finally {
-      setIsGeneratingDescription(false);
-    }
-  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -407,23 +315,6 @@ function PropertyDetailsContent() {
               Back to Type Selection
             </Button>
             
-            <Button
-              variant="outline"
-              onClick={() => setShowAIAssistant(!showAIAssistant)}
-              className="hidden lg:inline-flex w-full sm:w-auto text-gray-300 border-gray-600 hover:text-white hover:bg-gray-700"
-            >
-              {showAIAssistant ? (
-                <>
-                  <Bot className="mr-2 h-4 w-4" />
-                  Hide AI Assistant
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Show AI Assistant
-                </>
-              )}
-            </Button>
           </div>
           
           <div className="text-center">
@@ -445,10 +336,8 @@ function PropertyDetailsContent() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Main Form */}
-          <div className="flex-1 min-w-0 w-full">
-            <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="w-full">
+          <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-gray-700 shadow-2xl">
             <CardHeader className="pb-6">
@@ -544,41 +433,15 @@ function PropertyDetailsContent() {
                   <Label htmlFor="description" className="text-gray-300 font-medium">
                     Property Description
                   </Label>
-                  <Button
-                    type="button"
-                    onClick={generateAIDescription}
-                    disabled={isGeneratingDescription || !formData.propertyType || !formData.villageName || !formData.areaName || !formData.price}
-                    variant="outline"
-                    size="sm"
-                    className="text-gray-300 border-gray-600 hover:text-white hover:bg-gray-700 hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isGeneratingDescription ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="h-4 w-4 mr-2" />
-                        AI Generate
-                      </>
-                    )}
-                  </Button>
                 </div>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Describe your property in detail - include key features, amenities, location advantages, etc. (Or use AI Generate above!)"
+                  placeholder="Describe your property in detail - include key features, amenities, location advantages, etc."
                   rows={4}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 resize-none"
                 />
-                {errors.generate && (
-                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.generate}
-                  </p>
-                )}
                 {formData.description && (
                   <p className="text-gray-400 text-xs mt-1">
                     {formData.description.length} characters
@@ -1044,18 +907,6 @@ function PropertyDetailsContent() {
             </Button>
           </div>
         </form>
-          </div>
-
-          {/* AI Assistant Sidebar */}
-          {!isMobile && showAIAssistant && (
-            <div className="w-full lg:w-96 lg:flex-shrink-0 min-w-0">
-              <PropertyListingAIAssistant
-                propertyType={propertyType || 'normal'}
-                onFieldUpdate={handleAIFieldUpdate}
-                currentData={formData}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
